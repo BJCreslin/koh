@@ -1,4 +1,4 @@
-package ru.cbr.koh.panes_storage.panes.profile;
+package ru.cbr.koh.panes_storage.panels.profile;
 
 /**
  * Прфоиль

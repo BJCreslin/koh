@@ -1,11 +1,12 @@
-package ru.cbr.koh.panes_storage.panes;
+package ru.cbr.koh.panes_storage.panels;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
-import ru.cbr.koh.panes_storage.panes.profile.ProfilePanel;
+import ru.cbr.koh.panes_storage.panels.permission.PermissionPanel;
+import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
 
 import javax.swing.*;
 
-public class PermissionPane implements PaneInterface {
+public class PermissionMigrationPanel implements PaneInterface {
 
     @Override
     public String getTitle() {
@@ -17,7 +18,9 @@ public class PermissionPane implements PaneInterface {
         JTabbedPane nestedTabbedPane = new JTabbedPane();
         ProfilePanel profilePanel = new ProfilePanel();
         nestedTabbedPane.addTab(profilePanel.getTitle(), profilePanel.createPanel());
-        nestedTabbedPane.addTab("Nested Tab 2", createPanel("Content in Nested Tab 2"));
+
+        PermissionPanel permissionPanel = new PermissionPanel();
+        nestedTabbedPane.addTab(permissionPanel.getTitle(), permissionPanel.createPanel());
         return nestedTabbedPane;
     }
 

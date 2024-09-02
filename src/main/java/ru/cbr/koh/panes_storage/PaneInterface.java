@@ -1,4 +1,10 @@
-package ru.cbr.koh.panes;
+package ru.cbr.koh.panes_storage;
+
+import javax.swing.*;
 
 public interface PaneInterface {
+
+    String getTitle();
+
+    JComponent createPanel();
 }
