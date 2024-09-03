@@ -4,11 +4,7 @@ package ru.cbr.koh.panes_storage.panels.profile;
  * Прфоиль
  */
 public enum Profile {
-    CURATOR_CO1(1, "Куратор КО1"),
     BUSINESS_ADMIN_CO(2, "Бизнес администратор КО"),
-    OLD_BUSINESS_ANALYST_GIBR(3, "Бизнес-аналитик ГИБР"),
-    OLD_EMPLOYEE_SAR(5, "Сотрудник САР"),
-    OLD_REGIONAL_CURATOR(6, "Региональный куратор"),
     REGIONAL_CURATOR(10, "Региональный куратор"),
     EMPLOYEE_SAR(11, "Сотрудник САР"),
     AUDITOR(12, "Аудитор"),
