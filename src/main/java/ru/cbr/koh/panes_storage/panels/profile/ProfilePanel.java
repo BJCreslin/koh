@@ -23,7 +23,7 @@ public class ProfilePanel implements PaneInterface {
     }
 
     @Override
-    public JComponent createPanel() {
+    public JComponent createPanel(JFrame frame) {
 
         JPanel checkBoxPanel = new JPanel();
         checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.Y_AXIS));

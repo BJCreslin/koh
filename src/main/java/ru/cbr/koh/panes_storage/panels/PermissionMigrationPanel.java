@@ -14,13 +14,13 @@ public class PermissionMigrationPanel implements PaneInterface {
     }
 
     @Override
-    public JComponent createPanel() {
+    public JComponent createPanel(JFrame frame) {
         JTabbedPane nestedTabbedPane = new JTabbedPane();
         ProfilePanel profilePanel = new ProfilePanel();
-        nestedTabbedPane.addTab(profilePanel.getTitle(), profilePanel.createPanel());
+        nestedTabbedPane.addTab(profilePanel.getTitle(), profilePanel.createPanel(frame));
 
         PermissionPanel permissionPanel = new PermissionPanel();
-        nestedTabbedPane.addTab(permissionPanel.getTitle(), permissionPanel.createPanel());
+        nestedTabbedPane.addTab(permissionPanel.getTitle(), permissionPanel.createPanel(frame));
         return nestedTabbedPane;
     }
 

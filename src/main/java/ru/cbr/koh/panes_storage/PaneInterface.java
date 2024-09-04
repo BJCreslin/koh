@@ -6,5 +6,5 @@ public interface PaneInterface {
 
     String getTitle();
 
-    JComponent createPanel();
+    JComponent createPanel(JFrame frame);
 }

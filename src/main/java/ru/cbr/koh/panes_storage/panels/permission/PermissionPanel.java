@@ -6,8 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PermissionPanel implements PaneInterface {
+
+    private static final List<PermissionDialogObject> dataList = new ArrayList<>();
+
+    private PermissionDialogObject lastPermission;
 
     @Override
     public String getTitle() {
@@ -15,76 +21,146 @@ public class PermissionPanel implements PaneInterface {
     }
 
     @Override
-    public JComponent createPanel() {
-        // Создание панели для группы элементов
+    public JComponent createPanel(JFrame frame) {
         JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        // Кнопки для добавления новых паннелей
-        JButton addButton = new JButton("Add Components");
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                JPanel newPanel = createComponentPanel();
-//                panel.add(newPanel);
-                panel.add(Box.createVerticalStrut(10)); // Добавление разделителя между группами
-                panel.add(new JSeparator()); // Разделительная линия
-                panel.add(Box.createVerticalStrut(10));
-                panel.repaint();
-            }
-        });
-        panel.add(addButton, BorderLayout.SOUTH);
+        JButton openDialogButton = new JButton("Add Permission");
+        openDialogButton.addActionListener(new OpenDialogActionListener(frame, panel));
+        panel.add(openDialogButton);
+        drawLine(panel);
         return panel;
-
     }
 
-    private JPanel createComponentPanel() {
-    JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    private class OpenDialogActionListener implements ActionListener {
+        private final JFrame parentFrame;
+        private final JPanel panel;
 
-    // Добавление метки Key и текстового поля
-    JLabel labelKey = new JLabel("Key", SwingConstants.CENTER);
-        panel.add(labelKey);
-    JTextField textFieldKey = new JTextField();
-        panel.add(textFieldKey);
+        public OpenDialogActionListener(JFrame parentFrame, JPanel panel) {
+            this.parentFrame = parentFrame;
+            this.panel = panel;
+        }
 
-        panel.add(Box.createVerticalStrut(10)); // Разделение
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JDialog dialog = new JDialog(parentFrame, "Add new Permission");
+            dialog.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(5, 5, 5, 5);
+            int y = 0;
 
-    // Добавление выпадающего списка
-    JComboBox<PermissionType> comboBox = new JComboBox<>(PermissionType.values());
-        panel.add(comboBox);
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("Key:"), gbc);
+            JTextField keyField = new JTextField(20);
+            if (lastPermission != null && lastPermission.getKey() != null) {
+                keyField.setText(lastPermission.getKey());
+            }
+            gbc.gridx = 1;
+            dialog.add(keyField, gbc);
 
-        panel.add(Box.createVerticalStrut(10)); // Разделение
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("Permission Type:"), gbc);
+            JComboBox<PermissionType> comboBox = new JComboBox<>(PermissionType.values());
+            if (lastPermission == null) {
+                comboBox.setSelectedIndex(1);
+            } else {
+                comboBox.setSelectedIndex(lastPermission.getPermissionType().ordinal());
+            }
+            gbc.gridx = 1;
+            dialog.add(comboBox, gbc);
 
-    // Добавление метки и текстового поля для abacPermPresGroupAction
-        panel.add(createLabelAndTextField("abacPermPresGroupAction"));
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("abacPermPresGroupAction:"), gbc);
+            JTextField groupActionField = new JTextField(20);
+            if (lastPermission != null && lastPermission.getGroupAction() != null) {
+                groupActionField.setText(lastPermission.getGroupAction());
+            }
+            gbc.gridx = 1;
+            dialog.add(groupActionField, gbc);
 
-        panel.add(Box.createVerticalStrut(10)); // Разделение
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("abacPermPresUserAction:"), gbc);
+            JTextField userActionField = new JTextField(20);
+            if (lastPermission != null && lastPermission.getUserAction() != null) {
+                userActionField.setText(lastPermission.getUserAction());
+            }
+            gbc.gridx = 1;
+            dialog.add(userActionField, gbc);
 
-    // Добавление метки и текстового поля для abacPermPresUserAction
-        panel.add(createLabelAndTextField("abacPermPresUserAction"));
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("name:"), gbc);
+            JTextField nameField = new JTextField(20);
+            if (lastPermission != null && lastPermission.getName() != null) {
+                nameField.setText(lastPermission.getName());
+            }
+            gbc.gridx = 1;
+            dialog.add(nameField, gbc);
 
-        panel.add(Box.createVerticalStrut(10)); // Разделение
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(new JLabel("description:"), gbc);
+            JTextField descriptionField = new JTextField(20);
+            if (lastPermission != null && lastPermission.getDescription() != null) {
+                descriptionField.setText(lastPermission.getDescription());
+            }
+            gbc.gridx = 1;
+            dialog.add(descriptionField, gbc);
 
-    // Добавление метки и текстового поля для name
-        panel.add(createLabelAndTextField("name"));
+            JButton saveButton = new JButton("Save");
+            saveButton.addActionListener(e1 -> {
+                PermissionDialogObject obj = new PermissionDialogObject(
+                        keyField.getText(),
+                        (PermissionType) comboBox.getSelectedItem(),
+                        groupActionField.getText(),
+                        userActionField.getText(),
+                        nameField.getText(),
+                        descriptionField.getText()
+                );
+                lastPermission = obj;
+                dataList.add(obj);
+                drawAddedPermission(panel, obj);
+                dialog.dispose();
+            });
+            gbc.gridx = 1;
+            gbc.gridy = y++;
+            dialog.add(saveButton, gbc);
 
-        panel.add(Box.createVerticalStrut(10)); // Разделение
+            dialog.pack();
+            dialog.setLocationRelativeTo(parentFrame);
+            dialog.setVisible(true);
+        }
 
-    // Добавление метки и текстового поля для description
-        panel.add(createLabelAndTextField("description"));
+        private void drawAddedPermission(JPanel panel, PermissionDialogObject addedPermission) {
+            JLabel newLabel = new JLabel(addedPermission.toString());
+            panel.add(newLabel);
 
-        return panel;
-}
+            drawLine(panel);
 
-private JPanel createLabelAndTextField(String labelText) {
-    JPanel panel = new JPanel();
-    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    JLabel label = new JLabel(labelText, SwingConstants.CENTER);
-    panel.add(label);
-    JTextField textField = new JTextField();
-    panel.add(textField);
-    return panel;
-}
+            panel.revalidate(); // Обновляем панель
+            panel.repaint(); // Перерисовываем панель
+        }
+    }
+
+    private void drawLine(JPanel panel) {
+        // Добавляем разделительную линию
+        JPanel linePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.BLACK);
+                g.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
+            }
+
+            @Override
+            public Dimension getPreferredSize() {
+                return new Dimension(panel.getWidth(), 10);
+            }
+        };
+        panel.add(linePanel);
+    }
 }
 

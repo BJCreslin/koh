@@ -1,4 +1,4 @@
-package ru.cbr.koh;
+package ru.cbr.koh.main_window;
 
 import ru.cbr.koh.panes_storage.PanelsHolder;
 import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
@@ -22,7 +22,7 @@ public class MainWindow {
 
         PanelsHolder panelsHolder = new PanelsHolder();
 
-        panelsHolder.getPanels().forEach(it -> tabbedPane.addTab(it.getTitle(), it.createPanel()));
+        panelsHolder.getPanels().forEach(it -> tabbedPane.addTab(it.getTitle(), it.createPanel(frame)));
 
         frame.add(tabbedPane);
         frame.setVisible(true);
