@@ -41,4 +41,13 @@ public enum Profile {
     public String getDisplayName() {
         return name;
     }
+
+    public static Profile getProfileByName(String name) {
+        for (Profile profile : Profile.values()) {
+            if (profile.getName().equals(name)) {
+                return profile;
+            }
+        }
+        return null;
+    }
 }

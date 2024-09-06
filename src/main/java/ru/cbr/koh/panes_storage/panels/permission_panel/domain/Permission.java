@@ -5,6 +5,8 @@ import ru.cbr.koh.panes_storage.panels.permission_panel.PermissionDialogObject;
 import ru.cbr.koh.panes_storage.panels.permission_panel.PermissionType;
 import ru.cbr.koh.panes_storage.panels.profile.Profile;
 
+import java.util.List;
+
 public class Permission {
 
     private static final String PREFIX = "urn:%s:attr:01:subject:";
@@ -25,7 +27,7 @@ public class Permission {
 
     private final String abacPermPresUserAction;
 
-    private final Profile[] profiles;
+    private final List<Profile> profiles;
 
     private final boolean koPermission;
 
@@ -36,7 +38,7 @@ public class Permission {
                       String abacPermPresGroupAction,
                       String abacPermPresUserAction,
                       String name,
-                      Profile[] profiles,
+                      List<Profile> profiles,
                       String description) {
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
@@ -59,6 +61,16 @@ public class Permission {
                 object.getUserAction(),
                 object.getName(),
                 null,
+                object.getDescription());
+    }
+
+    public Permission(PermissionDialogObject object, List<Profile> profiles) {
+        this(object.getKey(),
+                object.getPermissionType(),
+                object.getGroupAction(),
+                object.getUserAction(),
+                object.getName(),
+                profiles,
                 object.getDescription());
     }
 
@@ -100,7 +112,7 @@ public class Permission {
         return abacPermPresGroupAction;
     }
 
-    public Profile[] getProfiles() {
+    public List<Profile> getProfiles() {
         return profiles;
     }
 
@@ -116,18 +128,19 @@ public class Permission {
         return description;
     }
 
+
     @Override
     public String toString() {
         return
-                "parent=" + parent + "\n" +
-                "type=" + type + "\n" +
-                "name=" + name + "\n" +
-                "relKey=" + relKey + "\n" +
-                "key=" + key + "\n" +
-                "abacPermPresAttrCode=" + abacPermPresAttrCode + "\n" +
-                "abacPermPresGroupAction=" + abacPermPresGroupAction + "\n" +
-                "abacPermPresUserAction=" + abacPermPresUserAction + "\n" +
-                "koPermission=" + koPermission + "\n" +
-                "description=" + description + "\n";
+                "parent= " + parent + "\n" +
+                "type= " + type + "\n" +
+                "name= " + name + "\n" +
+                "relKey= " + relKey + "\n" +
+                "key= " + key + "\n" +
+                "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
+                "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
+                "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
+                "koPermission= " + koPermission + "\n" +
+                "description= " + description + "\n";
     }
 }

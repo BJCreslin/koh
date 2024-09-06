@@ -17,6 +17,15 @@ public class ProfilePanel implements PaneInterface {
 
     private static final String FILE_NAME = "selectedCheckboxes.txt";
 
+    public static List<Profile> getCheckedProfiles() {
+        if (checkBoxList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return checkBoxList.stream().map(JCheckBox::getText)
+                .map(Profile::getProfileByName)
+                .toList();
+    }
+
     @Override
     public String getTitle() {
         return "Profiles";

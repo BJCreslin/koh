@@ -2,6 +2,9 @@ package ru.cbr.koh.panes_storage.panels.permission_panel;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_panel.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission_panel.domain.base_clases.ChangeLog;
+import ru.cbr.koh.panes_storage.panels.profile.Profile;
+import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +19,14 @@ public class PermissionPanel implements PaneInterface {
 
     private PermissionDialogObject lastPermission;
 
+    private static final String KEY_TEXT = "collateral_conclusion";
+
+    private static final String AUTHOR = "KreslinVYu";
+
+    private static final String STORY_NUMBER = "DOSIE-11982 (12083)";
+
+    private static final String TAB_NAME = "Заключения САР по залоговым объектам";
+
     @Override
     public String getTitle() {
         return "Permission";
@@ -24,12 +35,40 @@ public class PermissionPanel implements PaneInterface {
     @Override
     public JComponent createPanel(JFrame frame) {
         JPanel panel = new JPanel();
+
         JButton openDialogButton = new JButton("Add Permission");
         openDialogButton.addActionListener(new OpenDialogActionListener(frame, panel));
         panel.add(openDialogButton);
+
+        JButton createMigrationButton = new JButton("Create Migration");
+        createMigrationButton.addActionListener(new CreateMigrationActionListener(frame, panel));
+        panel.add(createMigrationButton);
+
         drawLine(panel);
         return panel;
     }
+
+    private class CreateMigrationActionListener implements ActionListener {
+        private final JFrame parentFrame;
+        private final JPanel panel;
+
+        public CreateMigrationActionListener(JFrame parentFrame, JPanel panel) {
+            this.parentFrame = parentFrame;
+            this.panel = panel;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            List<Profile> profiles = ProfilePanel.getCheckedProfiles();
+            List<Permission> permissions =
+                    dataList.stream().map(it -> new Permission(it, profiles)).toList();
+
+            ChangeLog changeLog = new ChangeLog(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME, permissions);
+            changeLog.create();
+        }
+    }
+
 
     private class OpenDialogActionListener implements ActionListener {
         private final JFrame parentFrame;
