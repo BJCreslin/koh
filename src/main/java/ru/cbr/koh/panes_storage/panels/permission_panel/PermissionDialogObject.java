@@ -1,4 +1,4 @@
-package ru.cbr.koh.panes_storage.panels.permission;
+package ru.cbr.koh.panes_storage.panels.permission_panel;
 
 /**
  * Класс хранения данных о диалоге выбора данных пермишнов

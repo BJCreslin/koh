@@ -1,6 +1,7 @@
-package ru.cbr.koh.panes_storage.panels.permission;
+package ru.cbr.koh.panes_storage.panels.permission_panel;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
+import ru.cbr.koh.panes_storage.panels.permission_panel.domain.Permission;
 
 import javax.swing.*;
 import java.awt.*;
@@ -129,14 +130,27 @@ public class PermissionPanel implements PaneInterface {
             gbc.gridy = y++;
             dialog.add(saveButton, gbc);
 
+            JButton canselButton = new JButton("Cansel");
+            canselButton.addActionListener(e1 -> {
+                dialog.dispose();
+            });
+            gbc.gridx = 2;
+            dialog.add(canselButton, gbc);
+
             dialog.pack();
             dialog.setLocationRelativeTo(parentFrame);
             dialog.setVisible(true);
         }
 
         private void drawAddedPermission(JPanel panel, PermissionDialogObject addedPermission) {
-            JLabel newLabel = new JLabel(addedPermission.toString());
-            panel.add(newLabel);
+            Permission permission = new Permission(addedPermission);
+
+            JTextArea textArea = new JTextArea(10, 30);
+            textArea.setText(permission.toString());
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setEditable(false);
+            panel.add(textArea);
 
             drawLine(panel);
 
