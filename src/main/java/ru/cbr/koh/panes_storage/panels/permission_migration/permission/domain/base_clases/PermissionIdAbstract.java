@@ -1,4 +1,4 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain.base_clases;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

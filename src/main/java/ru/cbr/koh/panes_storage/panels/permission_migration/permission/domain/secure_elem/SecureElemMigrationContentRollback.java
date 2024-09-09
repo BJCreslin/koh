@@ -1,7 +1,7 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain.secure_elem;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem;
 
 
-import ru.cbr.koh.panes_storage.panels.permission.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

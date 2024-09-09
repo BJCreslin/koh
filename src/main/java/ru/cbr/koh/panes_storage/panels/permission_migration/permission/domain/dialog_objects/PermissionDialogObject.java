@@ -1,6 +1,6 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain.dialog_objects;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects;
 
-import ru.cbr.koh.panes_storage.panels.permission.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.PermissionType;
 
 /**
  * Класс хранения данных о диалоге выбора данных пермишнов

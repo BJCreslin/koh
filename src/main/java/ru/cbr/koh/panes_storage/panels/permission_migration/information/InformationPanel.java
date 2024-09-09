@@ -1,7 +1,7 @@
-package ru.cbr.koh.panes_storage.panels.information;
+package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
-import ru.cbr.koh.panes_storage.panels.information.domain.Information;
+import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.properties.PropertiesService;
 
 import javax.swing.*;

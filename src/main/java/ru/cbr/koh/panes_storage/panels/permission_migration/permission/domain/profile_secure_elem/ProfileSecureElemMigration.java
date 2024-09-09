@@ -1,8 +1,8 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain.profile_secure_elem;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem;
 
 
-import ru.cbr.koh.panes_storage.panels.permission.domain.Permission;
-import ru.cbr.koh.panes_storage.panels.profile.Profile;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 public class ProfileSecureElemMigration {
 

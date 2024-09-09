@@ -1,12 +1,12 @@
-package ru.cbr.koh.panes_storage.panels.permission;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
-import ru.cbr.koh.panes_storage.panels.information.InformationPanel;
-import ru.cbr.koh.panes_storage.panels.permission.domain.Permission;
-import ru.cbr.koh.panes_storage.panels.permission.domain.base_clases.ChangeLog;
-import ru.cbr.koh.panes_storage.panels.permission.domain.dialog_objects.PermissionDialogObject;
-import ru.cbr.koh.panes_storage.panels.profile.Profile;
-import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
+import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects.PermissionDialogObject;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
 import ru.cbr.koh.utils.JPanelUtils;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-package ru.cbr.koh.panes_storage.panels.information.domain;
+package ru.cbr.koh.panes_storage.panels.permission_migration.information.domain;
 
 import java.io.Serializable;
 

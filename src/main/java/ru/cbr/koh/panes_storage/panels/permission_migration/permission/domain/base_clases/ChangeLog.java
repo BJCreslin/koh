@@ -1,14 +1,14 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain.base_clases;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases;
 
 
-import ru.cbr.koh.panes_storage.panels.information.domain.Information;
-import ru.cbr.koh.panes_storage.panels.permission.domain.Permission;
-import ru.cbr.koh.panes_storage.panels.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContent;
-import ru.cbr.koh.panes_storage.panels.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContentRollback;
-import ru.cbr.koh.panes_storage.panels.permission.domain.profile_secure_elem.ProfileSecureElemPermissionId;
-import ru.cbr.koh.panes_storage.panels.permission.domain.secure_elem.SecureElemMigrationContent;
-import ru.cbr.koh.panes_storage.panels.permission.domain.secure_elem.SecureElemMigrationContentRollback;
-import ru.cbr.koh.panes_storage.panels.permission.domain.secure_elem.SecureElemPermissionId;
+import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContent;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContentRollback;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemPermissionId;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContent;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContentRollback;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemPermissionId;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

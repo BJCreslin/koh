@@ -1,9 +1,9 @@
-package ru.cbr.koh.panes_storage.panels.permission.domain;
+package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain;
 
 
-import ru.cbr.koh.panes_storage.panels.permission.domain.dialog_objects.PermissionDialogObject;
-import ru.cbr.koh.panes_storage.panels.permission.PermissionType;
-import ru.cbr.koh.panes_storage.panels.profile.Profile;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects.PermissionDialogObject;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.util.List;
 

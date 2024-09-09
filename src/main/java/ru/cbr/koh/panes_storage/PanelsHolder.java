@@ -1,6 +1,6 @@
 package ru.cbr.koh.panes_storage;
 
-import ru.cbr.koh.panes_storage.panels.PermissionMigrationPanel;
+import ru.cbr.koh.panes_storage.panels.permission_migration.PermissionMigrationPanel;
 
 import java.util.ArrayList;
 import java.util.List;
