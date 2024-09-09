@@ -1,6 +1,7 @@
 package ru.cbr.koh.main_window;
 
 import ru.cbr.koh.panes_storage.PanelsHolder;
+import ru.cbr.koh.panes_storage.panels.information.InformationPanel;
 import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
 import ru.cbr.koh.properties.PropertiesService;
 
@@ -31,6 +32,7 @@ public class MainWindow {
             @Override
             public void windowClosing(WindowEvent e) {
                 ProfilePanel.saveCheckBoxesFile();
+                InformationPanel.setInformation();
                 System.exit(0);
             }
         });

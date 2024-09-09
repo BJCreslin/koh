@@ -1,7 +1,10 @@
 package ru.cbr.koh.properties;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class PropertiesService {
@@ -20,16 +23,27 @@ public class PropertiesService {
     private int horizontalSize;
     private int verticalSize;
     private String title;
+    private String author;
+    private String storyNumber;
+    private String storyName;
+    private String storyKey;
 
 
     public PropertiesService() {
         Properties properties = new Properties();
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
-            properties.load(in);
-            this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal"));
-            this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical"));
-            this.title = properties.getProperty("window.title");
+            assert in != null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+                properties.load(reader);
+                this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal"));
+                this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical"));
+                this.title = properties.getProperty("window.title");
 
+                this.author = properties.getProperty("story.author");
+                this.storyNumber = properties.getProperty("story.number");
+                this.storyName = properties.getProperty("story.name");
+                this.storyKey = properties.getProperty("story.key");
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -45,5 +59,21 @@ public class PropertiesService {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getStoryNumber() {
+        return storyNumber;
+    }
+
+    public String getStoryName() {
+        return storyName;
+    }
+
+    public String getStoryKey() {
+        return storyKey;
     }
 }

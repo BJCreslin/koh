@@ -1,4 +1,4 @@
-package ru.cbr.koh.panes_storage.panels.permission_panel;
+package ru.cbr.koh.panes_storage.panels.permission;
 
 public enum PermissionType {
 

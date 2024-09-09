@@ -1,7 +1,7 @@
-package ru.cbr.koh.panes_storage.panels.permission_panel.domain.profile_secure_elem;
+package ru.cbr.koh.panes_storage.panels.permission.domain.profile_secure_elem;
 
 
-import ru.cbr.koh.panes_storage.panels.permission_panel.domain.base_clases.PermissionIdAbstract;
+import ru.cbr.koh.panes_storage.panels.permission.domain.base_clases.PermissionIdAbstract;
 
 public class ProfileSecureElemPermissionId extends PermissionIdAbstract {
 

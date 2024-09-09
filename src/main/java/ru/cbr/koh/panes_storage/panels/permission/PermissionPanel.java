@@ -1,10 +1,13 @@
-package ru.cbr.koh.panes_storage.panels.permission_panel;
+package ru.cbr.koh.panes_storage.panels.permission;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
-import ru.cbr.koh.panes_storage.panels.permission_panel.domain.Permission;
-import ru.cbr.koh.panes_storage.panels.permission_panel.domain.base_clases.ChangeLog;
+import ru.cbr.koh.panes_storage.panels.information.InformationPanel;
+import ru.cbr.koh.panes_storage.panels.permission.domain.Permission;
+import ru.cbr.koh.panes_storage.panels.permission.domain.base_clases.ChangeLog;
+import ru.cbr.koh.panes_storage.panels.permission.domain.dialog_objects.PermissionDialogObject;
 import ru.cbr.koh.panes_storage.panels.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.profile.ProfilePanel;
+import ru.cbr.koh.utils.JPanelUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,14 +21,6 @@ public class PermissionPanel implements PaneInterface {
     private static final List<PermissionDialogObject> dataList = new ArrayList<>();
 
     private PermissionDialogObject lastPermission;
-
-    private static final String KEY_TEXT = "collateral_conclusion";
-
-    private static final String AUTHOR = "KreslinVYu";
-
-    private static final String STORY_NUMBER = "DOSIE-11982 (12083)";
-
-    private static final String TAB_NAME = "Заключения САР по залоговым объектам";
 
     @Override
     public String getTitle() {
@@ -44,7 +39,7 @@ public class PermissionPanel implements PaneInterface {
         createMigrationButton.addActionListener(new CreateMigrationActionListener(frame, panel));
         panel.add(createMigrationButton);
 
-        drawLine(panel);
+        JPanelUtils.drawLine(panel);
         return panel;
     }
 
@@ -64,7 +59,7 @@ public class PermissionPanel implements PaneInterface {
             List<Permission> permissions =
                     dataList.stream().map(it -> new Permission(it, profiles)).toList();
 
-            ChangeLog changeLog = new ChangeLog(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME, permissions);
+            ChangeLog changeLog = new ChangeLog(InformationPanel.getInformation(), permissions);
             changeLog.create();
         }
     }
@@ -191,29 +186,11 @@ public class PermissionPanel implements PaneInterface {
             textArea.setEditable(false);
             panel.add(textArea);
 
-            drawLine(panel);
+            JPanelUtils.drawLine(panel);
 
             panel.revalidate(); // Обновляем панель
             panel.repaint(); // Перерисовываем панель
         }
-    }
-
-    private void drawLine(JPanel panel) {
-        // Добавляем разделительную линию
-        JPanel linePanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                g.setColor(Color.BLACK);
-                g.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
-            }
-
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(panel.getWidth(), 10);
-            }
-        };
-        panel.add(linePanel);
     }
 }
 
