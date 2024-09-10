@@ -1,6 +1,7 @@
 package ru.cbr.koh.main_window;
 
 import ru.cbr.koh.panes_storage.PanelsHolder;
+import ru.cbr.koh.panes_storage.panels.logger_proxy.LoggerProxyPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
 import ru.cbr.koh.properties.PropertiesService;
@@ -33,6 +34,7 @@ public class MainWindow {
             public void windowClosing(WindowEvent e) {
                 ProfilePanel.saveCheckBoxesFile();
                 InformationPanel.setInformation();
+                LoggerProxyPanel.saveDossierKoDirectory();
                 System.exit(0);
             }
         });

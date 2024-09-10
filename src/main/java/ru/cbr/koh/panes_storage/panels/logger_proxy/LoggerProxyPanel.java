@@ -1,12 +1,29 @@
 package ru.cbr.koh.panes_storage.panels.logger_proxy;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
+import ru.cbr.koh.panes_storage.panels.logger_proxy.service.SpyService;
+import ru.cbr.koh.panes_storage.panels.logger_proxy.service.SpyServiceImpl;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class LoggerProxyPanel implements PaneInterface {
+
+    private static final String FILE_NAME = "logger.txt";
+
+    private static final JTextField dossierKoProjectField = new JTextField();
+
+    private final SpyService spyService;
+
+    public LoggerProxyPanel() {
+        spyService = new SpyServiceImpl();
+    }
 
     @Override
     public String getTitle() {
@@ -24,10 +41,10 @@ public class LoggerProxyPanel implements PaneInterface {
         label.setFont(new Font("Arial", Font.BOLD, 24));
         panel.add(label);
 
-        JTextField textField = new JTextField();
-        textField.setMaximumSize(new Dimension(Integer.MAX_VALUE, textField.getPreferredSize().height));
+        dossierKoProjectField.setMaximumSize(new Dimension(Integer.MAX_VALUE, dossierKoProjectField.getPreferredSize().height));
+        dossierKoProjectField.setText(getDossierKoDirectory());
         panel.add(Box.createVerticalStrut(10));
-        panel.add(textField);
+        panel.add(dossierKoProjectField);
 
         ImageIcon originalIcon = new ImageIcon("images.png");
         Image scaledImage = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
@@ -43,7 +60,7 @@ public class LoggerProxyPanel implements PaneInterface {
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int option = fileChooser.showOpenDialog(frame);
             if (option == JFileChooser.APPROVE_OPTION) {
-                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                dossierKoProjectField.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         });
 
@@ -62,6 +79,7 @@ public class LoggerProxyPanel implements PaneInterface {
         toggleButton.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 toggleButton.setText("ON");
+                setLoggerProxy();
             } else {
                 toggleButton.setText("OFF");
             }
@@ -71,5 +89,36 @@ public class LoggerProxyPanel implements PaneInterface {
         panel.add(toggleButton);
 
         return panel;
+    }
+
+    private void setLoggerProxy() {
+        String dossierKoDirectory = dossierKoProjectField.getText();
+        if (dossierKoDirectory.isEmpty() || Files.notExists(Paths.get(dossierKoDirectory)) || !Files.isDirectory(Paths.get(dossierKoDirectory))) {
+            return;
+        }
+        spyService.addLoggerProxy(dossierKoDirectory);
+
+    }
+
+    private String getDossierKoDirectory() {
+        Path path = Paths.get(FILE_NAME);
+        if (Files.exists(path)) {
+            try {
+                return Files.readAllLines(path).get(0);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return "Choose a Dossier Ko Directory: D:\\javaproject\\ko";
+    }
+
+    public static void saveDossierKoDirectory() {
+        if (dossierKoProjectField != null && !dossierKoProjectField.getText().isEmpty()) {
+            try (FileWriter writer = new FileWriter(FILE_NAME)) {
+                writer.write(dossierKoProjectField.getText());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

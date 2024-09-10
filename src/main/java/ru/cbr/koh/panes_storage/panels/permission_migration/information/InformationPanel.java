@@ -183,6 +183,5 @@ public class InformationPanel implements PaneInterface {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
