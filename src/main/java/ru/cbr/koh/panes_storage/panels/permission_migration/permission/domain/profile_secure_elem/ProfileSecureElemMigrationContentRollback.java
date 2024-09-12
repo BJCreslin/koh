@@ -4,6 +4,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.p
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProfileSecureElemMigrationContentRollback {
@@ -24,7 +25,7 @@ public class ProfileSecureElemMigrationContentRollback {
 
     private final String content;
 
-    public ProfileSecureElemMigrationContentRollback(Permission[] permissions) {
+    public ProfileSecureElemMigrationContentRollback(List<Permission> permissions) {
 
         StringBuilder result = new StringBuilder();
         for (Permission permission : permissions) {

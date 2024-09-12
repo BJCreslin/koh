@@ -1,6 +1,9 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects;
 
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
+
+import java.util.List;
 
 /**
  * Класс хранения данных о диалоге выбора данных пермишнов
@@ -19,13 +22,16 @@ public class PermissionDialogObject {
 
     private String description;
 
-    public PermissionDialogObject(String key, PermissionType permissionType, String groupAction, String userAction, String name, String description) {
+    private List<TreeType> treeType;
+
+    public PermissionDialogObject(String key, PermissionType permissionType, String groupAction, String userAction, String name, String description, List<TreeType> treeType) {
         this.key = key;
         this.permissionType = permissionType;
         this.groupAction = groupAction;
         this.userAction = userAction;
         this.name = name;
         this.description = description;
+        this.treeType = treeType;
     }
 
     public String getKey() {
@@ -52,6 +58,10 @@ public class PermissionDialogObject {
         return description;
     }
 
+    public List<TreeType> getTreeType() {
+        return treeType;
+    }
+
     @Override
     public String toString() {
         return """
@@ -61,6 +71,7 @@ public class PermissionDialogObject {
                 ", userAction='" + userAction + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", treeType=" + treeType +
                 """;
     }
 }

@@ -3,20 +3,20 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.s
 
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class SecureElemMigrationContent {
 
-    private final Permission[] permissions;
+    private final List<? extends Permission> permissions;
 
-    public SecureElemMigrationContent(Permission[] permissions) {
+    public SecureElemMigrationContent(List<? extends Permission> permissions) {
         this.permissions = permissions;
     }
 
     @Override
     public String toString() {
-        return Arrays.stream(permissions).toList().stream()
+        return permissions.stream()
                 .map(SecureElemMigration::new)
                 .map(SecureElemMigration::toString)
                 .collect(Collectors.joining());

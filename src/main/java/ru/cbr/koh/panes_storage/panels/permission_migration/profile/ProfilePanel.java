@@ -21,7 +21,10 @@ public class ProfilePanel implements PaneInterface {
         if (checkBoxList.isEmpty()) {
             return Collections.emptyList();
         }
-        return checkBoxList.stream().map(JCheckBox::getText)
+        return checkBoxList.stream()
+                .filter(Objects::nonNull)
+                .filter(AbstractButton::isSelected)
+                .map(JCheckBox::getText)
                 .map(Profile::getProfileByName)
                 .toList();
     }

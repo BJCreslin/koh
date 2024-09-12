@@ -5,6 +5,8 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.information.Informat
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects.PermissionDialogObject;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
 import ru.cbr.koh.utils.JPanelUtils;
@@ -145,6 +147,26 @@ public class PermissionPanel implements PaneInterface {
             gbc.gridx = 1;
             dialog.add(descriptionField, gbc);
 
+            JCheckBox koCheckBox = new JCheckBox(TreeType.KO.getText());
+            if (lastPermission != null && lastPermission.getTreeType() != null) {
+                koCheckBox.setSelected(lastPermission.getTreeType().stream().anyMatch(it -> it.equals(TreeType.KO)));
+            } else {
+                koCheckBox.setSelected(true);
+            }
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(koCheckBox, gbc);
+
+            JCheckBox gibrCheckBox = new JCheckBox(TreeType.GIBR.getText());
+            if (lastPermission != null && lastPermission.getTreeType() != null) {
+                gibrCheckBox.setSelected(lastPermission.getTreeType().stream().anyMatch(it -> it.equals(TreeType.GIBR)));
+            }  else {
+                gibrCheckBox.setSelected(false);
+            }
+            gbc.gridx = 0;
+            gbc.gridy = y++;
+            dialog.add(gibrCheckBox, gbc);
+
             JButton saveButton = new JButton("Save");
             saveButton.addActionListener(e1 -> {
                 PermissionDialogObject obj = new PermissionDialogObject(
@@ -153,7 +175,8 @@ public class PermissionPanel implements PaneInterface {
                         groupActionField.getText(),
                         userActionField.getText(),
                         nameField.getText(),
-                        descriptionField.getText()
+                        descriptionField.getText(),
+                        getTree(koCheckBox, gibrCheckBox)
                 );
                 lastPermission = obj;
                 dataList.add(obj);
@@ -191,6 +214,20 @@ public class PermissionPanel implements PaneInterface {
             panel.revalidate(); // Обновляем панель
             panel.repaint(); // Перерисовываем панель
         }
+    }
+
+    private List<TreeType> getTree(JCheckBox nogibrCheckBox, JCheckBox gibrCheckBox) {
+        List<TreeType> treeTypes = new ArrayList<>();
+        if (nogibrCheckBox.isSelected()) {
+            treeTypes.add(TreeType.KO);
+        }
+        if (gibrCheckBox.isSelected()) {
+            treeTypes.add(TreeType.GIBR);
+        }
+        if (treeTypes.isEmpty()) {
+            treeTypes.add(TreeType.KO);
+        }
+        return treeTypes;
     }
 }
 

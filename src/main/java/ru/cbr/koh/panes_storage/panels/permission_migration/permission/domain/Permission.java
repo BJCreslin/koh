@@ -2,7 +2,8 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain;
 
 
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects.PermissionDialogObject;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.util.List;
@@ -33,13 +34,20 @@ public class Permission {
 
     private final String description;
 
+    private final List<TreeType> treeType;
+
+    public List<TreeType> getTreeType() {
+        return treeType;
+    }
+
     public Permission(String key,
                       PermissionType type,
                       String abacPermPresGroupAction,
                       String abacPermPresUserAction,
                       String name,
                       List<Profile> profiles,
-                      String description) {
+                      String description, List<TreeType> treeType) {
+        this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
         this.key = key;
@@ -61,7 +69,8 @@ public class Permission {
                 object.getUserAction(),
                 object.getName(),
                 null,
-                object.getDescription());
+                object.getDescription(),
+                object.getTreeType());
     }
 
     public Permission(PermissionDialogObject object, List<Profile> profiles) {
@@ -71,7 +80,8 @@ public class Permission {
                 object.getUserAction(),
                 object.getName(),
                 profiles,
-                object.getDescription());
+                object.getDescription(),
+                object.getTreeType());
     }
 
     private String getParent(String key) {
@@ -141,6 +151,7 @@ public class Permission {
                 "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
                 "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
                 "koPermission= " + koPermission + "\n" +
-                "description= " + description + "\n";
+                "description= " + description + "\n" +
+                "treeType= " + treeType ;
     }
 }

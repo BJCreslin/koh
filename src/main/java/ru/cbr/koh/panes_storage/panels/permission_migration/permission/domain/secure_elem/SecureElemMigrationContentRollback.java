@@ -4,6 +4,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.s
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class SecureElemMigrationContentRollback {
@@ -47,9 +48,9 @@ public class SecureElemMigrationContentRollback {
                         </delete> \n
             """;
 
-    public SecureElemMigrationContentRollback(Permission[] permissions) {
+    public SecureElemMigrationContentRollback(List<Permission> permissions) {
         this.keyText =
-                Arrays.stream(permissions).map(Permission::getKey).map(it -> "'" + it + "'")
+                permissions.stream().map(Permission::getKey).map(it -> "'" + it + "'")
                         .collect(Collectors.joining(", \n\t\t\t\t\t"));
     }
 

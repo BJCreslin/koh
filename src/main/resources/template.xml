@@ -27,4 +27,16 @@
 
     </changeSet>
 
+    <changeSet id="%s" author="%s">
+
+        <comment>
+            DOSIE-%s Добавление пермишинов для вкладки %s в дерево
+        </comment>
+        %s
+        <rollback>
+            %s
+        </rollback>
+
+    </changeSet>
+
 </databaseChangeLog>

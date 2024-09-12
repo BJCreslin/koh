@@ -9,6 +9,9 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.pr
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContent;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContentRollback;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemPermissionId;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationContent;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationContentRollback;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationId;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -28,14 +31,14 @@ public class ChangeLog {
 
     private final String tabName;
 
-    private final Permission[] permissions;
+    private final List<Permission> permissions;
 
     public ChangeLog(Information information, List<Permission> permissions) {
         this.keyText = information.keyText();
         this.author = information.author();
         this.storyNumber = information.storyNumber();
         this.tabName = information.storyText();
-        this.permissions = permissions.toArray(new Permission[0]);
+        this.permissions = permissions;
     }
 
     public void create() {
@@ -44,7 +47,7 @@ public class ChangeLog {
         saveFile(permissionId, fileContent);
     }
 
-    private String getFileContent(Permission[] permissions, SecureElemPermissionId permissionId) {
+    private String getFileContent(List<Permission> permissions, SecureElemPermissionId permissionId) {
 
         return String.format(
                 getTempleFileContent(),
@@ -52,10 +55,16 @@ public class ChangeLog {
                 author, storyNumber, tabName,
                 new SecureElemMigrationContent(permissions),
                 new SecureElemMigrationContentRollback(permissions),
+
                 new ProfileSecureElemPermissionId(keyText),
                 author, storyNumber, tabName,
                 new ProfileSecureElemMigrationContent(permissions),
-                new ProfileSecureElemMigrationContentRollback(permissions)
+                new ProfileSecureElemMigrationContentRollback(permissions),
+
+                new TreeMigrationId(keyText),
+                author, storyNumber, tabName,
+                new TreeMigrationContent(permissions),
+                new TreeMigrationContentRollback(permissions)
         );
     }
 
