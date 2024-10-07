@@ -8,15 +8,14 @@ import java.util.stream.Collectors;
 public class TreeMigrationContentRollback {
 
     private static final String TEMPLATE = """
-            
              <delete tableName="secur_elem_tree">
-                            <where>
-                                secur_elem_id IN (
-                                SELECT id FROM secur_elem WHERE key IN
-                                (%s) )
-                            </where>
-                        </delete>
-            """;
+                      <where>
+                          secur_elem_id IN (
+                          SELECT id FROM secur_elem WHERE key IN
+                          (%s) )
+                      </where>
+             </delete>
+    """;
 
     private final List<Permission> permissions;
 

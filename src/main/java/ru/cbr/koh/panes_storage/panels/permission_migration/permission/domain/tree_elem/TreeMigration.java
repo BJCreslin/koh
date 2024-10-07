@@ -8,15 +8,14 @@ public class TreeMigration {
     private final Permission permission;
 
     private static final String TEMPLATE = """
-                    \n
-                    <insert tableName="secur_elem_tree">
-                        <column name="id" valueSequenceNext = "app_seq"/>
-                        <column name="tree_list_id" value = "%s"/>
-                        <column name="secur_elem_id"
-                                valueComputed="(SELECT id FROM secur_elem WHERE key = '%s')"/>
-                        <column name="description" value = "%s"/>
-                    </insert>
-            """;
+                <insert tableName="secur_elem_tree">
+                    <column name="id" valueSequenceNext = "app_seq"/>
+                    <column name="tree_list_id" value = "%s"/>
+                    <column name="secur_elem_id"
+                        valueComputed="(SELECT id FROM secur_elem WHERE key = '%s')"/>
+                    <column name="description" value = '%s'/>
+                </insert>
+""";
 
 
     public TreeMigration(Permission permission) {
@@ -27,7 +26,8 @@ public class TreeMigration {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (TreeType treeType : permission.getTreeType()) {
-            sb.append(String.format(TEMPLATE, treeType.getId(), permission.getKey(), permission.getDescription()));
+            sb.append(String.format(TEMPLATE, treeType.getId(), permission.getKey(), permission.getDescription()))
+                    .append(System.lineSeparator());
         }
         return sb.toString();
     }

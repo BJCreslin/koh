@@ -8,6 +8,8 @@ public class ProfileSecureElemMigration {
 
     private final Permission permission;
 
+    private final Profile profile;
+
     private static final String TEMPLATE = """
                     \n
                     <insert tableName="rights_template_profile_secur_elem">
@@ -18,17 +20,14 @@ public class ProfileSecureElemMigration {
                     </insert>
             """;
 
-    public ProfileSecureElemMigration(Permission permission) {
+    public ProfileSecureElemMigration(Permission permission, Profile profile) {
         this.permission = permission;
+        this.profile = profile;
     }
 
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Profile profile : permission.getProfiles()) {
-            sb.append(String.format(TEMPLATE, profile.getName(), permission.getKey()));
-        }
-        return sb.toString();
+        return String.format(TEMPLATE, profile.getName(), permission.getKey());
     }
 }
