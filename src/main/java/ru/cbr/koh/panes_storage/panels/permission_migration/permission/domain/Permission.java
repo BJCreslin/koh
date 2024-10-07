@@ -46,7 +46,8 @@ public class Permission {
                       String abacPermPresUserAction,
                       String name,
                       List<Profile> profiles,
-                      String description, List<TreeType> treeType) {
+                      String description,
+                      List<TreeType> treeType) {
         this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];

@@ -6,7 +6,7 @@
     </preConditions>
 
     <comment>
-        DOSIE-%s Добавление пермишинов для вкладки %s профиля %s
+        DOSIE-%s Добавление пермишинов для вкладки %s профиля %s (%s)
     </comment>
         %s
     <rollback>

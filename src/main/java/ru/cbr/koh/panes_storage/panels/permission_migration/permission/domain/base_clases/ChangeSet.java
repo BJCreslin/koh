@@ -4,10 +4,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.I
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContent;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContentRollback;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContent;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemMigrationContentRollback;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemPermissionId;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationContent;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.io.IOException;
@@ -43,6 +40,7 @@ public class ChangeSet {
                 information.storyNumber(),
                 information.storyText(),
                 profile.getDisplayName(),
+                profile.getId(),
                 new ProfileSecureElemMigrationContent(permissions, profile),
                 new ProfileSecureElemMigrationContentRollback(permissions, profile)
         );
