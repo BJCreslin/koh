@@ -13,8 +13,7 @@ public class TreeMigration {
                     <column name="tree_list_id" value = "%s"/>
                     <column name="secur_elem_id"
                         valueComputed="(SELECT id FROM secur_elem WHERE key = '%s')"/>
-                    <column name="description" value = '%s'/>
-                </insert>
+                %s</insert>
 """;
 
 
@@ -26,10 +25,18 @@ public class TreeMigration {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (TreeType treeType : permission.getTreeType()) {
-            sb.append(String.format(TEMPLATE, treeType.getId(), permission.getKey(), permission.getDescription()))
+            sb.append(String.format(TEMPLATE, treeType.getId(), permission.getKey(),
+                            getDescription(permission.getDescription())))
                     .append(System.lineSeparator());
         }
         return sb.toString();
+    }
+
+    private String getDescription(String description) {
+        if (description != null && !description.isBlank()) {
+            return String.format(" <column name=\"description\" value = '%s'/>" + "\n", description);
+        }
+        return "";
     }
 
 }

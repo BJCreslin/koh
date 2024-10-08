@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Permission {
 
-    private static final String PREFIX = "urn:%s:attr:01:subject:";
+    public static final String PREFIX = "urn:%s:attr:01:subject:";
 
     private final String parent;
 

@@ -54,24 +54,6 @@ public class ChangeLog {
                 new SecureElemMigrationContentRollback(permissions),
                 new TreeMigrationContentRollback(permissions),
                 getChangeLogCreatedContent(permissions, permissionId));
-
-//        return String.format(
-//                getChangeLogTempleFileContent(),
-//                permissionId.toString(),
-//                author, storyNumber, tabName,
-//                new SecureElemMigrationContent(permissions),
-//                new SecureElemMigrationContentRollback(permissions),
-//
-//                new ProfileSecureElemPermissionId(keyText),
-//                author, storyNumber, tabName,
-//                new ProfileSecureElemMigrationContent(permissions),
-//                new ProfileSecureElemMigrationContentRollback(permissions),
-//
-//                new TreeMigrationId(keyText),
-//                author, storyNumber, tabName,
-//                new TreeMigrationContent(permissions),
-//                new TreeMigrationContentRollback(permissions)
-//        );
     }
 
     private String getChangeLogCreatedContent(List<Permission> permissions, SecureElemPermissionId permissionId) {

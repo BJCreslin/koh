@@ -16,9 +16,7 @@ public class SecureElemMigration {
                 <column name="abac_perm_pres_attr_code"
                         value="%s"/>
                 <column name="abac_perm_pres_group_action" value="%s"/>
-                 <column name="description"
-                        value='%s'/>
-            </insert>
+            %s</insert>
 """;
 
     private static final String CHANGE_TEMPLATE_KO = """
@@ -34,9 +32,7 @@ public class SecureElemMigration {
                <column name="securable_by_ko" valueNumeric="1"/>
                <column name="abac_perm_pres_group_action" value="%s"/>
                <column name="abac_perm_pres_user_action" value="%s"/>
-               <column name="description"
-                        value='%s'/>
-            </insert>
+            %s</insert>
 """;
 
     private final Permission permission;
@@ -57,7 +53,7 @@ public class SecureElemMigration {
                     permission.getAbacPermPresAttrCode(),
                     permission.getAbacPermPresGroupAction(),
                     permission.getAbacPermPresUserAction(),
-                    permission.getDescription()
+                    getDescription(permission.getDescription())
             ) + "\n";
         } else {
             return String.format(CHANGE_TEMPLATE,
@@ -68,8 +64,15 @@ public class SecureElemMigration {
                     permission.getKey(),
                     permission.getAbacPermPresAttrCode(),
                     permission.getAbacPermPresGroupAction(),
-                    permission.getDescription()
+                    getDescription(permission.getDescription())
             ) + "\n";
         }
+    }
+
+    private String getDescription(String description) {
+        if (description != null && !description.isBlank()) {
+            return String.format(" <column name=\"description\" value = '%s'/>" + "\n", description);
+        }
+        return "";
     }
 }

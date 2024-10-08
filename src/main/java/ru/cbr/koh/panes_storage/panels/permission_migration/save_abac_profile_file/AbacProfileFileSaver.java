@@ -39,7 +39,7 @@ public class AbacProfileFileSaver {
     private void writeTable(List<Permission> permissions, BufferedWriter writer) {
         permissions.forEach(permission -> {
             try {
-                writer.write(permission.getAbacPermPresAttrCode().replace("urn:%s:attr:01:subject:", ""));
+                writer.write(permission.getAbacPermPresAttrCode().replace(Permission.PREFIX, ""));
                 writer.newLine();
                 writer.write(permission.getKey());
                 writer.newLine();
@@ -80,6 +80,5 @@ public class AbacProfileFileSaver {
                         Map.Entry::getKey,
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
     }
-
 
 }
