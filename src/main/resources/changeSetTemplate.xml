@@ -1,14 +1,14 @@
 <changeSet id="%s" author="%s">
     <preConditions onFail="MARK_RAN" onError="MARK_RAN">
         <sqlCheck expectedResult="1">
-            SELECT COUNT(*) FROM profile WHERE profile_name = '%s'
+            SELECT COUNT(*) FROM profile WHERE REPLACE(UPPER(profile_name), ' ', '') = REPLACE(UPPER( '%s' ),' ', '')
         </sqlCheck>
     </preConditions>
 
     <comment>
         DOSIE-%s Добавление пермишинов для вкладки %s профиля %s (%s)
     </comment>
-        %s
+    %s
     <rollback>
         %s
     </rollback>
