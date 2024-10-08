@@ -27,6 +27,8 @@ public class InformationPanel implements PaneInterface {
 
     private static JTextField tabNameField;
 
+    private static JCheckBox checkBox;
+
     private Information info;
 
     @Override
@@ -68,12 +70,16 @@ public class InformationPanel implements PaneInterface {
         tabNameField = new JTextField();
         tabNameField.setText(getStoryName());
 
+        checkBox = new JCheckBox("Save abac's politics to file");
+        checkBox.setSelected(true);
+
         Dimension txtFieldSize = new Dimension(properties.getHorizontalSize() - RIGHT_MARGIN,
                 textField.getPreferredSize().height);
         textField.setPreferredSize(txtFieldSize);
         authorField.setPreferredSize(txtFieldSize);
         storyNumberField.setPreferredSize(txtFieldSize);
         tabNameField.setPreferredSize(txtFieldSize);
+        checkBox.setPreferredSize(txtFieldSize);
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -83,7 +89,8 @@ public class InformationPanel implements PaneInterface {
                                         .addComponent(textField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(authorField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(storyNumberField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(tabNameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(tabNameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(checkBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(10))
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(10, 10, Short.MAX_VALUE)
@@ -124,6 +131,11 @@ public class InformationPanel implements PaneInterface {
                                 .addComponent(tabNameLabel))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(tabNameField))
+                        .addGap(DELIMITER_HEIGHT)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(tabNameLabel))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(checkBox))
         );
 
         return panel;
@@ -157,8 +169,16 @@ public class InformationPanel implements PaneInterface {
         return info.keyText();
     }
 
+    private boolean getCheckboxState() {
+        if (info == null) {
+            return properties.getSaveAbacPolitics();
+        }
+        return checkBox.isSelected();
+    }
+
     public static Information getInformation() {
-        return new Information(textField.getText(), authorField.getText(), storyNumberField.getText(), tabNameField.getText());
+        return new Information(textField.getText(), authorField.getText(), storyNumberField.getText(),
+                tabNameField.getText(), checkBox.isSelected());
     }
 
     public static void setInformation() {

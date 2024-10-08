@@ -77,7 +77,7 @@ public class OnlyMigrationApplication {
                 )
         );
 
-        var information = new Information(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME);
+        var information = new Information(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME,true);
 
         ChangeLog changeLog = new ChangeLog(information, permissions);
         changeLog.create();

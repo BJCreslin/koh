@@ -9,6 +9,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.Per
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
+import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_file.AbacProfileFileSaver;
 import ru.cbr.koh.utils.JPanelUtils;
 
 import javax.swing.*;
@@ -61,7 +62,8 @@ public class PermissionPanel implements PaneInterface {
             List<Permission> permissions =
                     dataList.stream().map(it -> new Permission(it, profiles)).toList();
 
-            ChangeLog changeLog = new ChangeLog(InformationPanel.getInformation(), permissions);
+            var information = InformationPanel.getInformation();
+            ChangeLog changeLog = new ChangeLog(information, permissions);
             changeLog.create();
         }
     }
@@ -160,7 +162,7 @@ public class PermissionPanel implements PaneInterface {
             JCheckBox gibrCheckBox = new JCheckBox(TreeType.GIBR.getText());
             if (lastPermission != null && lastPermission.getTreeType() != null) {
                 gibrCheckBox.setSelected(lastPermission.getTreeType().stream().anyMatch(it -> it.equals(TreeType.GIBR)));
-            }  else {
+            } else {
                 gibrCheckBox.setSelected(false);
             }
             gbc.gridx = 0;
