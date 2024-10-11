@@ -178,7 +178,7 @@ public class InformationPanel implements PaneInterface {
 
     public static Information getInformation() {
         return new Information(textField.getText(), authorField.getText(), storyNumberField.getText(),
-                tabNameField.getText(), checkBox.isSelected());
+                tabNameField.getText(), checkBox.isSelected(), checkBox.isSelected());
     }
 
     public static void setInformation() {

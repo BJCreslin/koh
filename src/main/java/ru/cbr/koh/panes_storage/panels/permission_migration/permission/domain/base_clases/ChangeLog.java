@@ -9,6 +9,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.se
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationContent;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tree_elem.TreeMigrationContentRollback;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_attribute_code.AbacAttributeCodeSaver;
 import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_file.AbacProfileFileSaver;
 
 import java.io.IOException;
@@ -39,6 +40,10 @@ public class ChangeLog {
         if (information.shouldWriteAbakFile()) {
             var saver = new AbacProfileFileSaver();
             saver.save(permissions);
+        }
+        if(information.shouldWriteAbacAttributeCode()){
+            var abacAttributeCodeSaver = new AbacAttributeCodeSaver();
+            abacAttributeCodeSaver.save(permissions);
         }
     }
 

@@ -2574,7 +2574,7 @@ public class OnlyMigrationApplication {
                 );
 
 
-        var information = new Information(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME, true);
+        var information = new Information(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME, true, true);
 
         ChangeLog changeLog = new ChangeLog(information, permissions);
         changeLog.create();

@@ -29,6 +29,7 @@ public class PropertiesService {
     private String storyKey;
     private Boolean shouldWriteAbakFile;
     private String abacFileName;
+    private String abacAttributeCodeFilePath;
 
 
     public PropertiesService() {
@@ -48,6 +49,8 @@ public class PropertiesService {
                 this.shouldWriteAbakFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile"));
 
                 this.abacFileName = properties.getProperty("abac.fileName");
+                this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
+
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -88,5 +91,9 @@ public class PropertiesService {
 
     public String getAbacFileName() {
         return abacFileName;
+    }
+
+    public String getAbacAttributeCodeFilePath() {
+        return abacAttributeCodeFilePath;
     }
 }
