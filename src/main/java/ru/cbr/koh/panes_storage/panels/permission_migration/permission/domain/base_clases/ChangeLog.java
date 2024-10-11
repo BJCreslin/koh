@@ -51,8 +51,8 @@ public class ChangeLog {
                 information.storyText(),
                 new SecureElemMigrationContent(permissions),
                 new TreeMigrationContent(permissions),
-                new SecureElemMigrationContentRollback(permissions),
                 new TreeMigrationContentRollback(permissions),
+                new SecureElemMigrationContentRollback(permissions),
                 getChangeLogCreatedContent(permissions, permissionId));
     }
 
