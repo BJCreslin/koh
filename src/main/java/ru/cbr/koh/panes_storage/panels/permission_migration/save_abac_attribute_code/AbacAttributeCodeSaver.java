@@ -28,7 +28,7 @@ public class AbacAttributeCodeSaver {
     private String createAbacAttributeCode(Permission permission) {
 
         return String.format("""
-                        %s("%s", "%s", %s),
+                        %s("%s", %s, %s),
                         """,
                 getPrefix(permission),
                 permission.getAbacPermPresAttrCode(),
@@ -40,7 +40,7 @@ public class AbacAttributeCodeSaver {
         if (permission.getDescription() == null) {
             return null;
         }
-        return "\"" + permission.getDescription() + "\"";
+        return "\"" + permission.getDescription().replace("\"", "\\\"") + "\"";
     }
 
     private String getAttributeCode(Permission permission) {
