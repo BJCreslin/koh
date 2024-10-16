@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 public class ProfileSecureElemMigrationContentRollback {
 
     private static final String TEMPLATE = """
-             <delete tableName="rights_template_profile_secur_elem">
-                   <where>
-                       profile_id IN (
-                         SELECT id FROM profile
-                            WHERE profile_name IN (%s) )
-                            AND secur_elem_id IN (
-                                SELECT id FROM secur_elem WHERE key IN (%s) )
-                   </where>
-             </delete>
-""";
+                         <delete tableName="rights_template_profile_secur_elem">
+                               <where>
+                                   profile_id IN (
+                                     SELECT id FROM profile
+                                        WHERE REPLACE(UPPER(profile_name), ' ', '') IN (%s) )
+                                        AND secur_elem_id IN (
+                                            SELECT id FROM secur_elem WHERE key IN (%s) )
+                               </where>
+                         </delete>
+            """;
 
     private final String content;
 
@@ -37,7 +37,7 @@ public class ProfileSecureElemMigrationContentRollback {
     }
 
     private String getProfile(Profile profile) {
-        return "'" + profile.getName() + "'";
+        return String.format("REPLACE(UPPER('%s'), ' ', '')", profile.getName());
     }
 
     @Override
