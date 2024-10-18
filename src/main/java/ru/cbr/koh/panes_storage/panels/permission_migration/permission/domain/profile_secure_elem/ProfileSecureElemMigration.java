@@ -14,7 +14,7 @@ public class ProfileSecureElemMigration {
                     \n
                     <insert tableName="rights_template_profile_secur_elem">
                         <column name="id" valueSequenceNext="app_seq"/>
-                        <column name="profile_id" valueComputed="(SELECT id FROM profile WHERE REPLACE(UPPER(profile_name), ' ', '') = REPLACE(UPPER('%s'), ' ', '')"/>
+                        <column name="profile_id" valueComputed="(SELECT id FROM profile WHERE REPLACE(UPPER(profile_name), ' ', '') = REPLACE(UPPER('%s'), ' ', ''))"/>
                         <column name="secur_elem_id"
                                 valueComputed="(SELECT id FROM secur_elem WHERE key = '%s')"/>
                     </insert>

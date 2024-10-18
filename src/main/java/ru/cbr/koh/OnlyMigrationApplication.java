@@ -1854,7 +1854,7 @@ public class OnlyMigrationApplication {
                         new Permission(
                                 "credit-organisation-card#interaction-spbr-tab#sar-tab#credit-risk-tab#borrowers-tab#borrowers-table#view#open",
                                 PermissionType.ACTION,
-                                "GET_CO_ASSETS_NEW_BORROWERS_DIVISION_OF_INFORMATION",
+                                "GET_CO_ASSETS_BORROWERS_DIVISION_OF_INFORMATION",
                                 null,
                                 "Информация в свободном доступе",
                                 List.of(
@@ -1869,7 +1869,7 @@ public class OnlyMigrationApplication {
                         new Permission(
                                 "credit-organisation-card#interaction-spbr-tab#sar-tab#credit-risk-tab#borrowers-tab#borrowers-table#view#close",
                                 PermissionType.ACTION,
-                                "GET_CO_ASSETS_NEW_BORROWERS_DIVISION_OF_INFORMATION",
+                                "GET_CO_ASSETS_BORROWERS_DIVISION_OF_INFORMATION",
                                 null,
                                 "Надзорная информация",
                                 List.of(
