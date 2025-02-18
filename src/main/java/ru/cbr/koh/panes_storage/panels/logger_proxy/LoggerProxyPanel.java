@@ -50,7 +50,6 @@ public class LoggerProxyPanel implements PaneInterface {
         Image scaledImage = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
-
         JButton folderButton = new JButton("Select Dossier Ko Directory", scaledIcon);  //
         folderButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
         folderButton.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <changeSet id="%s" author="%s">
         <comment>
-            DOSIE-%s Добавление пермишинов для вкладки %s
+            %s Добавление пермишинов для вкладки %s
         </comment>
 
 %s

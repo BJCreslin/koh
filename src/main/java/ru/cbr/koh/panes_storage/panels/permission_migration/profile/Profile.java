@@ -50,4 +50,13 @@ public enum Profile {
         }
         return null;
     }
+
+    public static Profile getProfileById(int id) {
+        for (Profile profile : Profile.values()) {
+            if (profile.id == id) {
+                return profile;
+            }
+        }
+        return null;
+    }
 }

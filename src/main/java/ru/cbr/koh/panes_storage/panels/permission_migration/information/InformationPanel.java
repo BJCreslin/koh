@@ -29,6 +29,8 @@ public class InformationPanel implements PaneInterface {
 
     private static JCheckBox checkBox;
 
+    private static JCheckBox excelInputCheckBox;
+
     private Information info;
 
     @Override
@@ -70,8 +72,12 @@ public class InformationPanel implements PaneInterface {
         tabNameField = new JTextField();
         tabNameField.setText(getStoryName());
 
+
+        excelInputCheckBox = new JCheckBox("Input data from excel");
+        excelInputCheckBox.setSelected(getDefaultExcelInputCheckBox());
+
         checkBox = new JCheckBox("Save abac's politics to file");
-        checkBox.setSelected(true);
+        checkBox.setSelected(getCheckboxState());
 
         Dimension txtFieldSize = new Dimension(properties.getHorizontalSize() - RIGHT_MARGIN,
                 textField.getPreferredSize().height);
@@ -80,6 +86,7 @@ public class InformationPanel implements PaneInterface {
         storyNumberField.setPreferredSize(txtFieldSize);
         tabNameField.setPreferredSize(txtFieldSize);
         checkBox.setPreferredSize(txtFieldSize);
+        excelInputCheckBox.setPreferredSize(txtFieldSize);
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -90,7 +97,8 @@ public class InformationPanel implements PaneInterface {
                                         .addComponent(authorField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(storyNumberField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(tabNameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(checkBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(checkBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(excelInputCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(10))
                         .addGroup(layout.createSequentialGroup()
                                 .addGap(10, 10, Short.MAX_VALUE)
@@ -136,6 +144,8 @@ public class InformationPanel implements PaneInterface {
                                 .addComponent(tabNameLabel))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(checkBox))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(excelInputCheckBox))
         );
 
         return panel;
@@ -173,12 +183,18 @@ public class InformationPanel implements PaneInterface {
         if (info == null) {
             return properties.getSaveAbacPolitics();
         }
-        return checkBox.isSelected();
+        return info.shouldWriteAbakFile();
     }
 
     public static Information getInformation() {
-        return new Information(textField.getText(), authorField.getText(), storyNumberField.getText(),
-                tabNameField.getText(), checkBox.isSelected(), checkBox.isSelected());
+        return new Information(
+                textField.getText(),
+                authorField.getText(),
+                storyNumberField.getText(),
+                tabNameField.getText(),
+                checkBox.isSelected(),
+                checkBox.isSelected(),
+                excelInputCheckBox.isSelected());
     }
 
     public static void setInformation() {
@@ -203,5 +219,16 @@ public class InformationPanel implements PaneInterface {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean getDefaultExcelInputCheckBox() {
+        if (info == null) {
+            return properties.getFromExcel();
+        }
+        return info.fromExcel();
+    }
+
+    public JCheckBox getExcelInputCheckBox() {
+        return excelInputCheckBox;
     }
 }
