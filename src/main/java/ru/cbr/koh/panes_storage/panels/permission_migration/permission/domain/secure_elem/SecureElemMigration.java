@@ -46,14 +46,14 @@ public class SecureElemMigration {
         if (permission.isKoPermission()) {
             return String.format(CHANGE_TEMPLATE_KO,
                     permission.getParent(),
-                    permission.getType().name(),
-                    permission.getName(),
-                    permission.getRelKey(),
-                    permission.getKey(),
-                    permission.getAbacPermPresAttrCode(),
-                    permission.getAbacPermPresGroupAction(),
-                    permission.getAbacPermPresUserAction(),
-                    getDescription(permission.getDescription())
+                    permission.getType().name().trim(),
+                    permission.getName().trim(),
+                    permission.getRelKey().trim(),
+                    permission.getKey().trim(),
+                    permission.getAbacPermPresAttrCode().trim(),
+                    permission.getAbacPermPresGroupAction().trim(),
+                    permission.getAbacPermPresUserAction().trim(),
+                    getDescription(permission.getDescription().trim())
             ) + "\n";
         } else {
             return String.format(CHANGE_TEMPLATE,

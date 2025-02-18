@@ -5,32 +5,36 @@ import java.util.List;
 
 public class KeysStack {
 
-    private List<String> stack;
+    private List<String> keys;
 
     public KeysStack() {
-        stack = new ArrayList<>();
-    }
-
-    public List<String> getStack() {
-        return stack;
+        keys = new ArrayList<>();
     }
 
     public String getKey() {
-        return String.join("#", stack);
+        return String.join("#", keys);
     }
 
     public void push(ValueShiftPair pair) {
-        List<String> newStack = new ArrayList<>();
-        if (pair.shift() > 0) {
-            for (int i = 0; i < pair.shift(); i++) {
-                newStack.add(stack.get(i));
-            }
+        int pos = pair.shift() + 1;
+        if (pos < 1) {
+            throw new IllegalArgumentException("Значение shift должно быть больше или равно 0");
         }
-        newStack.add(changeN(pair.value()));
-        stack = newStack;
+        int currentSize = keys.size();
+        String value = changeValue(pair.value());
+        if (pos <= currentSize) {
+            keys.set(pos - 1, value);
+            while (keys.size() > pos) {
+                keys.remove(keys.size() - 1);
+            }
+        } else if (pos == currentSize + 1) {
+            keys.add(value);
+        } else {
+            throw new IllegalArgumentException("Недопустимое значение shift. Ожидается: " + (currentSize + 1));
+        }
     }
 
-    private static String changeN(String value) {
+    private static String changeValue(String value) {
         if (value.contains("/n")) {
             value = value.replace("/n", "&#13;&#10;");
         }

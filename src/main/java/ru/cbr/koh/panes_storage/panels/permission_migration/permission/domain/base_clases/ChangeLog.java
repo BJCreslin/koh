@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,8 @@ public class ChangeLog {
         Set<Profile> profiles =
                 permissions.stream()
                         .<Profile>mapMulti((permission, consumer) ->
-                                permission.getProfiles().forEach(consumer::accept))
+                                permission.getProfiles().forEach(consumer))
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
         var accumulator = new StringBuilder();
         profiles.forEach(profile -> {

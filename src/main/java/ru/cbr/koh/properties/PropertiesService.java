@@ -31,6 +31,7 @@ public class PropertiesService {
     private Boolean fromExcel;
     private String abacFileName;
     private String abacAttributeCodeFilePath;
+    private String pathExcel;
 
 
     public PropertiesService() {
@@ -52,6 +53,8 @@ public class PropertiesService {
 
                 this.abacFileName = properties.getProperty("abac.fileName");
                 this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
+
+                this.pathExcel = properties.getProperty("story.pathExcel");
 
             }
         } catch (IOException ex) {
@@ -101,5 +104,15 @@ public class PropertiesService {
 
     public boolean getFromExcel() {
         return fromExcel != null && fromExcel;
+    }
+
+    public String getPathExcel() {
+        return pathExcel;
+    }
+
+    public void setPathExcel(String pathExcel) {
+        if (pathExcel != null && !pathExcel.isEmpty()) {
+            this.pathExcel = pathExcel;
+        }
     }
 }

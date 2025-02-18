@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.dialog_objects.PermissionDialogObject;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
@@ -18,13 +17,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class FileReader {
 
+    private static final int TOP_SPACE = 6;
+
     public static final int NAME_COLUMN_NUMBER = 10;
+    public static final int NEED_SAVE_COLUMN_NUMBER = 28;
     public static final String BANK_DEPENDENT = "**";
-    public static final String IGNORE_ROW_SYMBOL = "i";
+    public static final String INCLUDE_ROW_SYMBOL = "i";
     private static final String permissionsFileName = "permissions.txt";
 
     private final File file;
@@ -46,13 +49,13 @@ public class FileReader {
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
             for (Row row : sheet) {
-                if (row.getRowNum() < 7) {
+                if (row.getRowNum() < TOP_SPACE) {
                     continue;
                 }
 
                 ValueShiftPair valueShiftPair = valueFinder.find(row);
                 if (valueShiftPair == null) {
-                    break;
+                    continue;
                 }
 
                 var value = valueShiftPair.value();
@@ -75,27 +78,25 @@ public class FileReader {
 
                 String relKey = valueShiftPair.value();
 
-                System.out.println(key);
-
                 if (!key.isBlank() && !key.isEmpty()) {
                     String politic = getPolitic(workbook, politicNumber);
                     List<Profile> profiles = getProfiles(row);
                     String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                     String description = getDescription(row);
                     List<TreeType> types = getTreeType(workbook, row.getRowNum());
-                    var needSave = isNeedSave(row);
-
-                    permissionDialogObjects.add(
-                            new Permission(
-                                    key,
-                                    PermissionType.getPermissionType(relKey),
-                                    politic,
-                                    bankDependent ? getBankPolitic(key) : "userAction",
-                                    name,
-                                    profiles,
-                                    description,
-                                    types));
-
+                    if (isNeedSave(row)) {
+                        System.out.println(key);
+                        permissionDialogObjects.add(
+                                new Permission(
+                                        key,
+                                        PermissionType.getPermissionType(relKey),
+                                        politic,
+                                        bankDependent ? getBankPolitic(key) : "userAction",
+                                        name,
+                                        profiles,
+                                        description,
+                                        types));
+                    }
                 }
             }
             return permissionDialogObjects;
@@ -106,13 +107,13 @@ public class FileReader {
     }
 
     private String getBankPolitic(String key) {
-         return "ПРидумать политику";
+        return "GET_KO_LIST_"+ key.replaceAll("[#-]","_").toUpperCase(Locale.ROOT);
     }
 
     private boolean isNeedSave(Row row) {
-        Cell cell = row.getCell(28);
+        Cell cell = row.getCell(NEED_SAVE_COLUMN_NUMBER);
         String cellValue = getCellValue(cell);
-        return cellValue == null || !cellValue.equalsIgnoreCase(IGNORE_ROW_SYMBOL);
+        return cellValue != null && cellValue.equalsIgnoreCase(INCLUDE_ROW_SYMBOL);
     }
 
     private List<TreeType> getTreeType(Workbook workbook, int rowNumber) {
