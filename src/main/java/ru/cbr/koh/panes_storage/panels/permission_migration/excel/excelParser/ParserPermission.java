@@ -1,6 +1,7 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser;
 
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.util.List;
 import java.util.stream.Collectors;
