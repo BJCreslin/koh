@@ -2,6 +2,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
+import ru.cbr.koh.properties.ConfigManager;
 import ru.cbr.koh.properties.PropertiesService;
 
 import javax.swing.*;
@@ -153,28 +154,28 @@ public class InformationPanel implements PaneInterface {
 
     private String getStoryName() {
         if (info == null) {
-            return properties.getStoryName();
+            return ConfigManager.getProperty("story.name");
         }
         return info.storyText();
     }
 
     private String getStoryNumber() {
         if (info == null) {
-            return properties.getStoryNumber();
+            return ConfigManager.getProperty("story.number");
         }
         return info.storyNumber();
     }
 
     private String getAuthor() {
         if (info == null) {
-            return properties.getAuthor();
+            return ConfigManager.getProperty("story.author");
         }
         return info.author();
     }
 
     private String getKey() {
         if (info == null) {
-            return properties.getStoryKey();
+            return ConfigManager.getProperty("story.key");
         }
         return info.keyText();
     }

@@ -1,9 +1,6 @@
 package ru.cbr.koh.properties;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -12,6 +9,8 @@ public class PropertiesService {
     public static final String PROPERTIES_FILE = "config.properties";
 
     private static PropertiesService instance;
+
+    private static final Properties properties = new Properties();
 
     public static PropertiesService getInstance() {
         if (instance == null) {
@@ -35,31 +34,53 @@ public class PropertiesService {
 
 
     public PropertiesService() {
-        Properties properties = new Properties();
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
             assert in != null;
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
                 properties.load(reader);
-                this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal"));
-                this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical"));
-                this.title = properties.getProperty("window.title");
 
-                this.author = properties.getProperty("story.author");
-                this.storyNumber = properties.getProperty("story.number");
-                this.storyName = properties.getProperty("story.name");
-                this.storyKey = properties.getProperty("story.key");
-                this.shouldWriteAbakFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile"));
-                this.fromExcel = Boolean.parseBoolean(properties.getProperty("story.fromExcel"));
-
-                this.abacFileName = properties.getProperty("abac.fileName");
-                this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
-
-                this.pathExcel = properties.getProperty("story.pathExcel");
+                setPropertiesFields(properties);
 
             }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    public static void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+        saveProperties();
+    }
+
+    private static void saveProperties() {
+        try (OutputStream output = new FileOutputStream(PROPERTIES_FILE)) {
+            properties.store(output, "Обновлённые свойства");
+        } catch (IOException e) {
+            System.err.println("Ошибка сохранения файла " + PROPERTIES_FILE);
+            e.printStackTrace();
+        }
+    }
+
+    private void setPropertiesFields(Properties properties) {
+        this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal"));
+        this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical"));
+        this.title = properties.getProperty("window.title");
+
+        this.author = properties.getProperty("story.author");
+        this.storyNumber = properties.getProperty("story.number");
+        this.storyName = properties.getProperty("story.name");
+        this.storyKey = properties.getProperty("story.key");
+        this.shouldWriteAbakFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile"));
+        this.fromExcel = Boolean.parseBoolean(properties.getProperty("story.fromExcel"));
+
+        this.abacFileName = properties.getProperty("abac.fileName");
+        this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
+
+        this.pathExcel = properties.getProperty("story.pathExcel");
     }
 
     public int getHorizontalSize() {

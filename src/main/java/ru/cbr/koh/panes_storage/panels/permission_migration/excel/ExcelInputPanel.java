@@ -5,7 +5,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.Fi
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
-import ru.cbr.koh.properties.PropertiesService;
+import ru.cbr.koh.properties.ConfigManager;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -16,8 +16,6 @@ import java.util.List;
 public class ExcelInputPanel implements PaneInterface {
 
     private File file;
-
-    private final PropertiesService properties = PropertiesService.getInstance();
 
     @Override
     public String getTitle() {
@@ -65,14 +63,14 @@ public class ExcelInputPanel implements PaneInterface {
     }
 
     private void saveCurrentDirectoryToProperty() {
-        properties.setPathExcel(file.getParentFile().getAbsolutePath());
+        ConfigManager.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
     }
 
     private void setCurrentDirectory(JFileChooser fileChooser) {
-        var dir = properties.getPathExcel();
-        if (dir == null || dir.isEmpty()) {
+        var pathExcel = ConfigManager.getProperty("project.pathExcel");
+        if (pathExcel == null || pathExcel.isEmpty()) {
             return;
         }
-        fileChooser.setCurrentDirectory(new File(dir));
+        fileChooser.setCurrentDirectory(new File(pathExcel));
     }
 }
