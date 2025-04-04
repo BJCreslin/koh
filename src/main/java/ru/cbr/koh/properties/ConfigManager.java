@@ -2,17 +2,20 @@ package ru.cbr.koh.properties;
 
 import org.apache.commons.math3.util.Pair;
 
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Properties;
 
-public final class ConfigManager {
+public class ConfigManager {
     private static final Properties properties = new Properties();
     private static final String CONFIG_FILE = "config.properties";
 
     static {
-        try (InputStream input = new FileInputStream(CONFIG_FILE)) {
-            properties.load(input);
+        try (InputStream inStream = ConfigManager.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
+            properties.load(inStream);
         } catch (IOException e) {
             System.err.println("Не удалось загрузить " + CONFIG_FILE);
             e.printStackTrace();

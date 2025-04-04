@@ -15,7 +15,7 @@ public class ValueFinder {
         return null;
     }
 
-    private String getCellValue(Cell cell) {
+    public static String getCellValue(Cell cell) {
         if (cell == null) {
             return null;
         }

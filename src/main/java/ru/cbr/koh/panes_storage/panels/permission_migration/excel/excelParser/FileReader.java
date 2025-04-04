@@ -32,23 +32,29 @@ public class FileReader {
 
     private final File file;
 
+    private final char rowSelector;
+    private final int profileStartColumn;
+
     List<ParserPermission> parserPermissions = new ArrayList<>();
 
     List<Permission> permissionDialogObjects = new ArrayList<>();
 
-    public FileReader(File file) {
+    public FileReader(File file, char rowSelector, int profileStartColumn) {
         this.file = file;
+        this.rowSelector = rowSelector;
+        this.profileStartColumn = profileStartColumn;
     }
 
     public List<Permission> read() {
         try (InputStream inputStream = new FileInputStream(file)) {
 
             Workbook workbook = new XSSFWorkbook(inputStream);
-            Sheet sheet = workbook.getSheet("Дерево");
+            Sheet treeSheet = workbook.getSheet("Дерево");
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
-            for (Row row : sheet) {
+            var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn);
+            for (Row row : treeSheet) {
                 if (row.getRowNum() < TOP_SPACE) {
                     continue;
                 }
@@ -75,12 +81,13 @@ public class FileReader {
 
                 keysStack.push(valueShiftPair);
                 String key = keysStack.getKey();
+                System.out.println(key);
 
                 String relKey = valueShiftPair.value();
 
                 if (!key.isBlank() && !key.isEmpty()) {
                     String politic = getPolitic(workbook, politicNumber);
-                    List<Profile> profiles = getProfiles(row);
+                    List<Profile> profiles = getProfiles(profileHeaderManager, row);
                     String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                     String description = getDescription(row);
                     List<TreeType> types = getTreeType(workbook, row.getRowNum());
@@ -107,13 +114,13 @@ public class FileReader {
     }
 
     private String getBankPolitic(String key) {
-        return "GET_KO_LIST_"+ key.replaceAll("[#-]","_").toUpperCase(Locale.ROOT);
+        return "GET_KO_LIST_" + key.replaceAll("[#-]", "_").toUpperCase(Locale.ROOT);
     }
 
     private boolean isNeedSave(Row row) {
         Cell cell = row.getCell(NEED_SAVE_COLUMN_NUMBER);
         String cellValue = getCellValue(cell);
-        return cellValue != null && cellValue.equalsIgnoreCase(INCLUDE_ROW_SYMBOL);
+        return cellValue != null && cellValue.equalsIgnoreCase(String.valueOf(rowSelector));
     }
 
     private List<TreeType> getTreeType(Workbook workbook, int rowNumber) {
@@ -188,13 +195,12 @@ public class FileReader {
         return new Pair(lastNumber, lastIndex);
     }
 
-    private List<Profile> getProfiles(Row row) {
+    private List<Profile> getProfiles(ProfileHeaderManager profileHeaderManager, Row row) {
         List<Profile> profiles = new ArrayList<>();
-        int startColumn = 11;
-        for (int i = 0; i < 17; i++) {
-            String cell = getCellValue(row.getCell(startColumn + i));
+        for (int i = 0; i < Profile.values().length; i++) {
+            String cell = getCellValue(row.getCell(profileStartColumn + i));
             if (cell != null && cell.equals("+")) {
-                profiles.add(Profile.getProfileById(i));
+                profiles.add(profileHeaderManager.getProfile(i));
             }
         }
         return profiles;
