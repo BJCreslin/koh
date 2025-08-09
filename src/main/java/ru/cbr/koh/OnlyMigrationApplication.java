@@ -1,16 +1,21 @@
 package ru.cbr.koh;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.utils.ResourceValidator;
 
 import java.util.List;
 
 @SuppressWarnings({"java:S1192", "java:S1854"})
 public class OnlyMigrationApplication {
+
+    private static final Logger logger = LogManager.getLogger(OnlyMigrationApplication.class);
 
     private static final String KEY_TEXT = "subord_instrument";
 
@@ -21,7 +26,23 @@ public class OnlyMigrationApplication {
     private static final String TAB_NAME = "Реализовать работу с субординироваными инструментами";
 
     public static void main(String[] args) {
-        action();
+        logger.info("Запуск Migration приложения...");
+        
+        // Валидация ресурсов перед запуском
+        if (!ResourceValidator.validateAllResources()) {
+            logger.error("Критическая ошибка: отсутствуют обязательные ресурсы. Приложение не может быть запущено.");
+            System.err.println("Ошибка: отсутствуют критические файлы ресурсов. Проверьте логи для деталей.");
+            System.exit(1);
+        }
+        
+        try {
+            action();
+            logger.info("Migration приложение завершено успешно");
+        } catch (Exception e) {
+            logger.fatal("Критическая ошибка при выполнении миграции", e);
+            System.err.println("Критическая ошибка при выполнении миграции: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void action() {

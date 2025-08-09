@@ -1,5 +1,7 @@
 package ru.cbr.koh.panes_storage.panels.logger_proxy.service;
 
+import ru.cbr.koh.utils.ResourceValidator;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -30,22 +32,27 @@ public class SpyServiceImpl implements SpyService {
     }
 
     private void createSpyPropertiesFile(String dossierKoDirectory, String propertyFile) {
+        if (dossierKoDirectory == null || propertyFile == null) {
+            throw new IllegalArgumentException("Параметры dossierKoDirectory и propertyFile не могут быть null");
+        }
 
-        URL originalPomResource = SpyServiceImpl.class.getClassLoader().getResource(ORIGINAL_PROPERTIES_FILENAME);
+        URL originalPomResource = ResourceValidator.getResourceSafely(ORIGINAL_PROPERTIES_FILENAME, SpyServiceImpl.class);
         if (originalPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + ORIGINAL_PROPERTIES_FILENAME);
+            throw new IllegalArgumentException("Файл ресурса не найден: " + ORIGINAL_PROPERTIES_FILENAME);
         }
         try {
             Path propertiespath = Paths.get(originalPomResource.toURI());
             String content = Files.readString(propertiespath);
 
             Path destinationPath = Paths.get(dossierKoDirectory + propertyFile);
+            Files.createDirectories(destinationPath.getParent());
             Files.writeString(destinationPath, content);
 
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException("Файл не найден: " + propertyFile);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Ошибка записи файла: " + propertyFile, e);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException("Некорректный URI ресурса: " + ORIGINAL_PROPERTIES_FILENAME, e);
         }
-
     }
 
     @Override
@@ -55,17 +62,23 @@ public class SpyServiceImpl implements SpyService {
     }
 
     void replaceDataInFile(String filePath, String findTextFileName, String replaceTextFilename) {
+        if (filePath == null || findTextFileName == null || replaceTextFilename == null) {
+            throw new IllegalArgumentException("Все параметры должны быть не null");
+        }
+        
         Path path = Paths.get(filePath);
-
-        URL originalPomResource = SpyServiceImpl.class.getClassLoader().getResource(findTextFileName);
-        if (originalPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + findTextFileName);
+        if (!Files.exists(path)) {
+            throw new IllegalArgumentException("Целевой файл не существует: " + filePath);
         }
 
-        URL replacementPomResource = SpyServiceImpl.class.getClassLoader().getResource(replaceTextFilename);
+        URL originalPomResource = ResourceValidator.getResourceSafely(findTextFileName, SpyServiceImpl.class);
+        if (originalPomResource == null) {
+            throw new IllegalArgumentException("Файл ресурса не найден: " + findTextFileName);
+        }
 
+        URL replacementPomResource = ResourceValidator.getResourceSafely(replaceTextFilename, SpyServiceImpl.class);
         if (replacementPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + replaceTextFilename);
+            throw new IllegalArgumentException("Файл ресурса не найден: " + replaceTextFilename);
         }
 
         try {
@@ -77,13 +90,12 @@ public class SpyServiceImpl implements SpyService {
             Path replacementTextPath = Paths.get(replacementPomResource.toURI());
             String replacementText = Files.readString(replacementTextPath);
 
-
             content = content.replace(searchText, replacementText);
             Files.writeString(path, content);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Ошибка работы с файлом: " + filePath, e);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Некорректный URI ресурса", e);
         }
     }
 

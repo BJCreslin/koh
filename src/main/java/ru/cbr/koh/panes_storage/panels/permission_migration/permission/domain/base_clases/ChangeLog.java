@@ -12,6 +12,8 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_attribute_code.AbacAttributeCodeSaver;
 import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_file.AbacProfileFileSaver;
 
+import ru.cbr.koh.utils.ResourceValidator;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -88,16 +90,18 @@ public class ChangeLog {
     }
 
     private static String getChangeLogTempleFileContent() {
-        URL resource = ChangeLog.class.getClassLoader().getResource("changeLogTemplate.xml");
+        URL resource = ResourceValidator.getResourceSafely("changeLogTemplate.xml", ChangeLog.class);
         if (resource == null) {
-            throw new RuntimeException("File not found!");
+            throw new RuntimeException("Файл шаблона не найден: changeLogTemplate.xml. Убедитесь, что файл находится в resources/");
         }
         try {
             Path path = Paths.get(resource.toURI());
             List<String> fileLines = Files.readAllLines(path);
             return String.join("\n", fileLines);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка чтения файла шаблона changeLogTemplate.xml", e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Некорректный URI для ресурса changeLogTemplate.xml", e);
         }
     }
 }
