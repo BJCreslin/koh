@@ -14,7 +14,6 @@ public final class JPanelUtils {
      */
     @Deprecated
     public static void drawLine(JPanel panel) {
-        // Добавляем современную разделительную линию
         JSeparator separator = ModernUIUtils.createModernSeparator();
         separator.setPreferredSize(new Dimension(panel.getWidth(), 1));
         panel.add(separator);
@@ -41,7 +40,6 @@ public final class JPanelUtils {
         section.setBackground(ModernTheme.BACKGROUND_SECONDARY);
         section.setBorder(ModernTheme.createCardBorder());
         
-        // Заголовок секции
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(ModernTheme.FONT_TITLE);
         titleLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -85,7 +83,6 @@ public final class JPanelUtils {
                               ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL);
         gbc.anchor = GridBagConstraints.WEST;
         
-        // Метка
         JLabel label = new JLabel(labelText);
         label.setFont(ModernTheme.FONT_BOLD);
         label.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -95,7 +92,6 @@ public final class JPanelUtils {
         gbc.weightx = 0;
         formPanel.add(label, gbc);
         
-        // Поле
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -115,7 +111,6 @@ public final class JPanelUtils {
             component.setAlignmentX(Component.LEFT_ALIGNMENT);
             listPanel.add(component);
             
-            // Добавляем отступ между элементами (кроме последнего)
             if (i < components.length - 1) {
                 listPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_MEDIUM)));
             }
@@ -137,7 +132,6 @@ public final class JPanelUtils {
             component.setAlignmentY(Component.CENTER_ALIGNMENT);
             listPanel.add(component);
             
-            // Добавляем отступ между элементами (кроме последнего)
             if (i < components.length - 1) {
                 listPanel.add(Box.createRigidArea(new Dimension(ModernTheme.PADDING_MEDIUM, 0)));
             }

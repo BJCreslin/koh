@@ -52,22 +52,16 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
             ModernTheme.PADDING_LARGE
         ));
 
-        // Создаем карточку с основной информацией
         JPanel infoCard = createMainInfoCard();
-        
-        // Создаем карточку с настройками
         JPanel settingsCard = createSettingsCard();
-        
-        // Создаем карточку режима ввода данных
         JPanel inputModeCard = createInputModeCard();
 
-        // Добавляем все карточки на главную панель
         mainPanel.add(infoCard);
         mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
         mainPanel.add(settingsCard);
         mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
         mainPanel.add(inputModeCard);
-        mainPanel.add(Box.createVerticalGlue()); // Заполнитель для выравнивания по верху
+        mainPanel.add(Box.createVerticalGlue());
 
         return mainPanel;
     }
@@ -190,7 +184,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Префикс ключа
         JLabel keyLabel = new JLabel("Префикс ключа:");
         keyLabel.setFont(ModernTheme.FONT_BOLD);
         keyLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -198,7 +191,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         textField = ModernTheme.createTextField("Введите префикс ключа");
         textField.setText(getKey());
         
-        // Автор
         JLabel authorLabel = new JLabel("Автор:");
         authorLabel.setFont(ModernTheme.FONT_BOLD);
         authorLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -206,7 +198,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         authorField = ModernTheme.createTextField("Введите имя автора");
         authorField.setText(getAuthor());
 
-        // Размещение компонентов
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         content.add(keyLabel, gbc);
         gbc.gridx = 1; gbc.weightx = 1;
@@ -236,7 +227,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Номер истории
         JLabel storyNumberLabel = new JLabel("Номер истории:");
         storyNumberLabel.setFont(ModernTheme.FONT_BOLD);
         storyNumberLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -244,7 +234,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         storyNumberField = ModernTheme.createTextField("Введите номер истории");
         storyNumberField.setText(getStoryNumber());
 
-        // Название истории
         JLabel storyNameLabel = new JLabel("Название истории:");
         storyNameLabel.setFont(ModernTheme.FONT_BOLD);
         storyNameLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -252,7 +241,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         tabNameField = ModernTheme.createTextField("Введите название истории");
         tabNameField.setText(getStoryName());
 
-        // Размещение компонентов
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         content.add(storyNumberLabel, gbc);
         gbc.gridx = 1; gbc.weightx = 1;
@@ -278,14 +266,12 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBackground(ModernTheme.BACKGROUND_SECONDARY);
         
-        // Чекбокс сохранения ABAC политик
         checkBox = new JCheckBox("💾 Сохранить ABAC политики в файл");
         checkBox.setSelected(getCheckboxState());
         ModernTheme.styleCheckbox(checkBox);
         checkBox.setFont(ModernTheme.FONT_BOLD);
         checkBox.setForeground(ModernTheme.TEXT_PRIMARY);
         
-        // Панель режима Excel
         JPanel excelModePanel = createExcelModePanel();
         
         content.add(checkBox);
@@ -313,7 +299,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
             )
         ));
         
-        // Переключатель Excel
         excelInputCheckBox = new JCheckBox("📊 Загрузить данные из Excel файла");
         excelInputCheckBox.setSelected(getDefaultExcelInputCheckBox());
         excelInputCheckBox.setFont(ModernTheme.FONT_LARGE_BOLD);
@@ -323,7 +308,6 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
         excelInputCheckBox.setFocusPainted(false);
         excelInputCheckBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Описание
         JLabel description = new JLabel(
             "<html><i>При включении этого режима данные будут загружаться из Excel файла.<br/>" +
             "Вкладки 'Profile' и 'Permission' будут отключены.</i></html>"

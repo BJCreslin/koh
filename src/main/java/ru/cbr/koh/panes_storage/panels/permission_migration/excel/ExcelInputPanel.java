@@ -54,7 +54,6 @@ public class ExcelInputPanel implements PaneInterface {
             ModernTheme.PADDING_LARGE
         ));
 
-        // Создаем карточку с настройками Excel
         JPanel settingsCard = ModernTheme.createCardWithTitle("⚙️ Настройки Excel");
         settingsCard.setLayout(new BorderLayout());
         
@@ -65,7 +64,6 @@ public class ExcelInputPanel implements PaneInterface {
                               ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Компонент для выбора символа строки
         JLabel rowSelectorLabel = new JLabel("Символ выбора строки:");
         rowSelectorLabel.setFont(ModernTheme.FONT_BOLD);
         rowSelectorLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -88,7 +86,6 @@ public class ExcelInputPanel implements PaneInterface {
             }
         });
 
-        // Компонент для выбора начального столбца профилей
         JLabel profileColumnLabel = new JLabel("Начальный столбец профилей:");
         profileColumnLabel.setFont(ModernTheme.FONT_BOLD);
         profileColumnLabel.setForeground(ModernTheme.TEXT_PRIMARY);
@@ -106,7 +103,6 @@ public class ExcelInputPanel implements PaneInterface {
             }
         });
 
-        // Размещение компонентов в сетке
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
         settingsContent.add(rowSelectorLabel, gbc);
         gbc.gridx = 1; gbc.weightx = 1;
@@ -119,22 +115,18 @@ public class ExcelInputPanel implements PaneInterface {
 
         settingsCard.add(settingsContent, BorderLayout.CENTER);
         
-        // Загрузка сохраненных настроек
         loadSettings(rowSelectorField, profileColumnSpinner);
 
-        // Создаем современную кнопку загрузки файла
         JButton fileButton = createModernFileButton(frame);
 
-        // Создаем информационную панель
         JPanel infoPanel = createInfoPanel();
 
-        // Добавляем все компоненты на главную панель
         mainPanel.add(settingsCard);
         mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
         mainPanel.add(fileButton);
         mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_MEDIUM)));
         mainPanel.add(infoPanel);
-        mainPanel.add(Box.createVerticalGlue()); // Заполнитель для выравнивания по верху
+        mainPanel.add(Box.createVerticalGlue());
         
         return mainPanel;
     }
@@ -205,7 +197,6 @@ public class ExcelInputPanel implements PaneInterface {
      * Создает современную кнопку для выбора файла
      */
     private JButton createModernFileButton(JFrame frame) {
-        // Создаем иконку для кнопки
         ImageIcon icon = null;
         try {
             ImageIcon originalIcon = new ImageIcon("images.png");

@@ -39,7 +39,6 @@ public class MainWindow {
     }
 
     public void start() {
-        // Применяем современный Look and Feel
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -51,10 +50,8 @@ public class MainWindow {
         frame.setSize(getHorizontalSize(), getVerticalSize());
         frame.setLocationRelativeTo(null);
         
-        // Применяем современную тему к окну
         ModernTheme.applyToFrame(frame);
         
-        // Создаем главную панель с современным дизайном
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(ModernTheme.BACKGROUND_PRIMARY);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(
@@ -64,22 +61,18 @@ public class MainWindow {
             ModernTheme.PADDING_MEDIUM
         ));
         
-        // Создаем заголовок приложения
         JPanel headerPanel = createHeaderPanel();
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Создаем современные вкладки
         JTabbedPane tabbedPane = new JTabbedPane();
         ModernTheme.applyToTabbedPane(tabbedPane);
         
-        // Добавляем отступы между вкладками и контентом
         tabbedPane.setBorder(BorderFactory.createEmptyBorder(
             ModernTheme.PADDING_MEDIUM, 0, 0, 0
         ));
 
         panels.forEach(panel -> {
             JComponent panelComponent = panel.createPanel(frame);
-            // Оборачиваем каждую панель в современный контейнер
             JPanel wrappedPanel = wrapPanelInModernContainer(panelComponent);
             tabbedPane.addTab(panel.getTitle(), wrappedPanel);
         });
@@ -164,18 +157,15 @@ public class MainWindow {
         headerPanel.setBackground(ModernTheme.BACKGROUND_SECONDARY);
         headerPanel.setBorder(ModernTheme.createCardBorder());
         
-        // Заголовок
         JLabel titleLabel = new JLabel(getTitle());
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(ModernTheme.PRIMARY_COLOR);
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
         
-        // Подзаголовок
         JLabel subtitleLabel = new JLabel("Современное приложение для миграции разрешений");
         subtitleLabel.setFont(ModernTheme.FONT_REGULAR);
         subtitleLabel.setForeground(ModernTheme.TEXT_SECONDARY);
         
-        // Панель с текстом
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setBackground(ModernTheme.BACKGROUND_SECONDARY);
@@ -183,7 +173,6 @@ public class MainWindow {
         textPanel.add(Box.createVerticalStrut(4));
         textPanel.add(subtitleLabel);
         
-        // Иконка приложения (если есть)
         JLabel iconLabel = new JLabel("🚀");
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 32));
         iconLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, ModernTheme.PADDING_MEDIUM));
@@ -207,7 +196,6 @@ public class MainWindow {
             ModernTheme.PADDING_MEDIUM
         ));
         
-        // Если исходная панель имеет фон, обновляем его
         if (panel instanceof JPanel) {
             panel.setBackground(ModernTheme.BACKGROUND_SECONDARY);
         }
