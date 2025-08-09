@@ -9,7 +9,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.Per
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
-import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_file.AbacProfileFileSaver;
+
 import ru.cbr.koh.utils.JPanelUtils;
 
 import javax.swing.*;
@@ -22,8 +22,14 @@ import java.util.List;
 public class PermissionPanel implements PaneInterface {
 
     private static final List<PermissionDialogObject> dataList = new ArrayList<>();
-
+    private final ProfilePanel profilePanel;
+    private final InformationPanel informationPanel;
     private PermissionDialogObject lastPermission;
+    
+    public PermissionPanel(ProfilePanel profilePanel, InformationPanel informationPanel) {
+        this.profilePanel = profilePanel;
+        this.informationPanel = informationPanel;
+    }
 
     @Override
     public String getTitle() {
@@ -47,22 +53,19 @@ public class PermissionPanel implements PaneInterface {
     }
 
     private class CreateMigrationActionListener implements ActionListener {
-        private final JFrame parentFrame;
-        private final JPanel panel;
 
         public CreateMigrationActionListener(JFrame parentFrame, JPanel panel) {
-            this.parentFrame = parentFrame;
-            this.panel = panel;
+            // parentFrame и panel не используются в этом ActionListener
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            List<Profile> profiles = ProfilePanel.getCheckedProfiles();
+            List<Profile> profiles = profilePanel.getCheckedProfiles();
             List<Permission> permissions =
                     dataList.stream().map(it -> new Permission(it, profiles)).toList();
 
-            var information = InformationPanel.getInformation();
+            var information = informationPanel.getInformation();
             ChangeLog changeLog = new ChangeLog(information, permissions);
             changeLog.create();
         }

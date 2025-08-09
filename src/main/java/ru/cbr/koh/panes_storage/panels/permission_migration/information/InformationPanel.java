@@ -1,6 +1,7 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
+import ru.cbr.koh.main_window.SaveablePanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.properties.ConfigurationService;
 import ru.cbr.koh.exceptions.ConfigurationException;
@@ -13,7 +14,7 @@ import java.awt.*;
 import java.io.*;
 
 
-public class InformationPanel implements PaneInterface {
+public class InformationPanel implements PaneInterface, SaveablePanel {
 
     private static final Logger logger = LogManager.getLogger(InformationPanel.class);
     private static final String FILE_NAME = "information.txt";
@@ -24,17 +25,12 @@ public class InformationPanel implements PaneInterface {
 
     private final ConfigurationService properties;
 
-    private static JTextField textField;
-
-    private static JTextField authorField;
-
-    private static JTextField storyNumberField;
-
-    private static JTextField tabNameField;
-
-    private static JCheckBox checkBox;
-
-    private static JCheckBox excelInputCheckBox;
+    private JTextField textField;
+    private JTextField authorField;
+    private JTextField storyNumberField;
+    private JTextField tabNameField;
+    private JCheckBox checkBox;
+    private JCheckBox excelInputCheckBox;
 
     private Information info;
 
@@ -191,7 +187,7 @@ public class InformationPanel implements PaneInterface {
         return info.shouldWriteAbakFile();
     }
 
-    public static Information getInformation() {
+    public Information getInformation() {
         return new Information(
                 textField.getText(),
                 authorField.getText(),
@@ -202,7 +198,8 @@ public class InformationPanel implements PaneInterface {
                 excelInputCheckBox.isSelected());
     }
 
-    public static void setInformation() throws SerializationException {
+    @Override
+    public void saveData() throws SerializationException {
         Information information = getInformation();
         try (FileOutputStream fileOut = new FileOutputStream(FILE_NAME);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
@@ -214,6 +211,15 @@ public class InformationPanel implements PaneInterface {
             logger.error("Ошибка сохранения информации в файл {}", FILE_NAME, e);
             throw new SerializationException("Не удалось сохранить информацию в файл: " + FILE_NAME, e);
         }
+    }
+    
+    /**
+     * @deprecated Используйте метод saveData() для сохранения данных панели
+     */
+    @Deprecated
+    public static void setInformation() throws SerializationException {
+        // Этот метод оставлен для обратной совместимости, но не должен использоваться
+        throw new UnsupportedOperationException("Используйте инстансный метод saveData() вместо статического setInformation()");
     }
 
     public InformationPanel() throws ConfigurationException, SerializationException {

@@ -1,9 +1,7 @@
 package ru.cbr.koh.main_window;
 
+import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.PanelsHolder;
-import ru.cbr.koh.panes_storage.panels.logger_proxy.LoggerProxyPanel;
-import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
-import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
 import ru.cbr.koh.properties.ConfigurationService;
 import ru.cbr.koh.exceptions.ConfigurationException;
 import ru.cbr.koh.exceptions.SerializationException;
@@ -13,7 +11,8 @@ import org.apache.logging.log4j.Logger;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class MainWindow {
@@ -22,7 +21,20 @@ public class MainWindow {
     private static final String DEFAULT_TITLE = "KOH (KO Helper)";
     private static final String DEFAULT_HORIZONTAL_SIZE = "900";
     private static final String DEFAULT_VERTICAL_SIZE = "900";
+    
+    private final ConfigurationService configurationService;
+    private final List<PaneInterface> panels;
 
+    public MainWindow(ConfigurationService configurationService) throws ConfigurationException {
+        this.configurationService = configurationService;
+        this.panels = new ArrayList<>();
+        initializePanels();
+    }
+    
+    private void initializePanels() throws ConfigurationException {
+        PanelsHolder panelsHolder = new PanelsHolder();
+        this.panels.addAll(panelsHolder.getPanels());
+    }
 
     public void start() {
         JFrame frame = new JFrame(getTitle());
@@ -32,9 +44,7 @@ public class MainWindow {
 
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        PanelsHolder panelsHolder = new PanelsHolder();
-
-        panelsHolder.getPanels().forEach(it -> tabbedPane.addTab(it.getTitle(), it.createPanel(frame)));
+        panels.forEach(panel -> tabbedPane.addTab(panel.getTitle(), panel.createPanel(frame)));
 
         frame.add(tabbedPane);
         frame.setVisible(true);
@@ -43,9 +53,7 @@ public class MainWindow {
             @Override
             public void windowClosing(WindowEvent e) {
                 try {
-                    ProfilePanel.saveCheckBoxesFile();
-                    InformationPanel.setInformation();
-                    LoggerProxyPanel.saveDossierKoDirectory();
+                    saveAllPanelData();
                     logger.info("Приложение завершается корректно");
                 } catch (SerializationException ex) {
                     logger.error("Ошибка при сохранении данных перед закрытием приложения", ex);
@@ -58,40 +66,54 @@ public class MainWindow {
             }
         });
     }
+    
+    private void saveAllPanelData() throws SerializationException {
+        for (PaneInterface panel : panels) {
+            if (panel instanceof SaveablePanel) {
+                ((SaveablePanel) panel).saveData();
+            }
+        }
+    }
 
     private int getVerticalSize() {
-        return Integer.parseInt(Optional.ofNullable(ConfigurationService.getProperty("window.verticalSize"))
-                .orElseGet(() -> {
-                    try {
-                        ConfigurationService.setProperty("window.verticalSize", DEFAULT_VERTICAL_SIZE);
-                    } catch (ConfigurationException e) {
-                        logger.warn("Не удалось сохранить размер окна по умолчанию", e);
-                    }
-                    return DEFAULT_VERTICAL_SIZE;
-                }));
+        String verticalSize = ConfigurationService.getProperty("window.verticalSize");
+        if (verticalSize != null) {
+            return Integer.parseInt(verticalSize);
+        }
+        
+        try {
+            ConfigurationService.setProperty("window.verticalSize", DEFAULT_VERTICAL_SIZE);
+        } catch (ConfigurationException e) {
+            logger.warn("Не удалось сохранить размер окна по умолчанию", e);
+        }
+        return Integer.parseInt(DEFAULT_VERTICAL_SIZE);
     }
 
     private int getHorizontalSize() {
-        return Integer.parseInt(Optional.ofNullable(ConfigurationService.getProperty("window.horizontalSize"))
-                .orElseGet(() -> {
-                    try {
-                        ConfigurationService.setProperty("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
-                    } catch (ConfigurationException e) {
-                        logger.warn("Не удалось сохранить размер окна по умолчанию", e);
-                    }
-                    return DEFAULT_HORIZONTAL_SIZE;
-                }));
+        String horizontalSize = ConfigurationService.getProperty("window.horizontalSize");
+        if (horizontalSize != null) {
+            return Integer.parseInt(horizontalSize);
+        }
+        
+        try {
+            ConfigurationService.setProperty("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
+        } catch (ConfigurationException e) {
+            logger.warn("Не удалось сохранить размер окна по умолчанию", e);
+        }
+        return Integer.parseInt(DEFAULT_HORIZONTAL_SIZE);
     }
 
     private String getTitle() {
-        return Optional.ofNullable(ConfigurationService.getProperty("window.title"))
-                .orElseGet(() -> {
-                    try {
-                        ConfigurationService.setProperty("window.title", DEFAULT_TITLE);
-                    } catch (ConfigurationException e) {
-                        logger.warn("Не удалось сохранить заголовок окна по умолчанию", e);
-                    }
-                    return DEFAULT_TITLE;
-                });
+        String title = ConfigurationService.getProperty("window.title");
+        if (title != null) {
+            return title;
+        }
+        
+        try {
+            ConfigurationService.setProperty("window.title", DEFAULT_TITLE);
+        } catch (ConfigurationException e) {
+            logger.warn("Не удалось сохранить заголовок окна по умолчанию", e);
+        }
+        return DEFAULT_TITLE;
     }
 }

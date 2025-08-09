@@ -3,6 +3,8 @@ package ru.cbr.koh;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.cbr.koh.main_window.MainWindow;
+import ru.cbr.koh.properties.ConfigurationService;
+import ru.cbr.koh.exceptions.ConfigurationException;
 import ru.cbr.koh.utils.ResourceValidator;
 
 public class GUIApplication {
@@ -20,8 +22,13 @@ public class GUIApplication {
         }
         
         try {
-            MainWindow mainWindow = new MainWindow();
+            ConfigurationService configurationService = ConfigurationService.getInstance();
+            MainWindow mainWindow = new MainWindow(configurationService);
             mainWindow.start();
+        } catch (ConfigurationException e) {
+            logger.fatal("Ошибка загрузки конфигурации", e);
+            System.err.println("Ошибка загрузки конфигурации: " + e.getMessage());
+            System.exit(1);
         } catch (Exception e) {
             logger.fatal("Критическая ошибка при запуске приложения", e);
             System.err.println("Критическая ошибка при запуске приложения: " + e.getMessage());

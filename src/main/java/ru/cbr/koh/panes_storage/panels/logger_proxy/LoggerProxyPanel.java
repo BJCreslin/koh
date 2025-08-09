@@ -1,6 +1,8 @@
 package ru.cbr.koh.panes_storage.panels.logger_proxy;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
+import ru.cbr.koh.main_window.SaveablePanel;
+import ru.cbr.koh.exceptions.SerializationException;
 import ru.cbr.koh.panes_storage.panels.logger_proxy.service.SpyService;
 import ru.cbr.koh.panes_storage.panels.logger_proxy.service.SpyServiceImpl;
 
@@ -13,11 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class LoggerProxyPanel implements PaneInterface {
+public class LoggerProxyPanel implements PaneInterface, SaveablePanel {
 
     private static final String FILE_NAME = "logger.txt";
-
-    private static final JTextField dossierKoProjectField = new JTextField();
+    private final JTextField dossierKoProjectField = new JTextField();
 
     private final SpyService spyService;
 
@@ -111,13 +112,23 @@ public class LoggerProxyPanel implements PaneInterface {
         return "Choose a Dossier Ko Directory: D:\\javaproject\\ko";
     }
 
-    public static void saveDossierKoDirectory() {
+    @Override
+    public void saveData() throws SerializationException {
         if (dossierKoProjectField != null && !dossierKoProjectField.getText().isEmpty()) {
             try (FileWriter writer = new FileWriter(FILE_NAME)) {
                 writer.write(dossierKoProjectField.getText());
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new SerializationException("Не удалось сохранить путь к директории Dossier Ko в файл: " + FILE_NAME, e);
             }
         }
+    }
+    
+    /**
+     * @deprecated Используйте метод saveData() для сохранения данных панели
+     */
+    @Deprecated
+    public static void saveDossierKoDirectory() {
+        // Этот метод оставлен для обратной совместимости, но не должен использоваться
+        throw new UnsupportedOperationException("Используйте инстансный метод saveData() вместо статического saveDossierKoDirectory()");
     }
 }
