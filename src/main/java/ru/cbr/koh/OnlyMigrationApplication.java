@@ -2,12 +2,14 @@ package ru.cbr.koh;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.cbr.koh.exceptions.ConfigurationException;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.properties.ConfigurationService;
 import ru.cbr.koh.utils.ResourceValidator;
 
 import java.util.List;
@@ -16,14 +18,6 @@ import java.util.List;
 public class OnlyMigrationApplication {
 
     private static final Logger logger = LogManager.getLogger(OnlyMigrationApplication.class);
-
-    private static final String KEY_TEXT = "subord_instrument";
-
-    private static final String AUTHOR = "69KreslinVYU";
-
-    private static final String STORY_NUMBER = "PDKO-267(PDKO-256)";
-
-    private static final String TAB_NAME = "Реализовать работу с субординироваными инструментами";
 
     public static void main(String[] args) {
         logger.info("Запуск Migration приложения...");
@@ -36,8 +30,13 @@ public class OnlyMigrationApplication {
         }
         
         try {
-            action();
+            ConfigurationService config = ConfigurationService.getInstance();
+            action(config);
             logger.info("Migration приложение завершено успешно");
+        } catch (ConfigurationException e) {
+            logger.fatal("Ошибка загрузки конфигурации", e);
+            System.err.println("Ошибка загрузки конфигурации: " + e.getMessage());
+            System.exit(1);
         } catch (Exception e) {
             logger.fatal("Критическая ошибка при выполнении миграции", e);
             System.err.println("Критическая ошибка при выполнении миграции: " + e.getMessage());
@@ -45,42 +44,9 @@ public class OnlyMigrationApplication {
         }
     }
 
-    private static void action() {
+    private static void action(ConfigurationService config) {
 
-        List<Profile> allProfiles =
-                List.of(
-                        Profile.REGIONAL_CURATOR, Profile.EMPLOYEE_SAR, Profile.AUDITOR,
-                        Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN,
-                        Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO,
-                        Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO,
-                        Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                );
-        List<Profile> allWithoutSarAndRegionalCurator =
-                List.of(
-                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN,
-                        Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN,
-                        Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN,
-                        Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                );
-        List<Profile> allWithoutSar =
-                List.of(
-                        Profile.REGIONAL_CURATOR, Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR,
-                        Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS,
-                        Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO,
-                        Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN,
-                        Profile.METHODOLOGIST_DNSZKO
-                );
-        List<Profile> allWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO =
-                List.of(
-                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN,
-                        Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN,
-                        Profile.COORDINATOR_STBN, Profile.ANALYST_STBN, Profile.METHODOLOGIST_STBN
-                );
-
-        List<Profile> baAndOther =
-                List.of(
-                        Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_DNSZKO
-                );
+        List<Profile> allWithoutSarAndRegionalCurator = config.getAllWithoutSarAndRegionalCurator();
 
         List<Permission> permissions =
                 List.of(
@@ -90,9 +56,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_CO_CARD",
                                 null,
                                 "Раздел \"5.4 Капитал\"",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Раздел \"5.4 Капитал\"",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -105,9 +69,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_CO_CARD",
                                 null,
                                 "Раздел \"5.4.2 Субординированные инструменты\"",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Раздел \"5.4.2 Субординированные инструменты\"",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -120,9 +82,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_CO_CARD",
                                 null,
                                 "Право на просмотр информации",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Право на просмотр информации: &#13;&#10;1) Таблица с данными &#13;&#10;2) Выгрузка в excel &#13;&#10;3) Оценка ставки",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -135,9 +95,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_CO_CARD",
                                 "GET_KO_LIST_CO_CARD_SUBORD_TAB_WRITE",
                                 "Право на добавление инструментов",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Право на добавление инструментов",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -150,9 +108,7 @@ public class OnlyMigrationApplication {
                                 "GET_MAIN_PERMISSIONS",
                                 null,
                                 "Субординированные инструменты",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Субординированные инструменты",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -165,9 +121,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_SUBORD",
                                 "GET_KO_LIST_SUBORD_VIEW",
                                 "Право на просмотр информации",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Право на просмотр информации: &#13;&#10;1) Таблица с данными &#13;&#10;2) Выгрузка в excel &#13;&#10;3) Оценка ставки",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -180,9 +134,7 @@ public class OnlyMigrationApplication {
                                 "GET_PERMISSIONS_SUBORD",
                                 "GET_KO_LIST_SUBORD_EDIT",
                                 "Право на добавление инструментов",
-                                List.of(
-                                        Profile.AUDITOR, Profile.BUSINESS_ANALYST_GIBR, Profile.BUSINESS_ADMINISTRATOR, Profile.CURATOR_STBN, Profile.CURATOR_GIBR, Profile.CURATOR_DFS, Profile.CURATOR_DNSZKO, Profile.MANAGER_CURATOR_OBN, Profile.COORDINATOR_STBN, Profile.COORDINATOR_DNSZKO, Profile.ANALYST_STBN, Profile.ANALYST_DNSZKO, Profile.METHODOLOGIST_STBN, Profile.METHODOLOGIST_DNSZKO
-                                ),
+                                allWithoutSarAndRegionalCurator,
                                 "Право на добавление инструментов",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
@@ -191,7 +143,12 @@ public class OnlyMigrationApplication {
                 );
 
 
-        var information = new Information(KEY_TEXT, AUTHOR, STORY_NUMBER, TAB_NAME, true, true, true);
+        var information = new Information(
+                config.getMigrationKeyText(), 
+                config.getMigrationAuthor(), 
+                config.getMigrationStoryNumber(), 
+                config.getMigrationTabName(), 
+                true, true, true);
 
         ChangeLog changeLog = new ChangeLog(information, permissions);
         changeLog.create();

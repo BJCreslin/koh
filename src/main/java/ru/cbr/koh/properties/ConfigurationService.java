@@ -7,8 +7,11 @@ import ru.cbr.koh.exceptions.ConfigurationException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 public class ConfigurationService {
     
@@ -30,6 +33,12 @@ public class ConfigurationService {
     private String abacFileName;
     private String abacAttributeCodeFilePath;
     private String pathExcel;
+    
+    // Migration configuration fields
+    private String migrationKeyText;
+    private String migrationAuthor;
+    private String migrationStoryNumber;
+    private String migrationTabName;
 
     // Singleton pattern
     public static ConfigurationService getInstance() throws ConfigurationException {
@@ -76,6 +85,12 @@ public class ConfigurationService {
             this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
 
             this.pathExcel = properties.getProperty("story.pathExcel");
+            
+            // Migration configuration
+            this.migrationKeyText = properties.getProperty("migration.keyText");
+            this.migrationAuthor = properties.getProperty("migration.author");
+            this.migrationStoryNumber = properties.getProperty("migration.storyNumber");
+            this.migrationTabName = properties.getProperty("migration.tabName");
             
             logger.debug("Поля конфигурации успешно инициализированы");
         } catch (NumberFormatException e) {
@@ -173,5 +188,64 @@ public class ConfigurationService {
             this.pathExcel = pathExcel;
             setProperty("story.pathExcel", pathExcel);
         }
+    }
+
+    // Migration configuration getters
+    public String getMigrationKeyText() {
+        return migrationKeyText;
+    }
+
+    public String getMigrationAuthor() {
+        return migrationAuthor;
+    }
+
+    public String getMigrationStoryNumber() {
+        return migrationStoryNumber;
+    }
+
+    public String getMigrationTabName() {
+        return migrationTabName;
+    }
+
+    // Profile group methods
+    public List<Profile> getAllProfiles() {
+        return parseProfiles("migration.profiles.all");
+    }
+
+    public List<Profile> getAllWithoutSarAndRegionalCurator() {
+        return parseProfiles("migration.profiles.allWithoutSarAndRegionalCurator");
+    }
+
+    public List<Profile> getAllWithoutSar() {
+        return parseProfiles("migration.profiles.allWithoutSar");
+    }
+
+    public List<Profile> getAllWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO() {
+        return parseProfiles("migration.profiles.allWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO");
+    }
+
+    public List<Profile> getBaAndOther() {
+        return parseProfiles("migration.profiles.baAndOther");
+    }
+
+    private List<Profile> parseProfiles(String propertyKey) {
+        String profilesString = properties.getProperty(propertyKey);
+        if (profilesString == null || profilesString.isEmpty()) {
+            logger.warn("Профили для ключа {} не найдены", propertyKey);
+            return List.of();
+        }
+        
+        return Arrays.stream(profilesString.split(","))
+                .map(String::trim)
+                .map(profileName -> {
+                    try {
+                        return Profile.valueOf(profileName);
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Неизвестный профиль: {}", profileName, e);
+                        return null;
+                    }
+                })
+                .filter(profile -> profile != null)
+                .collect(Collectors.toList());
     }
 }
