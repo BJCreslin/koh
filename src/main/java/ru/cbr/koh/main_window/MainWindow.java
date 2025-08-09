@@ -162,7 +162,7 @@ public class MainWindow {
         titleLabel.setForeground(ModernTheme.PRIMARY_COLOR);
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
         
-        JLabel subtitleLabel = new JLabel("Современное приложение для миграции разрешений");
+        JLabel subtitleLabel = new JLabel("Помощник разработчика Досье КО");
         subtitleLabel.setFont(ModernTheme.FONT_REGULAR);
         subtitleLabel.setForeground(ModernTheme.TEXT_SECONDARY);
         
