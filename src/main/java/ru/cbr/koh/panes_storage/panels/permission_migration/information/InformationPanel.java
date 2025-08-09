@@ -3,6 +3,10 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.properties.ConfigurationService;
+import ru.cbr.koh.exceptions.ConfigurationException;
+import ru.cbr.koh.exceptions.SerializationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,13 +15,14 @@ import java.io.*;
 
 public class InformationPanel implements PaneInterface {
 
+    private static final Logger logger = LogManager.getLogger(InformationPanel.class);
     private static final String FILE_NAME = "information.txt";
 
     public static final int RIGHT_MARGIN = 40;
     public static final int LEFT_MARGIN = 10;
     public static final int DELIMITER_HEIGHT = 30;
 
-    private final ConfigurationService properties = ConfigurationService.getInstance();
+    private final ConfigurationService properties;
 
     private static JTextField textField;
 
@@ -197,27 +202,39 @@ public class InformationPanel implements PaneInterface {
                 excelInputCheckBox.isSelected());
     }
 
-    public static void setInformation() {
+    public static void setInformation() throws SerializationException {
         Information information = getInformation();
         try (FileOutputStream fileOut = new FileOutputStream(FILE_NAME);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
             out.writeObject(information);
+            logger.info("Информация успешно сохранена в {}", FILE_NAME);
 
-        } catch (IOException i) {
-            i.printStackTrace();
+        } catch (IOException e) {
+            logger.error("Ошибка сохранения информации в файл {}", FILE_NAME, e);
+            throw new SerializationException("Не удалось сохранить информацию в файл: " + FILE_NAME, e);
         }
     }
 
-    public InformationPanel() {
+    public InformationPanel() throws ConfigurationException, SerializationException {
+        try {
+            properties = ConfigurationService.getInstance();
+        } catch (ConfigurationException e) {
+            logger.error("Ошибка инициализации конфигурации", e);
+            throw e;
+        }
+        
         info = null;
         try (FileInputStream fileIn = new FileInputStream(FILE_NAME);
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             info = (Information) in.readObject();
-        } catch (IOException ignored) {
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            logger.debug("Информация успешно загружена из {}", FILE_NAME);
+        } catch (FileNotFoundException e) {
+            logger.info("Файл {} не найден, будут использованы значения по умолчанию", FILE_NAME);
+            // Это нормальная ситуация при первом запуске
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Ошибка загрузки информации из файла {}", FILE_NAME, e);
+            throw new SerializationException("Не удалось загрузить информацию из файла: " + FILE_NAME, e);
         }
     }
 

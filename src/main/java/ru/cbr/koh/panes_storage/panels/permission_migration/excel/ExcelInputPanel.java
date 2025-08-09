@@ -6,6 +6,10 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.information.Informat
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
 import ru.cbr.koh.properties.ConfigurationService;
+import ru.cbr.koh.exceptions.ConfigurationException;
+import ru.cbr.koh.exceptions.ExcelParsingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -17,6 +21,7 @@ import java.util.List;
 
 public class ExcelInputPanel implements PaneInterface {
 
+    private static final Logger logger = LogManager.getLogger(ExcelInputPanel.class);
     private char rowSelector = 'i'; // символ для выбора строки значений (по умолчанию 'i')
     private int profileStartColumn = 11; // номер столбца, с которого начинаются профили (по умолчанию 11)
 
@@ -137,15 +142,34 @@ public class ExcelInputPanel implements PaneInterface {
     }
 
     private void createChangelogMigration() {
-        FileReader reader = new FileReader(file, rowSelector, profileStartColumn);
-        List<Permission> permissions = reader.read();
-        var information = InformationPanel.getInformation();
-        ChangeLog changeLog = new ChangeLog(information, permissions);
-        changeLog.create();
+        try {
+            FileReader reader = new FileReader(file, rowSelector, profileStartColumn);
+            List<Permission> permissions = reader.read();
+            var information = InformationPanel.getInformation();
+            ChangeLog changeLog = new ChangeLog(information, permissions);
+            changeLog.create();
+            logger.info("Changelog успешно создан из файла: {}", file.getName());
+        } catch (ExcelParsingException e) {
+            logger.error("Ошибка при обработке Excel файла: {}", file.getName(), e);
+            JOptionPane.showMessageDialog(null, 
+                "Ошибка при обработке Excel файла:\n" + e.getMessage(), 
+                "Ошибка парсинга Excel", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.error("Неожиданная ошибка при создании changelog", e);
+            JOptionPane.showMessageDialog(null, 
+                "Неожиданная ошибка при создании changelog:\n" + e.getMessage(), 
+                "Ошибка", 
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void saveCurrentDirectoryToProperty() {
-        ConfigurationService.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
+        try {
+            ConfigurationService.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
+        } catch (ConfigurationException e) {
+            logger.warn("Не удалось сохранить путь к файлу в конфигурацию", e);
+        }
     }
 
     private void setCurrentDirectory(JFileChooser fileChooser) {

@@ -1,6 +1,9 @@
 package ru.cbr.koh.properties;
 
 import org.apache.commons.math3.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.cbr.koh.exceptions.ConfigurationException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +12,7 @@ import java.util.Properties;
 
 public class ConfigurationService {
     
+    private static final Logger logger = LogManager.getLogger(ConfigurationService.class);
     private static final String CONFIG_FILE = "config.properties";
     private static final Properties properties = new Properties();
     private static ConfigurationService instance;
@@ -28,32 +32,34 @@ public class ConfigurationService {
     private String pathExcel;
 
     // Singleton pattern
-    public static ConfigurationService getInstance() {
+    public static ConfigurationService getInstance() throws ConfigurationException {
         if (instance == null) {
             instance = new ConfigurationService();
         }
         return instance;
     }
 
-    private ConfigurationService() {
+    private ConfigurationService() throws ConfigurationException {
         loadProperties();
         setPropertiesFields();
     }
 
-    private void loadProperties() {
+    private void loadProperties() throws ConfigurationException {
         try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
-            if (inStream != null) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8))) {
-                    properties.load(reader);
-                }
+            if (inStream == null) {
+                throw new ConfigurationException("Файл конфигурации не найден: " + CONFIG_FILE);
+            }
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8))) {
+                properties.load(reader);
+                logger.info("Конфигурация успешно загружена из {}", CONFIG_FILE);
             }
         } catch (IOException e) {
-            System.err.println("Не удалось загрузить " + CONFIG_FILE);
-            e.printStackTrace();
+            logger.error("Не удалось загрузить {}", CONFIG_FILE, e);
+            throw new ConfigurationException("Ошибка загрузки файла конфигурации: " + CONFIG_FILE, e);
         }
     }
 
-    private void setPropertiesFields() {
+    private void setPropertiesFields() throws ConfigurationException {
         try {
             this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal", "800"));
             this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical", "600"));
@@ -70,9 +76,11 @@ public class ConfigurationService {
             this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
 
             this.pathExcel = properties.getProperty("story.pathExcel");
+            
+            logger.debug("Поля конфигурации успешно инициализированы");
         } catch (NumberFormatException e) {
-            System.err.println("Ошибка парсинга числовых значений из properties");
-            e.printStackTrace();
+            logger.error("Ошибка парсинга числовых значений из properties", e);
+            throw new ConfigurationException("Некорректные числовые значения в конфигурации", e);
         }
     }
 
@@ -81,7 +89,7 @@ public class ConfigurationService {
         return properties.getProperty(key);
     }
 
-    public static void setProperty(String key, String value) {
+    public static void setProperty(String key, String value) throws ConfigurationException {
         properties.setProperty(key, value);
         saveProperties();
         // Обновляем поля экземпляра если он существует
@@ -90,7 +98,7 @@ public class ConfigurationService {
         }
     }
 
-    public static void setProperties(List<Pair<String, String>> propers) {
+    public static void setProperties(List<Pair<String, String>> propers) throws ConfigurationException {
         for (Pair<String, String> property : propers) {
             properties.setProperty(property.getFirst(), property.getSecond());
         }
@@ -101,12 +109,13 @@ public class ConfigurationService {
         }
     }
 
-    private static void saveProperties() {
+    private static void saveProperties() throws ConfigurationException {
         try (OutputStream output = new FileOutputStream(CONFIG_FILE)) {
             properties.store(output, "Обновлённые свойства");
+            logger.info("Конфигурация успешно сохранена в {}", CONFIG_FILE);
         } catch (IOException e) {
-            System.err.println("Ошибка сохранения файла " + CONFIG_FILE);
-            e.printStackTrace();
+            logger.error("Ошибка сохранения файла {}", CONFIG_FILE, e);
+            throw new ConfigurationException("Не удалось сохранить конфигурацию в файл: " + CONFIG_FILE, e);
         }
     }
 
@@ -159,7 +168,7 @@ public class ConfigurationService {
         return pathExcel;
     }
 
-    public void setPathExcel(String pathExcel) {
+    public void setPathExcel(String pathExcel) throws ConfigurationException {
         if (pathExcel != null && !pathExcel.isEmpty()) {
             this.pathExcel = pathExcel;
             setProperty("story.pathExcel", pathExcel);

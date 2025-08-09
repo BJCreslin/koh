@@ -1,6 +1,8 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser;
 
 import org.apache.commons.math3.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -10,6 +12,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Pe
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.exceptions.ExcelParsingException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,13 +25,13 @@ import java.util.Locale;
 
 public class FileReader {
 
+    private static final Logger logger = LogManager.getLogger(FileReader.class);
     private static final int TOP_SPACE = 6;
 
     public static final int NAME_COLUMN_NUMBER = 10;
     public static final int NEED_SAVE_COLUMN_NUMBER = 28;
     public static final String BANK_DEPENDENT = "**";
     public static final String INCLUDE_ROW_SYMBOL = "i";
-    private static final String permissionsFileName = "permissions.txt";
 
     private final File file;
 
@@ -45,71 +48,91 @@ public class FileReader {
         this.profileStartColumn = profileStartColumn;
     }
 
-    public List<Permission> read() {
-        try (InputStream inputStream = new FileInputStream(file)) {
+    public List<Permission> read() throws ExcelParsingException {
+        if (file == null || !file.exists()) {
+            throw new ExcelParsingException("Файл не существует или не указан: " + (file != null ? file.getPath() : "null"));
+        }
 
+        try (InputStream inputStream = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet treeSheet = workbook.getSheet("Дерево");
+            
+            if (treeSheet == null) {
+                throw new ExcelParsingException("Лист 'Дерево' не найден в файле: " + file.getPath());
+            }
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
             var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn);
+            
             for (Row row : treeSheet) {
                 if (row.getRowNum() < TOP_SPACE) {
                     continue;
                 }
 
-                ValueShiftPair valueShiftPair = valueFinder.find(row);
-                if (valueShiftPair == null) {
-                    continue;
-                }
-
-                var value = valueShiftPair.value();
-                var bankDependent = value.startsWith(BANK_DEPENDENT);
-                if (bankDependent) {
-                    value = value.replace(BANK_DEPENDENT, "").trim();
-                    valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
-                }
-
-                Pair<String, Integer> politicNumber = getPoliticNumber(value);
-
-                if (politicNumber.getFirst() != null) {
-                    value =
-                            (value.substring(0, politicNumber.getSecond()) + value.substring(politicNumber.getSecond() + politicNumber.getFirst().length())).trim();
-                    valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
-                }
-
-                keysStack.push(valueShiftPair);
-                String key = keysStack.getKey();
-                System.out.println(key);
-
-                String relKey = valueShiftPair.value();
-
-                if (!key.isBlank() && !key.isEmpty()) {
-                    String politic = getPolitic(workbook, politicNumber);
-                    List<Profile> profiles = getProfiles(profileHeaderManager, row);
-                    String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
-                    String description = getDescription(row);
-                    List<TreeType> types = getTreeType(workbook, row.getRowNum());
-                    if (isNeedSave(row)) {
-                        System.out.println(key);
-                        permissionDialogObjects.add(
-                                new Permission(
-                                        key,
-                                        PermissionType.getPermissionType(relKey),
-                                        politic,
-                                        bankDependent ? getBankPolitic(key) : "userAction",
-                                        name,
-                                        profiles,
-                                        description,
-                                        types));
+                try {
+                    ValueShiftPair valueShiftPair = valueFinder.find(row);
+                    if (valueShiftPair == null) {
+                        continue;
                     }
+
+                    var value = valueShiftPair.value();
+                    var bankDependent = value.startsWith(BANK_DEPENDENT);
+                    if (bankDependent) {
+                        value = value.replace(BANK_DEPENDENT, "").trim();
+                        valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
+                    }
+
+                    Pair<String, Integer> politicNumber = getPoliticNumber(value);
+
+                    if (politicNumber.getFirst() != null) {
+                        value =
+                                (value.substring(0, politicNumber.getSecond()) + value.substring(politicNumber.getSecond() + politicNumber.getFirst().length())).trim();
+                        valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
+                    }
+
+                    keysStack.push(valueShiftPair);
+                    String key = keysStack.getKey();
+                    logger.debug("Processing key: {}", key);
+
+                    String relKey = valueShiftPair.value();
+
+                    if (!key.isBlank() && !key.isEmpty()) {
+                        String politic = getPolitic(workbook, politicNumber);
+                        List<Profile> profiles = getProfiles(profileHeaderManager, row);
+                        String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
+                        String description = getDescription(row);
+                        List<TreeType> types = getTreeType(workbook, row.getRowNum());
+                        if (isNeedSave(row)) {
+                            logger.info("Saving permission with key: {}", key);
+                            permissionDialogObjects.add(
+                                    new Permission(
+                                            key,
+                                            PermissionType.getPermissionType(relKey),
+                                            politic,
+                                            bankDependent ? getBankPolitic(key) : "userAction",
+                                            name,
+                                            profiles,
+                                            description,
+                                            types));
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Ошибка обработки строки {}: {}", row.getRowNum(), e.getMessage(), e);
+                    throw new ExcelParsingException("Ошибка обработки строки " + row.getRowNum() + " в файле " + file.getPath(), e);
                 }
             }
             return permissionDialogObjects;
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error("Ошибка чтения файла: {}", file.getPath(), e);
+            throw new ExcelParsingException("Не удалось прочитать Excel файл: " + file.getPath(), e);
+        } catch (Exception e) {
+            if (e instanceof ExcelParsingException) {
+                throw e;
+            }
+            logger.error("Неожиданная ошибка при парсинге файла: {}", file.getPath(), e);
+            throw new ExcelParsingException("Неожиданная ошибка при парсинге файла: " + file.getPath(), e);
         }
     }
 
@@ -192,7 +215,7 @@ public class FileReader {
             lastNumber = matcher.group();
             lastIndex = matcher.start();
         }
-        return new Pair(lastNumber, lastIndex);
+        return new Pair<>(lastNumber, lastIndex);
     }
 
     private List<Profile> getProfiles(ProfileHeaderManager profileHeaderManager, Row row) {
