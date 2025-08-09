@@ -2,8 +2,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
-import ru.cbr.koh.properties.ConfigManager;
-import ru.cbr.koh.properties.PropertiesService;
+import ru.cbr.koh.properties.ConfigurationService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +17,7 @@ public class InformationPanel implements PaneInterface {
     public static final int LEFT_MARGIN = 10;
     public static final int DELIMITER_HEIGHT = 30;
 
-    private final PropertiesService properties = PropertiesService.getInstance();
+    private final ConfigurationService properties = ConfigurationService.getInstance();
 
     private static JTextField textField;
 
@@ -154,28 +153,28 @@ public class InformationPanel implements PaneInterface {
 
     private String getStoryName() {
         if (info == null) {
-            return ConfigManager.getProperty("story.name");
+            return ConfigurationService.getProperty("story.name");
         }
         return info.storyText();
     }
 
     private String getStoryNumber() {
         if (info == null) {
-            return ConfigManager.getProperty("story.number");
+            return ConfigurationService.getProperty("story.number");
         }
         return info.storyNumber();
     }
 
     private String getAuthor() {
         if (info == null) {
-            return ConfigManager.getProperty("story.author");
+            return ConfigurationService.getProperty("story.author");
         }
         return info.author();
     }
 
     private String getKey() {
         if (info == null) {
-            return ConfigManager.getProperty("story.key");
+            return ConfigurationService.getProperty("story.key");
         }
         return info.keyText();
     }

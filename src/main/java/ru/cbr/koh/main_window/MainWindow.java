@@ -4,7 +4,7 @@ import ru.cbr.koh.panes_storage.PanelsHolder;
 import ru.cbr.koh.panes_storage.panels.logger_proxy.LoggerProxyPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
-import ru.cbr.koh.properties.ConfigManager;
+import ru.cbr.koh.properties.ConfigurationService;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -46,25 +46,25 @@ public class MainWindow {
     }
 
     private int getVerticalSize() {
-        return Integer.parseInt(Optional.ofNullable(ConfigManager.getProperty("window.verticalSize"))
+        return Integer.parseInt(Optional.ofNullable(ConfigurationService.getProperty("window.verticalSize"))
                 .orElseGet(() -> {
-                    ConfigManager.setProperty("window.verticalSize", DEFAULT_VERTICAL_SIZE);
+                    ConfigurationService.setProperty("window.verticalSize", DEFAULT_VERTICAL_SIZE);
                     return DEFAULT_VERTICAL_SIZE;
                 }));
     }
 
     private int getHorizontalSize() {
-        return Integer.parseInt(Optional.ofNullable(ConfigManager.getProperty("window.horizontalSize"))
+        return Integer.parseInt(Optional.ofNullable(ConfigurationService.getProperty("window.horizontalSize"))
                 .orElseGet(() -> {
-                    ConfigManager.setProperty("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
+                    ConfigurationService.setProperty("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
                     return DEFAULT_HORIZONTAL_SIZE;
                 }));
     }
 
     private String getTitle() {
-        return Optional.ofNullable(ConfigManager.getProperty("window.title"))
+        return Optional.ofNullable(ConfigurationService.getProperty("window.title"))
                 .orElseGet(() -> {
-                    ConfigManager.setProperty("window.title", DEFAULT_TITLE);
+                    ConfigurationService.setProperty("window.title", DEFAULT_TITLE);
                     return DEFAULT_TITLE;
                 });
     }

@@ -5,7 +5,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.Fi
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.base_clases.ChangeLog;
-import ru.cbr.koh.properties.ConfigManager;
+import ru.cbr.koh.properties.ConfigurationService;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -23,9 +23,9 @@ public class ExcelInputPanel implements PaneInterface {
     private File file;
 
     public void ExcelInputPanel() {
-        var profileStartColumnString = ConfigManager.getProperty("excel.profileStartColumn");
+        var profileStartColumnString = ConfigurationService.getProperty("excel.profileStartColumn");
         if (profileStartColumnString != null) {
-            profileStartColumn = Integer.parseInt(ConfigManager.getProperty("excel.profileStartColumn"));
+            profileStartColumn = Integer.parseInt(ConfigurationService.getProperty("excel.profileStartColumn"));
         }
     }
 
@@ -60,7 +60,7 @@ public class ExcelInputPanel implements PaneInterface {
                 if (text != null && !text.isEmpty()) {
                     rowSelector = text.charAt(0);
                     // Сохраняем в конфигурации
-                    ConfigManager.setProperty("excel.rowSelector", String.valueOf(rowSelector));
+                    ConfigurationService.setProperty("excel.rowSelector", String.valueOf(rowSelector));
                 }
             }
         });
@@ -72,7 +72,7 @@ public class ExcelInputPanel implements PaneInterface {
         profileColumnSpinner.addChangeListener(e -> {
             profileStartColumn = (Integer) profileColumnSpinner.getValue();
             // Сохраняем в конфигурации
-            ConfigManager.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
+            ConfigurationService.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
         });
 
         settingsPanel.add(rowSelectorLabel);
@@ -118,14 +118,14 @@ public class ExcelInputPanel implements PaneInterface {
      */
     private void loadSettings(JTextField rowSelectorField, JSpinner profileColumnSpinner) {
         // Загрузка символа строки
-        String savedRowSelector = ConfigManager.getProperty("excel.rowSelector");
+        String savedRowSelector = ConfigurationService.getProperty("excel.rowSelector");
         if (savedRowSelector != null && !savedRowSelector.isEmpty()) {
             rowSelector = savedRowSelector.charAt(0);
             rowSelectorField.setText(String.valueOf(rowSelector));
         }
 
         // Загрузка номера столбца
-        String savedProfileColumn = ConfigManager.getProperty("excel.profileStartColumn");
+        String savedProfileColumn = ConfigurationService.getProperty("excel.profileStartColumn");
         if (savedProfileColumn != null && !savedProfileColumn.isEmpty()) {
             try {
                 profileStartColumn = Integer.parseInt(savedProfileColumn);
@@ -145,11 +145,11 @@ public class ExcelInputPanel implements PaneInterface {
     }
 
     private void saveCurrentDirectoryToProperty() {
-        ConfigManager.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
+        ConfigurationService.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
     }
 
     private void setCurrentDirectory(JFileChooser fileChooser) {
-        var pathExcel = ConfigManager.getProperty("project.pathExcel");
+        var pathExcel = ConfigurationService.getProperty("project.pathExcel");
         if (pathExcel == null || pathExcel.isEmpty()) {
             return;
         }
