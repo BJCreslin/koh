@@ -7,22 +7,11 @@ public class ValueFinder {
 
     ValueShiftPair find(Row row) {
         for (Cell cell : row) {
-            String value = getCellValue(cell);
-            if (value != null && !value.isEmpty()) {
+            String value = ExcelUtils.getCellValue(cell);
+            if (!value.isEmpty()) {
                 return new ValueShiftPair(cell.getColumnIndex(), value);
             }
         }
         return null;
-    }
-
-    public static String getCellValue(Cell cell) {
-        if (cell == null) {
-            return null;
-        }
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
-            default -> cell.getStringCellValue();
-        };
     }
 }

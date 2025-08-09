@@ -5,7 +5,7 @@ import java.util.List;
 
 public class KeysStack {
 
-    private List<String> keys;
+    private final List<String> keys;
 
     public KeysStack() {
         keys = new ArrayList<>();
@@ -20,24 +20,20 @@ public class KeysStack {
         if (pos < 1) {
             throw new IllegalArgumentException("Значение shift должно быть больше или равно 0");
         }
+        
         int currentSize = keys.size();
-        String value = changeValue(pair.value());
+        String value = ExcelUtils.cleanValue(pair.value());
+        
         if (pos <= currentSize) {
             keys.set(pos - 1, value);
-            while (keys.size() > pos) {
-                keys.remove(keys.size() - 1);
+            // Оптимизированное удаление элементов с конца
+            if (keys.size() > pos) {
+                keys.subList(pos, keys.size()).clear();
             }
         } else if (pos == currentSize + 1) {
             keys.add(value);
         } else {
             throw new IllegalArgumentException("Недопустимое значение shift. Ожидается: " + (currentSize + 1));
         }
-    }
-
-    private static String changeValue(String value) {
-        if (value.contains("/n")) {
-            value = value.replace("/n", "&#13;&#10;");
-        }
-        return value;
     }
 }
