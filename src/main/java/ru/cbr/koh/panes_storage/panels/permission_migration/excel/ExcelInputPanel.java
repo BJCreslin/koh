@@ -26,11 +26,13 @@ public class ExcelInputPanel implements PaneInterface {
     private int profileStartColumn = 11; // номер столбца, с которого начинаются профили (по умолчанию 11)
 
     private File file;
+    private final InformationPanel informationPanel;
 
-    public void ExcelInputPanel() {
+    public ExcelInputPanel(InformationPanel informationPanel) {
+        this.informationPanel = informationPanel;
         var profileStartColumnString = ConfigurationService.getProperty("excel.profileStartColumn");
         if (profileStartColumnString != null) {
-            profileStartColumn = Integer.parseInt(ConfigurationService.getProperty("excel.profileStartColumn"));
+            profileStartColumn = Integer.parseInt(profileStartColumnString);
         }
     }
 
@@ -65,7 +67,11 @@ public class ExcelInputPanel implements PaneInterface {
                 if (text != null && !text.isEmpty()) {
                     rowSelector = text.charAt(0);
                     // Сохраняем в конфигурации
-                    ConfigurationService.setProperty("excel.rowSelector", String.valueOf(rowSelector));
+                    try {
+                        ConfigurationService.setProperty("excel.rowSelector", String.valueOf(rowSelector));
+                    } catch (ConfigurationException ex) {
+                        logger.warn("Не удалось сохранить настройку excel.rowSelector", ex);
+                    }
                 }
             }
         });
@@ -77,7 +83,11 @@ public class ExcelInputPanel implements PaneInterface {
         profileColumnSpinner.addChangeListener(e -> {
             profileStartColumn = (Integer) profileColumnSpinner.getValue();
             // Сохраняем в конфигурации
-            ConfigurationService.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
+            try {
+                ConfigurationService.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
+            } catch (ConfigurationException ex) {
+                logger.warn("Не удалось сохранить настройку excel.profileStartColumn", ex);
+            }
         });
 
         settingsPanel.add(rowSelectorLabel);
@@ -145,7 +155,7 @@ public class ExcelInputPanel implements PaneInterface {
         try {
             FileReader reader = new FileReader(file, rowSelector, profileStartColumn);
             List<Permission> permissions = reader.read();
-            var information = InformationPanel.getInformation();
+            var information = informationPanel.getInformation();
             ChangeLog changeLog = new ChangeLog(information, permissions);
             changeLog.create();
             logger.info("Changelog успешно создан из файла: {}", file.getName());

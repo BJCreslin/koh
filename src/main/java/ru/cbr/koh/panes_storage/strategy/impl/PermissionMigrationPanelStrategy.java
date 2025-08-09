@@ -47,7 +47,7 @@ public class PermissionMigrationPanelStrategy implements SaveablePanelStrategy {
             PermissionPanel permissionPanel = new PermissionPanel(profilePanel, informationPanel);
             nestedTabbedPane.addTab(permissionPanel.getTitle(), permissionPanel.createPanel(frame));
 
-            ExcelInputPanel excelInputPanel = new ExcelInputPanel();
+            ExcelInputPanel excelInputPanel = new ExcelInputPanel(informationPanel);
             nestedTabbedPane.addTab(excelInputPanel.getTitle(), excelInputPanel.createPanel(frame));
 
             setDefaultPanels(nestedTabbedPane);

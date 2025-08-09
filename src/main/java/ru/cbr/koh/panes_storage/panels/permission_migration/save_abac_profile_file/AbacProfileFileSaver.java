@@ -2,6 +2,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_f
 
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.properties.ConfigurationService;
+import ru.cbr.koh.exceptions.ConfigurationException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -16,7 +17,11 @@ import java.util.stream.Stream;
 
 public class AbacProfileFileSaver {
 
-    private final ConfigurationService properties = ConfigurationService.getInstance();
+    private final ConfigurationService properties;
+
+    public AbacProfileFileSaver() throws ConfigurationException {
+        this.properties = ConfigurationService.getInstance();
+    }
 
     public void save(List<Permission> permissions) {
 

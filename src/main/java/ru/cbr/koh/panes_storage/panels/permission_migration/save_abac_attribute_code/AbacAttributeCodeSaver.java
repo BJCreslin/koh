@@ -2,6 +2,7 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_attribute
 
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.properties.ConfigurationService;
+import ru.cbr.koh.exceptions.ConfigurationException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -12,7 +13,11 @@ import java.util.Locale;
 
 public class AbacAttributeCodeSaver {
 
-    private final ConfigurationService properties = ConfigurationService.getInstance();
+    private final ConfigurationService properties;
+
+    public AbacAttributeCodeSaver() throws ConfigurationException {
+        this.properties = ConfigurationService.getInstance();
+    }
 
     public void save(List<Permission> permissions) {
         Path filePath = Path.of(properties.getAbacAttributeCodeFilePath());

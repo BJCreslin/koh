@@ -11,6 +11,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.tr
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_attribute_code.AbacAttributeCodeSaver;
 import ru.cbr.koh.panes_storage.panels.permission_migration.save_abac_profile_file.AbacProfileFileSaver;
+import ru.cbr.koh.exceptions.ConfigurationException;
 
 import ru.cbr.koh.utils.ResourceValidator;
 
@@ -41,12 +42,20 @@ public class ChangeLog {
         String fileContent = getFileContent(permissions, permissionId);
         saveFile(permissionId, fileContent);
         if (information.shouldWriteAbakFile()) {
-            var saver = new AbacProfileFileSaver();
-            saver.save(permissions);
+            try {
+                var saver = new AbacProfileFileSaver();
+                saver.save(permissions);
+            } catch (ConfigurationException e) {
+                throw new RuntimeException("Ошибка конфигурации при создании AbacProfileFileSaver", e);
+            }
         }
         if(information.shouldWriteAbacAttributeCode()){
-            var abacAttributeCodeSaver = new AbacAttributeCodeSaver();
-            abacAttributeCodeSaver.save(permissions);
+            try {
+                var abacAttributeCodeSaver = new AbacAttributeCodeSaver();
+                abacAttributeCodeSaver.save(permissions);
+            } catch (ConfigurationException e) {
+                throw new RuntimeException("Ошибка конфигурации при создании AbacAttributeCodeSaver", e);
+            }
         }
     }
 
