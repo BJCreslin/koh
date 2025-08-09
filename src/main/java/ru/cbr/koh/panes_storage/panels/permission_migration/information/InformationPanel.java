@@ -6,6 +6,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.I
 import ru.cbr.koh.properties.ConfigurationService;
 import ru.cbr.koh.exceptions.ConfigurationException;
 import ru.cbr.koh.exceptions.SerializationException;
+import ru.cbr.koh.utils.ModernTheme;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,120 +37,39 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
 
     @Override
     public String getTitle() {
-        return "Common information";
+        return "📋 Общая информация";
     }
 
     @Override
     public JComponent createPanel(JFrame frame) {
-        JPanel panel = new JPanel();
-        GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE
+        ));
 
+        // Создаем карточку с основной информацией
+        JPanel infoCard = createMainInfoCard();
+        
+        // Создаем карточку с настройками
+        JPanel settingsCard = createSettingsCard();
+        
+        // Создаем карточку режима ввода данных
+        JPanel inputModeCard = createInputModeCard();
 
-        JLabel keyLabel = new JLabel();
-        keyLabel.setText("Key prefix");
+        // Добавляем все карточки на главную панель
+        mainPanel.add(infoCard);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
+        mainPanel.add(settingsCard);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
+        mainPanel.add(inputModeCard);
+        mainPanel.add(Box.createVerticalGlue()); // Заполнитель для выравнивания по верху
 
-        textField = new JTextField();
-        textField.setText(getKey());
-
-        JLabel authorLabel = new JLabel();
-        authorLabel.setText("Author");
-
-        authorField = new JTextField();
-        authorField.setText(getAuthor());
-
-
-        JLabel storyNumberLabel = new JLabel();
-        storyNumberLabel.setText("Story number");
-
-        storyNumberField = new JTextField();
-        storyNumberField.setText(getStoryNumber());
-
-        JLabel tabNameLabel = new JLabel();
-        tabNameLabel.setText("Story name");
-
-        tabNameField = new JTextField();
-        tabNameField.setText(getStoryName());
-
-
-        excelInputCheckBox = new JCheckBox("Input data from excel");
-        excelInputCheckBox.setSelected(getDefaultExcelInputCheckBox());
-
-        checkBox = new JCheckBox("Save abac's politics to file");
-        checkBox.setSelected(getCheckboxState());
-
-        Dimension txtFieldSize = new Dimension(properties.getHorizontalSize() - RIGHT_MARGIN,
-                textField.getPreferredSize().height);
-        textField.setPreferredSize(txtFieldSize);
-        authorField.setPreferredSize(txtFieldSize);
-        storyNumberField.setPreferredSize(txtFieldSize);
-        tabNameField.setPreferredSize(txtFieldSize);
-        checkBox.setPreferredSize(txtFieldSize);
-        excelInputCheckBox.setPreferredSize(txtFieldSize);
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(LEFT_MARGIN)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(textField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(authorField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(storyNumberField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(tabNameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(checkBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(excelInputCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(10))
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, Short.MAX_VALUE)
-                                .addComponent(keyLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, Short.MAX_VALUE)
-                                .addComponent(authorLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, Short.MAX_VALUE)
-                                .addComponent(storyNumberLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, Short.MAX_VALUE))
-                        .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, Short.MAX_VALUE)
-                                .addComponent(tabNameLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, Short.MAX_VALUE))
-        );
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(keyLabel))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(textField))
-                        .addGap(DELIMITER_HEIGHT)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(authorLabel))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(authorField))
-                        .addGap(DELIMITER_HEIGHT)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(storyNumberLabel))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(storyNumberField))
-                        .addGap(DELIMITER_HEIGHT)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(tabNameLabel))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(tabNameField))
-                        .addGap(DELIMITER_HEIGHT)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(tabNameLabel))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(checkBox))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(excelInputCheckBox))
-        );
-
-        return panel;
+        return mainPanel;
     }
 
     private String getStoryName() {
@@ -253,5 +173,168 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
 
     public JCheckBox getExcelInputCheckBox() {
         return excelInputCheckBox;
+    }
+    
+    /**
+     * Создает карточку с основной информацией
+     */
+    private JPanel createMainInfoCard() {
+        JPanel card = ModernTheme.createCardWithTitle("📝 Основная информация");
+        card.setLayout(new BorderLayout());
+        
+        JPanel content = new JPanel(new GridBagLayout());
+        content.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL, 
+                              ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Префикс ключа
+        JLabel keyLabel = new JLabel("Префикс ключа:");
+        keyLabel.setFont(ModernTheme.FONT_BOLD);
+        keyLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        textField = ModernTheme.createTextField("Введите префикс ключа");
+        textField.setText(getKey());
+        
+        // Автор
+        JLabel authorLabel = new JLabel("Автор:");
+        authorLabel.setFont(ModernTheme.FONT_BOLD);
+        authorLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        authorField = ModernTheme.createTextField("Введите имя автора");
+        authorField.setText(getAuthor());
+
+        // Размещение компонентов
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        content.add(keyLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        content.add(textField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        content.add(authorLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        content.add(authorField, gbc);
+
+        card.add(content, BorderLayout.CENTER);
+        return card;
+    }
+    
+    /**
+     * Создает карточку с настройками истории
+     */
+    private JPanel createSettingsCard() {
+        JPanel card = ModernTheme.createCardWithTitle("🎯 Настройки истории");
+        card.setLayout(new BorderLayout());
+        
+        JPanel content = new JPanel(new GridBagLayout());
+        content.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL, 
+                              ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Номер истории
+        JLabel storyNumberLabel = new JLabel("Номер истории:");
+        storyNumberLabel.setFont(ModernTheme.FONT_BOLD);
+        storyNumberLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        storyNumberField = ModernTheme.createTextField("Введите номер истории");
+        storyNumberField.setText(getStoryNumber());
+
+        // Название истории
+        JLabel storyNameLabel = new JLabel("Название истории:");
+        storyNameLabel.setFont(ModernTheme.FONT_BOLD);
+        storyNameLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        tabNameField = ModernTheme.createTextField("Введите название истории");
+        tabNameField.setText(getStoryName());
+
+        // Размещение компонентов
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        content.add(storyNumberLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        content.add(storyNumberField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        content.add(storyNameLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        content.add(tabNameField, gbc);
+
+        card.add(content, BorderLayout.CENTER);
+        return card;
+    }
+    
+    /**
+     * Создает карточку режима ввода данных
+     */
+    private JPanel createInputModeCard() {
+        JPanel card = ModernTheme.createCardWithTitle("⚙️ Режим работы");
+        card.setLayout(new BorderLayout());
+        
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        
+        // Чекбокс сохранения ABAC политик
+        checkBox = new JCheckBox("💾 Сохранить ABAC политики в файл");
+        checkBox.setSelected(getCheckboxState());
+        ModernTheme.styleCheckbox(checkBox);
+        checkBox.setFont(ModernTheme.FONT_BOLD);
+        checkBox.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        // Панель режима Excel
+        JPanel excelModePanel = createExcelModePanel();
+        
+        content.add(checkBox);
+        content.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_MEDIUM)));
+        content.add(excelModePanel);
+        
+        card.add(content, BorderLayout.CENTER);
+        return card;
+    }
+    
+    /**
+     * Создает панель режима Excel
+     */
+    private JPanel createExcelModePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(ModernTheme.SUCCESS_COLOR.brighter());
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(ModernTheme.SUCCESS_COLOR, 2),
+            BorderFactory.createEmptyBorder(
+                ModernTheme.PADDING_MEDIUM,
+                ModernTheme.PADDING_MEDIUM, 
+                ModernTheme.PADDING_MEDIUM, 
+                ModernTheme.PADDING_MEDIUM
+            )
+        ));
+        
+        // Переключатель Excel
+        excelInputCheckBox = new JCheckBox("📊 Загрузить данные из Excel файла");
+        excelInputCheckBox.setSelected(getDefaultExcelInputCheckBox());
+        excelInputCheckBox.setFont(ModernTheme.FONT_LARGE_BOLD);
+        excelInputCheckBox.setForeground(new Color(0, 100, 0));
+        excelInputCheckBox.setBackground(ModernTheme.SUCCESS_COLOR.brighter());
+        excelInputCheckBox.setOpaque(true);
+        excelInputCheckBox.setFocusPainted(false);
+        excelInputCheckBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Описание
+        JLabel description = new JLabel(
+            "<html><i>При включении этого режима данные будут загружаться из Excel файла.<br/>" +
+            "Вкладки 'Profile' и 'Permission' будут отключены.</i></html>"
+        );
+        description.setFont(ModernTheme.FONT_SMALL);
+        description.setForeground(ModernTheme.TEXT_SECONDARY);
+        
+        panel.add(excelInputCheckBox);
+        panel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_SMALL)));
+        panel.add(description);
+        
+        return panel;
     }
 }

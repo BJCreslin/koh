@@ -8,6 +8,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.ba
 import ru.cbr.koh.properties.ConfigurationService;
 import ru.cbr.koh.exceptions.ConfigurationException;
 import ru.cbr.koh.exceptions.ExcelParsingException;
+import ru.cbr.koh.utils.ModernTheme;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,35 +39,46 @@ public class ExcelInputPanel implements PaneInterface {
 
     @Override
     public String getTitle() {
-        return "Data from Excel";
+        return "📊 Excel Input";
     }
 
     @Override
     public JComponent createPanel(JFrame frame) {
-        JPanel jPanel = new JPanel();
-        jPanel.setLayout(new BoxLayout(jPanel, BoxLayout.Y_AXIS));
-        jPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE, 
+            ModernTheme.PADDING_LARGE
+        ));
 
-        // Панель для настроек Excel
-        JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new GridLayout(2, 2, 10, 10));
-        settingsPanel.setBorder(BorderFactory.createTitledBorder("Excel Settings"));
-        settingsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        settingsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Создаем карточку с настройками Excel
+        JPanel settingsCard = ModernTheme.createCardWithTitle("⚙️ Настройки Excel");
+        settingsCard.setLayout(new BorderLayout());
+        
+        JPanel settingsContent = new JPanel(new GridBagLayout());
+        settingsContent.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL, 
+                              ModernTheme.PADDING_SMALL, ModernTheme.PADDING_SMALL);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        // Добавление компонента для выбора символа строки
-        JLabel rowSelectorLabel = new JLabel("Row Selector Symbol:");
-        JTextField rowSelectorField = new JTextField(String.valueOf(rowSelector), 1);
-        // Увеличить размер текущего шрифта на 4 пункта
-        float newSize = rowSelectorField.getFont().getSize() + 4f;
-        rowSelectorField.setFont(rowSelectorField.getFont().deriveFont(newSize));
+        // Компонент для выбора символа строки
+        JLabel rowSelectorLabel = new JLabel("Символ выбора строки:");
+        rowSelectorLabel.setFont(ModernTheme.FONT_BOLD);
+        rowSelectorLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
+        JTextField rowSelectorField = ModernTheme.createTextField("Символ строки");
+        rowSelectorField.setText(String.valueOf(rowSelector));
+        rowSelectorField.setPreferredSize(new Dimension(80, ModernTheme.COMPONENT_HEIGHT));
         rowSelectorField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
                 String text = rowSelectorField.getText();
                 if (text != null && !text.isEmpty()) {
                     rowSelector = text.charAt(0);
-                    // Сохраняем в конфигурации
                     try {
                         ConfigurationService.setProperty("excel.rowSelector", String.valueOf(rowSelector));
                     } catch (ConfigurationException ex) {
@@ -76,13 +88,17 @@ public class ExcelInputPanel implements PaneInterface {
             }
         });
 
-        // Добавление компонента для выбора начального столбца профилей
-        JLabel profileColumnLabel = new JLabel("Profile Start Column:");
+        // Компонент для выбора начального столбца профилей
+        JLabel profileColumnLabel = new JLabel("Начальный столбец профилей:");
+        profileColumnLabel.setFont(ModernTheme.FONT_BOLD);
+        profileColumnLabel.setForeground(ModernTheme.TEXT_PRIMARY);
+        
         JSpinner profileColumnSpinner = new JSpinner(
                 new SpinnerNumberModel(profileStartColumn, 1, 100, 1));
+        ModernTheme.styleSpinner(profileColumnSpinner);
+        profileColumnSpinner.setPreferredSize(new Dimension(120, ModernTheme.COMPONENT_HEIGHT));
         profileColumnSpinner.addChangeListener(e -> {
             profileStartColumn = (Integer) profileColumnSpinner.getValue();
-            // Сохраняем в конфигурации
             try {
                 ConfigurationService.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
             } catch (ConfigurationException ex) {
@@ -90,42 +106,37 @@ public class ExcelInputPanel implements PaneInterface {
             }
         });
 
-        settingsPanel.add(rowSelectorLabel);
-        settingsPanel.add(rowSelectorField);
-        settingsPanel.add(profileColumnLabel);
-        settingsPanel.add(profileColumnSpinner);
+        // Размещение компонентов в сетке
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0;
+        settingsContent.add(rowSelectorLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        settingsContent.add(rowSelectorField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0;
+        settingsContent.add(profileColumnLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1;
+        settingsContent.add(profileColumnSpinner, gbc);
 
+        settingsCard.add(settingsContent, BorderLayout.CENTER);
+        
         // Загрузка сохраненных настроек
         loadSettings(rowSelectorField, profileColumnSpinner);
 
-        ImageIcon originalIcon = new ImageIcon("images.png");
-        Image scaledImage = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        // Создаем современную кнопку загрузки файла
+        JButton fileButton = createModernFileButton(frame);
 
-        JButton folderButton = new JButton("Select xlsx Permissions File", scaledIcon);  //
-        folderButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
-        folderButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        folderButton.setFocusPainted(false);
+        // Создаем информационную панель
+        JPanel infoPanel = createInfoPanel();
 
-        folderButton.addActionListener(e -> {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
-            setCurrentDirectory(fileChooser);
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-            int option = fileChooser.showOpenDialog(frame);
-            if (option == JFileChooser.APPROVE_OPTION) {
-                file = fileChooser.getSelectedFile();
-                createChangelogMigration();
-                saveCurrentDirectoryToProperty();
-            }
-        });
-
-        // Добавляем компоненты на основную панель
-        jPanel.add(settingsPanel);
-        jPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Отступ
-        jPanel.add(folderButton);
-        return jPanel;
+        // Добавляем все компоненты на главную панель
+        mainPanel.add(settingsCard);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_LARGE)));
+        mainPanel.add(fileButton);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, ModernTheme.PADDING_MEDIUM)));
+        mainPanel.add(infoPanel);
+        mainPanel.add(Box.createVerticalGlue()); // Заполнитель для выравнивания по верху
+        
+        return mainPanel;
     }
 
     /**
@@ -188,5 +199,82 @@ public class ExcelInputPanel implements PaneInterface {
             return;
         }
         fileChooser.setCurrentDirectory(new File(pathExcel));
+    }
+    
+    /**
+     * Создает современную кнопку для выбора файла
+     */
+    private JButton createModernFileButton(JFrame frame) {
+        // Создаем иконку для кнопки
+        ImageIcon icon = null;
+        try {
+            ImageIcon originalIcon = new ImageIcon("images.png");
+            Image scaledImage = originalIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(scaledImage);
+        } catch (Exception e) {
+            logger.debug("Не удалось загрузить иконку для кнопки", e);
+        }
+        
+        JButton fileButton;
+        if (icon != null) {
+            fileButton = ModernTheme.createIconButton("📄 Выбрать Excel файл с разрешениями", icon);
+        } else {
+            fileButton = ModernTheme.createPrimaryButton("📄 Выбрать Excel файл с разрешениями");
+        }
+        
+        fileButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, ModernTheme.BUTTON_HEIGHT));
+        fileButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        fileButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
+            setCurrentDirectory(fileChooser);
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+            int option = fileChooser.showOpenDialog(frame);
+            if (option == JFileChooser.APPROVE_OPTION) {
+                file = fileChooser.getSelectedFile();
+                createChangelogMigration();
+                saveCurrentDirectoryToProperty();
+            }
+        });
+        
+        return fileButton;
+    }
+    
+    /**
+     * Создает информационную панель с инструкциями
+     */
+    private JPanel createInfoPanel() {
+        JPanel infoCard = ModernTheme.createCardWithTitle("ℹ️ Информация");
+        infoCard.setLayout(new BorderLayout());
+        
+        JTextArea infoText = new JTextArea();
+        infoText.setText(
+            "Инструкции по использованию:\n\n" +
+            "1. Настройте символ выбора строки (по умолчанию 'i')\n" +
+            "2. Укажите начальный столбец профилей (по умолчанию 11)\n" +
+            "3. Выберите Excel файл с разрешениями (.xlsx)\n" +
+            "4. Система автоматически создаст changelog миграции\n\n" +
+            "Примечание: Убедитесь, что Excel файл содержит правильную структуру данных " +
+            "с профилями, начинающимися с указанного столбца."
+        );
+        
+        infoText.setFont(ModernTheme.FONT_REGULAR);
+        infoText.setForeground(ModernTheme.TEXT_SECONDARY);
+        infoText.setBackground(ModernTheme.BACKGROUND_SECONDARY);
+        infoText.setEditable(false);
+        infoText.setWrapStyleWord(true);
+        infoText.setLineWrap(true);
+        infoText.setBorder(BorderFactory.createEmptyBorder(
+            ModernTheme.PADDING_SMALL, 0, 0, 0
+        ));
+        
+        infoCard.add(infoText, BorderLayout.CENTER);
+        
+        // Ограничиваем высоту информационной панели
+        infoCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
+        
+        return infoCard;
     }
 }

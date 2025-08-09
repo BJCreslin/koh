@@ -54,10 +54,22 @@ public class PermissionMigrationPanelStrategy implements SaveablePanelStrategy {
 
             informationPanel.getExcelInputCheckBox().addItemListener(
                     e -> {
-                        boolean enabled = informationPanel.getExcelInputCheckBox().isSelected();
-                        nestedTabbedPane.setEnabledAt(1, !enabled);
-                        nestedTabbedPane.setEnabledAt(2, !enabled);
-                        nestedTabbedPane.setEnabledAt(3, enabled);
+                        boolean excelMode = informationPanel.getExcelInputCheckBox().isSelected();
+                        
+                        // Переключение доступности вкладок
+                        nestedTabbedPane.setEnabledAt(1, !excelMode);
+                        nestedTabbedPane.setEnabledAt(2, !excelMode);
+                        nestedTabbedPane.setEnabledAt(3, excelMode);
+                        
+                        // Визуальная индикация состояния вкладок
+                        updateTabTitles(nestedTabbedPane, excelMode);
+                        
+                        // Автоматическое переключение на активную вкладку
+                        if (excelMode) {
+                            nestedTabbedPane.setSelectedIndex(3); // Excel вкладка
+                        } else {
+                            nestedTabbedPane.setSelectedIndex(1); // Profile вкладка
+                        }
                     }
             );
 
@@ -105,12 +117,40 @@ public class PermissionMigrationPanelStrategy implements SaveablePanelStrategy {
             nestedTabbedPane.setEnabledAt(1, !enabled);
             nestedTabbedPane.setEnabledAt(2, !enabled);
             nestedTabbedPane.setEnabledAt(3, enabled);
+            
+            // Инициализация заголовков вкладок
+            updateTabTitles(nestedTabbedPane, enabled);
+            
+            // Установка активной вкладки по умолчанию
+            if (enabled) {
+                nestedTabbedPane.setSelectedIndex(3); // Excel вкладка
+            } else {
+                nestedTabbedPane.setSelectedIndex(1); // Profile вкладка
+            }
         } catch (ConfigurationException e) {
             logger.error("Ошибка при получении конфигурации для установки панелей по умолчанию", e);
             // Устанавливаем значения по умолчанию
             nestedTabbedPane.setEnabledAt(1, true);
             nestedTabbedPane.setEnabledAt(2, true);
             nestedTabbedPane.setEnabledAt(3, false);
+            updateTabTitles(nestedTabbedPane, false);
+        }
+    }
+    
+    /**
+     * Обновляет заголовки вкладок в зависимости от режима
+     */
+    private void updateTabTitles(JTabbedPane tabbedPane, boolean excelMode) {
+        if (excelMode) {
+            // Excel режим - выделяем активную вкладку
+            tabbedPane.setTitleAt(1, "❌ Profile (отключено)");
+            tabbedPane.setTitleAt(2, "❌ Permission (отключено)");
+            tabbedPane.setTitleAt(3, "✅ 📊 Excel Input (активно)");
+        } else {
+            // Обычный режим
+            tabbedPane.setTitleAt(1, "Profile");
+            tabbedPane.setTitleAt(2, "Permission");
+            tabbedPane.setTitleAt(3, "📊 Excel Input (отключено)");
         }
     }
 }
