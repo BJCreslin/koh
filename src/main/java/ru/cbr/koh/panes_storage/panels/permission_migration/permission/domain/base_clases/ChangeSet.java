@@ -6,6 +6,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.pr
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.profile_secure_elem.ProfileSecureElemMigrationContentRollback;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.secure_elem.SecureElemPermissionId;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
+import ru.cbr.koh.utils.ResourceValidator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -47,16 +48,18 @@ public class ChangeSet {
     }
 
     private static String getChangeSetTempleFileContent() {
-        URL resource = ChangeLog.class.getClassLoader().getResource("changeSetTemplate.xml");
+        URL resource = ResourceValidator.getResourceSafely("changeSetTemplate.xml", ChangeSet.class);
         if (resource == null) {
-            throw new RuntimeException("File not found!");
+            throw new RuntimeException("Файл шаблона не найден: changeSetTemplate.xml. Убедитесь, что файл находится в resources/");
         }
         try {
             Path path = Paths.get(resource.toURI());
             List<String> fileLines = Files.readAllLines(path);
             return String.join("\n", fileLines);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка чтения файла шаблона changeSetTemplate.xml", e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Некорректный URI для ресурса changeSetTemplate.xml", e);
         }
     }
 

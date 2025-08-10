@@ -18,13 +18,14 @@ public class ProfileHeaderManager {
         Row row = treeSheet.getRow(profileRowNumber);
         int shift = 0;
         while (true) {
-            var cellValue = ValueFinder.getCellValue(row.getCell(profileStartColumn + shift));
-            if (cellValue == null || cellValue.isBlank()) {
+            var cellValue = ExcelUtils.getCellValue(row.getCell(profileStartColumn + shift));
+            if (cellValue.isBlank()) {
                 break;
             }
 
-            if (Profile.getProfileByName(cellValue) != null) {
-                headerMap.put(shift, Profile.getProfileByName(cellValue));
+            Profile profile = Profile.getProfileByName(cellValue);
+            if (profile != null) {
+                headerMap.put(shift, profile);
             }
             shift++;
         }

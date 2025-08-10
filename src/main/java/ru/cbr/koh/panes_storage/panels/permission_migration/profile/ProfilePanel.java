@@ -1,6 +1,8 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.profile;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
+import ru.cbr.koh.main_window.SaveablePanel;
+import ru.cbr.koh.exceptions.SerializationException;
 
 import javax.swing.*;
 import java.io.FileWriter;
@@ -11,13 +13,12 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProfilePanel implements PaneInterface {
+public class ProfilePanel implements PaneInterface, SaveablePanel {
 
-    private static final List<JCheckBox> checkBoxList = new ArrayList<>();
-
+    private final List<JCheckBox> checkBoxList = new ArrayList<>();
     private static final String FILE_NAME = "selectedCheckboxes.txt";
 
-    public static List<Profile> getCheckedProfiles() {
+    public List<Profile> getCheckedProfiles() {
         if (checkBoxList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -72,7 +73,7 @@ public class ProfilePanel implements PaneInterface {
         return Collections.emptyList();
     }
 
-    private static void addCheckBoxes(JPanel checkBoxPanel, List<JCheckBox> checkBoxList) {
+    private void addCheckBoxes(JPanel checkBoxPanel, List<JCheckBox> checkBoxList) {
         for (Profile option : Profile.values()) {
             JCheckBox checkBox = new JCheckBox(option.getDisplayName());
             checkBoxPanel.add(checkBox);
@@ -80,7 +81,8 @@ public class ProfilePanel implements PaneInterface {
         }
     }
 
-    public static void saveCheckBoxesFile() {
+    @Override
+    public void saveData() throws SerializationException {
         if (!checkBoxList.isEmpty()) {
             Set<String> checkedBoxesNames =
                     checkBoxList.stream()
@@ -93,8 +95,17 @@ public class ProfilePanel implements PaneInterface {
                     writer.write(name + System.lineSeparator());
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new SerializationException("Не удалось сохранить выбранные профили в файл: " + FILE_NAME, e);
             }
         }
+    }
+    
+    /**
+     * @deprecated Используйте метод saveData() для сохранения данных панели
+     */
+    @Deprecated
+    public static void saveCheckBoxesFile() {
+        // Этот метод оставлен для обратной совместимости, но не должен использоваться
+        throw new UnsupportedOperationException("Используйте инстансный метод saveData() вместо статического saveCheckBoxesFile()");
     }
 }

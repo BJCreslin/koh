@@ -1,62 +1,60 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration;
 
+import ru.cbr.koh.exceptions.SerializationException;
+import ru.cbr.koh.main_window.SaveablePanel;
 import ru.cbr.koh.panes_storage.PaneInterface;
-import ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel;
-import ru.cbr.koh.panes_storage.panels.permission_migration.permission.PermissionPanel;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.ProfilePanel;
-import ru.cbr.koh.properties.PropertiesService;
+import ru.cbr.koh.panes_storage.strategy.PanelContext;
+import ru.cbr.koh.panes_storage.strategy.PanelType;
+import ru.cbr.koh.panes_storage.strategy.PanelStrategyFactory;
+import ru.cbr.koh.panes_storage.strategy.impl.PermissionMigrationPanelStrategy;
 
 import javax.swing.*;
 
-public class PermissionMigrationPanel implements PaneInterface {
+/**
+ * Панель миграции разрешений, использующая паттерн Strategy
+ * @deprecated Используйте {@link PanelContext} с {@link PermissionMigrationPanelStrategy}
+ */
+@Deprecated
+public class PermissionMigrationPanel implements PaneInterface, SaveablePanel {
 
-    private ProfilePanel profilePanel;
+    private final PanelContext context;
+    private final PermissionMigrationPanelStrategy strategy;
+
+    public PermissionMigrationPanel() {
+        this.strategy = (PermissionMigrationPanelStrategy) PanelStrategyFactory.createStrategy(PanelType.PERMISSION_MIGRATION);
+        this.context = new PanelContext(strategy);
+    }
 
     @Override
     public String getTitle() {
-        return "permissions";
+        return context.getTitle();
     }
 
     @Override
     public JComponent createPanel(JFrame frame) {
-        JTabbedPane nestedTabbedPane = new JTabbedPane();
-
-        InformationPanel informationPanel = new InformationPanel();
-        nestedTabbedPane.addTab(informationPanel.getTitle(), informationPanel.createPanel(frame));
-
-        profilePanel = new ProfilePanel();
-        nestedTabbedPane.addTab(profilePanel.getTitle(), profilePanel.createPanel(frame));
-
-        PermissionPanel permissionPanel = new PermissionPanel();
-        nestedTabbedPane.addTab(permissionPanel.getTitle(), permissionPanel.createPanel(frame));
-
-        ExcelInputPanel excelInputPanel = new ExcelInputPanel();
-        nestedTabbedPane.addTab(excelInputPanel.getTitle(), excelInputPanel.createPanel(frame));
-
-        setDefaultPanels(nestedTabbedPane);
-
-        informationPanel.getExcelInputCheckBox().addItemListener(
-                e -> {
-                    boolean enabled = informationPanel.getExcelInputCheckBox().isSelected();
-                    nestedTabbedPane.setEnabledAt(1, !enabled);
-                    nestedTabbedPane.setEnabledAt(2, !enabled);
-                    nestedTabbedPane.setEnabledAt(3, enabled);
-                }
-        );
-
-        return nestedTabbedPane;
+        return context.createPanel(frame);
     }
 
+    /**
+     * Получить панель профиля
+     * @return панель профиля
+     */
     public ProfilePanel getProfilePanel() {
-        return profilePanel;
+        return strategy.getProfilePanel();
     }
-
-    private void setDefaultPanels(JTabbedPane nestedTabbedPane) {
-        PropertiesService propertiesService = PropertiesService.getInstance();
-        boolean enabled = propertiesService.getFromExcel();
-        nestedTabbedPane.setEnabledAt(1, !enabled);
-        nestedTabbedPane.setEnabledAt(2, !enabled);
-        nestedTabbedPane.setEnabledAt(3, enabled);
+    
+    /**
+     * Получить информационную панель
+     * @return информационная панель
+     */
+    public InformationPanel getInformationPanel() {
+        return strategy.getInformationPanel();
+    }
+    
+    @Override
+    public void saveData() throws SerializationException {
+        context.saveData();
     }
 }
