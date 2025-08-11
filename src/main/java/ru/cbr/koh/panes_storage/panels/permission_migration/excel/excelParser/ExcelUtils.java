@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader.*;
+
 /**
  * Утилитный класс для работы с Excel файлами
  */
@@ -83,8 +85,13 @@ public final class ExcelUtils {
         for (Row row : matrixSheet) {
             int rowNum = row.getRowNum();
 
-            boolean hasKO = getCellValue(row.getCell(12)).contains("+");
-            boolean hasGIBR = getCellValue(row.getCell(13)).contains("+");
+            boolean hasKO = getCellValue(row.getCell(MATRIX_CO_COLUMN_NUMBER)).contains(MATRIX_TREE_SYMBOL);
+            boolean hasGIBR = getCellValue(row.getCell(MATRIX_GIBR_COLUMN_NUMBER)).contains(MATRIX_TREE_SYMBOL);
+
+            if ((!hasGIBR) && (!hasKO)) {
+                hasKO = getCellValue(row.getCell(MATRIX_CO_COLUMN_NUMBER - 2)).contains(MATRIX_TREE_SYMBOL);
+                hasGIBR = getCellValue(row.getCell(MATRIX_GIBR_COLUMN_NUMBER - 2)).contains(MATRIX_TREE_SYMBOL);
+            }
 
             treeTypesCache.put(rowNum, new TreeTypeData(hasKO, hasGIBR));
         }

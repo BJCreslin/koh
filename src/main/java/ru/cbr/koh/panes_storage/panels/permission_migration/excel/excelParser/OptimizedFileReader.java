@@ -6,11 +6,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.cbr.koh.exceptions.ExcelParsingException;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
-import ru.cbr.koh.exceptions.ExcelParsingException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +24,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
+
+import static ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader.PROFILE_ROW_NUMBER;
 
 /**
  * Оптимизированная версия FileReader с поддержкой многопоточности и улучшенным кешированием
@@ -42,7 +44,7 @@ public class OptimizedFileReader {
     private final char rowSelector;
     private final int profileStartColumn;
     private final boolean enableParallelProcessing;
-    
+
     private Map<Integer, String> politicsCache;
     private Map<Integer, ExcelUtils.TreeTypeData> treeTypesCache;
 
@@ -63,26 +65,26 @@ public class OptimizedFileReader {
         }
 
         long startTime = System.currentTimeMillis();
-        
+
         try (InputStream inputStream = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet treeSheet = workbook.getSheet("Дерево");
-            
+
             if (treeSheet == null) {
                 throw new ExcelParsingException("Лист 'Дерево' не найден в файле: " + file.getPath());
             }
-            
+
             initializeCaches(workbook);
-            
-            var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn);
-            
-            List<Permission> permissions = enableParallelProcessing ? 
-                processRowsParallel(treeSheet, profileHeaderManager) :
-                processRowsSequential(treeSheet, profileHeaderManager);
-            
+
+            var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn, PROFILE_ROW_NUMBER);
+
+            List<Permission> permissions = enableParallelProcessing ?
+                    processRowsParallel(treeSheet, profileHeaderManager) :
+                    processRowsSequential(treeSheet, profileHeaderManager);
+
             long endTime = System.currentTimeMillis();
             logger.info("Обработано {} разрешений за {} мс", permissions.size(), endTime - startTime);
-            
+
             return permissions;
 
         } catch (IOException e) {
@@ -96,66 +98,66 @@ public class OptimizedFileReader {
             throw new ExcelParsingException("Неожиданная ошибка при парсинге файла: " + file.getPath(), e);
         }
     }
-    
+
     private List<Permission> processRowsSequential(Sheet treeSheet, ProfileHeaderManager profileHeaderManager) {
         List<Permission> permissions = new ArrayList<>();
         var valueFinder = new ValueFinder();
         var keysStack = new KeysStack();
-        
+
         for (Row row : treeSheet) {
             if (row.getRowNum() < TOP_SPACE) {
                 continue;
             }
-            
+
             Permission permission = processRow(row, valueFinder, keysStack, profileHeaderManager);
             if (permission != null) {
                 permissions.add(permission);
             }
         }
-        
+
         return permissions;
     }
-    
+
     private List<Permission> processRowsParallel(Sheet treeSheet, ProfileHeaderManager profileHeaderManager) {
         List<Row> rowsToProcess = new ArrayList<>();
-        
+
         // Собираем строки для обработки
         for (Row row : treeSheet) {
             if (row.getRowNum() >= TOP_SPACE) {
                 rowsToProcess.add(row);
             }
         }
-        
+
         int numThreads = Math.min(Runtime.getRuntime().availableProcessors(), 4);
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-        
+
         try {
             List<CompletableFuture<List<Permission>>> futures = IntStream.range(0, numThreads)
-                .mapToObj(threadIndex -> CompletableFuture.supplyAsync(() -> {
-                    List<Permission> threadPermissions = new ArrayList<>();
-                    var valueFinder = new ValueFinder();
-                    var keysStack = new KeysStack();
-                    
-                    for (int i = threadIndex; i < rowsToProcess.size(); i += numThreads) {
-                        Row row = rowsToProcess.get(i);
-                        Permission permission = processRow(row, valueFinder, keysStack, profileHeaderManager);
-                        if (permission != null) {
-                            threadPermissions.add(permission);
+                    .mapToObj(threadIndex -> CompletableFuture.supplyAsync(() -> {
+                        List<Permission> threadPermissions = new ArrayList<>();
+                        var valueFinder = new ValueFinder();
+                        var keysStack = new KeysStack();
+
+                        for (int i = threadIndex; i < rowsToProcess.size(); i += numThreads) {
+                            Row row = rowsToProcess.get(i);
+                            Permission permission = processRow(row, valueFinder, keysStack, profileHeaderManager);
+                            if (permission != null) {
+                                threadPermissions.add(permission);
+                            }
                         }
-                    }
-                    
-                    return threadPermissions;
-                }, executor))
-                .toList();
-            
+
+                        return threadPermissions;
+                    }, executor))
+                    .toList();
+
             // Собираем результаты
             List<Permission> allPermissions = new ArrayList<>();
             for (CompletableFuture<List<Permission>> future : futures) {
                 allPermissions.addAll(future.get());
             }
-            
+
             return allPermissions;
-            
+
         } catch (Exception e) {
             logger.error("Ошибка при параллельной обработке", e);
             // Fallback к последовательной обработке
@@ -164,7 +166,7 @@ public class OptimizedFileReader {
             executor.shutdown();
         }
     }
-    
+
     private Permission processRow(Row row, ValueFinder valueFinder, KeysStack keysStack, ProfileHeaderManager profileHeaderManager) {
         try {
             ValueShiftPair valueShiftPair = valueFinder.find(row);
@@ -182,7 +184,7 @@ public class OptimizedFileReader {
             ExcelUtils.NumberPosition politicNumber = ExcelUtils.findLastNumber(value);
 
             if (politicNumber.number() != null) {
-                value = (value.substring(0, politicNumber.position()) + 
+                value = (value.substring(0, politicNumber.position()) +
                         value.substring(politicNumber.position() + politicNumber.number().length())).trim();
                 valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
             }
@@ -199,7 +201,7 @@ public class OptimizedFileReader {
                 String name = ExcelUtils.getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                 String description = getDescription(row);
                 List<TreeType> types = getTreeType(row.getRowNum());
-                
+
                 logger.debug("Saving permission with key: {}", key);
                 return new Permission(
                         key,
@@ -211,9 +213,9 @@ public class OptimizedFileReader {
                         description,
                         types);
             }
-            
+
             return null;
-            
+
         } catch (Exception e) {
             logger.error("Ошибка обработки строки {}: {}", row.getRowNum(), e.getMessage(), e);
             return null;
@@ -231,7 +233,7 @@ public class OptimizedFileReader {
         } else {
             politicsCache = Map.of();
         }
-        
+
         // Кеширование типов дерева
         Sheet matrixSheet = workbook.getSheet("Матрица распределения прав АД");
         if (matrixSheet != null) {
@@ -240,7 +242,7 @@ public class OptimizedFileReader {
             treeTypesCache = Map.of();
         }
     }
-    
+
     private String getBankPolitic(String key) {
         return "GET_KO_LIST_" + key.replaceAll("[#-]", "_").toUpperCase(Locale.ROOT);
     }
@@ -252,7 +254,7 @@ public class OptimizedFileReader {
 
     private List<TreeType> getTreeType(int rowNumber) {
         List<TreeType> types = new ArrayList<>();
-        
+
         ExcelUtils.TreeTypeData data = treeTypesCache.get(rowNumber);
         if (data != null) {
             if (data.hasKO()) {
@@ -262,7 +264,7 @@ public class OptimizedFileReader {
                 types.add(TreeType.GIBR);
             }
         }
-        
+
         return types;
     }
 
@@ -278,7 +280,7 @@ public class OptimizedFileReader {
         if (politicNumber.number() == null) {
             return "";
         }
-        
+
         return politicsCache.getOrDefault(politicNumber.number(), "");
     }
 

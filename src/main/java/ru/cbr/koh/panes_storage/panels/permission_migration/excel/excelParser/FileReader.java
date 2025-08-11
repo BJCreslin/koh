@@ -32,9 +32,16 @@ public class FileReader {
     public static final int NEED_SAVE_COLUMN_NUMBER = 30;
     public static final int ORDER_COLUMN_NUMBER = 12;
     public static final int PROFILE_COLUMN_NUMBER = 14;
+    public static final int PROFILE_ROW_NUMBER = 3;
+
+    public static final int MATRIX_CO_COLUMN_NUMBER = 14;
+    public static final int MATRIX_GIBR_COLUMN_NUMBER = 15;
+    public static final String MATRIX_TREE_SYMBOL = "+";
 
 
-    public static final String BANK_DEPENDENT = "**";
+
+
+    public static final String BANK_DEPENDENT_SYMBOLS = "**";
     public static final String INCLUDE_ROW_SYMBOL = "i";
 
     private final File file;
@@ -72,7 +79,7 @@ public class FileReader {
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
-            var profileHeaderManager = new ProfileHeaderManager(treeSheet, PROFILE_COLUMN_NUMBER);
+            var profileHeaderManager = new ProfileHeaderManager(treeSheet, PROFILE_COLUMN_NUMBER, PROFILE_ROW_NUMBER);
 
             for (Row row : treeSheet) {
                 if (row.getRowNum() < TOP_SPACE) {
@@ -86,8 +93,8 @@ public class FileReader {
                     }
 
                     var value = valueShiftPair.value();
-                    var bankDependent = value.startsWith(BANK_DEPENDENT);
-                    if (bankDependent) {
+                    var isBankDependent = value.startsWith(BANK_DEPENDENT_SYMBOLS);
+                    if (isBankDependent) {
                         value = value.substring(2).trim();
                         valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
                     }
@@ -106,7 +113,7 @@ public class FileReader {
 
                     String relKey = valueShiftPair.value();
 
-                    if (!key.isBlank() && !key.isEmpty()) {
+                    if (!key.isBlank()) {
                         String politic = getPolitic(politicNumber);
                         List<Profile> profiles = getProfiles(profileHeaderManager, row);
                         String name = ExcelUtils.getCellValue(row.getCell(NAME_COLUMN_NUMBER));
@@ -119,7 +126,7 @@ public class FileReader {
                                             key,
                                             PermissionType.getPermissionType(relKey),
                                             politic,
-                                            bankDependent ? getBankPolitic(key) : "userAction",
+                                            isBankDependent ? getBankPolitic(key) : "userAction",
                                             name,
                                             profiles,
                                             description,

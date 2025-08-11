@@ -11,10 +11,7 @@ public class ProfileHeaderManager {
 
     private final Map<Integer, Profile> headerMap = new HashMap<>();
 
-
-    private final int profileRowNumber = 3;
-
-    ProfileHeaderManager(Sheet treeSheet, int profileStartColumn) {
+    ProfileHeaderManager(Sheet treeSheet, int profileStartColumn, int profileRowNumber) {
         Row row = treeSheet.getRow(profileRowNumber);
         int shift = 0;
         while (true) {
