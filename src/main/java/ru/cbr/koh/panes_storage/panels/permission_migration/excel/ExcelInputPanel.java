@@ -78,7 +78,7 @@ public class ExcelInputPanel implements PaneInterface {
                 if (text != null && !text.isEmpty()) {
                     rowSelector = text.charAt(0);
                     try {
-                        ConfigurationService.setProperty("excel.rowSelector", String.valueOf(rowSelector));
+                        ConfigurationService.setPropertyStatic("excel.rowSelector", String.valueOf(rowSelector));
                     } catch (ConfigurationException ex) {
                         logger.warn("Не удалось сохранить настройку excel.rowSelector", ex);
                     }
@@ -97,7 +97,7 @@ public class ExcelInputPanel implements PaneInterface {
         profileColumnSpinner.addChangeListener(e -> {
             profileStartColumn = (Integer) profileColumnSpinner.getValue();
             try {
-                ConfigurationService.setProperty("excel.profileStartColumn", String.valueOf(profileStartColumn));
+                ConfigurationService.setPropertyStatic("excel.profileStartColumn", String.valueOf(profileStartColumn));
             } catch (ConfigurationException ex) {
                 logger.warn("Не удалось сохранить настройку excel.profileStartColumn", ex);
             }
@@ -179,7 +179,7 @@ public class ExcelInputPanel implements PaneInterface {
 
     private void saveCurrentDirectoryToProperty() {
         try {
-            ConfigurationService.setProperty("project.pathExcel", file.getParentFile().getAbsolutePath());
+            ConfigurationService.setPropertyStatic("project.pathExcel", file.getParentFile().getAbsolutePath());
         } catch (ConfigurationException e) {
             logger.warn("Не удалось сохранить путь к файлу в конфигурацию", e);
         }

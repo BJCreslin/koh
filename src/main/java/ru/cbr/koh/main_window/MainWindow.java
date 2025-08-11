@@ -114,7 +114,7 @@ public class MainWindow {
         }
         
         try {
-            ConfigurationService.setProperty("window.verticalSize", DEFAULT_VERTICAL_SIZE);
+            ConfigurationService.setPropertyStatic("window.verticalSize", DEFAULT_VERTICAL_SIZE);
         } catch (ConfigurationException e) {
             logger.warn("Не удалось сохранить размер окна по умолчанию", e);
         }
@@ -128,7 +128,7 @@ public class MainWindow {
         }
         
         try {
-            ConfigurationService.setProperty("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
+            ConfigurationService.setPropertyStatic("window.horizontalSize", DEFAULT_HORIZONTAL_SIZE);
         } catch (ConfigurationException e) {
             logger.warn("Не удалось сохранить размер окна по умолчанию", e);
         }
@@ -142,7 +142,7 @@ public class MainWindow {
         }
         
         try {
-            ConfigurationService.setProperty("window.title", DEFAULT_TITLE);
+            ConfigurationService.setPropertyStatic("window.title", DEFAULT_TITLE);
         } catch (ConfigurationException e) {
             logger.warn("Не удалось сохранить заголовок окна по умолчанию", e);
         }

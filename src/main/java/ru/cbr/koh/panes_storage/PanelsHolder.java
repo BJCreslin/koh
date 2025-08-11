@@ -5,9 +5,7 @@ import ru.cbr.koh.panes_storage.strategy.PanelStrategyFactory;
 import ru.cbr.koh.panes_storage.strategy.PanelType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Держатель панелей, использующий паттерн Strategy
@@ -62,13 +60,10 @@ public class PanelsHolder {
     }
 
     /**
-     * Создать панели, используя паттерн Strategy
+     * Создать панели, используя фабрику
      * @return список панелей
      */
     private List<PaneInterface> createPanelsUsingStrategy() {
-        return Arrays.stream(PanelType.values())
-                .map(PanelStrategyFactory::createStrategy)
-                .map(PanelContext::new)
-                .collect(Collectors.toList());
+        return PanelFactory.createDefaultPanels();
     }
 }

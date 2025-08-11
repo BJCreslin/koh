@@ -7,13 +7,11 @@ import ru.cbr.koh.exceptions.ConfigurationException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
-public class ConfigurationService {
+public class ConfigurationService implements ConfigurationProvider {
     
     private static final Logger logger = LogManager.getLogger(ConfigurationService.class);
     private static final String CONFIG_FILE = "config.properties";
@@ -39,6 +37,9 @@ public class ConfigurationService {
     private String migrationAuthor;
     private String migrationStoryNumber;
     private String migrationTabName;
+    
+    // Profile parser
+    private final ProfileParser profileParser;
 
     // Singleton pattern
     public static ConfigurationService getInstance() throws ConfigurationException {
@@ -51,6 +52,7 @@ public class ConfigurationService {
     private ConfigurationService() throws ConfigurationException {
         loadProperties();
         setPropertiesFields();
+        this.profileParser = new ProfileParser(properties);
     }
 
     private void loadProperties() throws ConfigurationException {
@@ -99,12 +101,60 @@ public class ConfigurationService {
         }
     }
 
+    // Реализация методов интерфейса ConfigurationProvider
+    @Override
+    public String getString(String key) {
+        return properties.getProperty(key);
+    }
+    
+    @Override
+    public String getString(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+    
+    @Override
+    public int getInt(String key, int defaultValue) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            logger.warn("Некорректное числовое значение для ключа {}: {}", key, value);
+            return defaultValue;
+        }
+    }
+    
+    @Override
+    public boolean getBoolean(String key, boolean defaultValue) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return Boolean.parseBoolean(value);
+    }
+    
+    @Override
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+        try {
+            saveProperties();
+            // Обновляем поля экземпляра если он существует
+            if (instance != null) {
+                instance.setPropertiesFields();
+            }
+        } catch (ConfigurationException e) {
+            logger.error("Ошибка при сохранении свойства", e);
+        }
+    }
+    
     // Статические методы для совместимости с ConfigManager
     public static String getProperty(String key) {
         return properties.getProperty(key);
     }
 
-    public static void setProperty(String key, String value) throws ConfigurationException {
+    public static void setPropertyStatic(String key, String value) throws ConfigurationException {
         properties.setProperty(key, value);
         saveProperties();
         // Обновляем поля экземпляра если он существует
@@ -183,7 +233,8 @@ public class ConfigurationService {
         return pathExcel;
     }
 
-    public void setPathExcel(String pathExcel) throws ConfigurationException {
+    @Override
+    public void setPathExcel(String pathExcel) {
         if (pathExcel != null && !pathExcel.isEmpty()) {
             this.pathExcel = pathExcel;
             setProperty("story.pathExcel", pathExcel);
@@ -208,44 +259,28 @@ public class ConfigurationService {
     }
 
     // Profile group methods
+    @Override
     public List<Profile> getAllProfiles() {
-        return parseProfiles("migration.profiles.all");
+        return profileParser.getAllProfiles();
     }
 
+    @Override
     public List<Profile> getAllWithoutSarAndRegionalCurator() {
-        return parseProfiles("migration.profiles.allWithoutSarAndRegionalCurator");
+        return profileParser.getAllWithoutSarAndRegionalCurator();
     }
 
+    @Override
     public List<Profile> getAllWithoutSar() {
-        return parseProfiles("migration.profiles.allWithoutSar");
+        return profileParser.getAllWithoutSar();
     }
 
+    @Override
     public List<Profile> getAllWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO() {
-        return parseProfiles("migration.profiles.allWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO");
+        return profileParser.getAllWithoutSarAndRegionalCuratorAndCoordinatorAnalystMethotologDNSZKO();
     }
 
+    @Override
     public List<Profile> getBaAndOther() {
-        return parseProfiles("migration.profiles.baAndOther");
-    }
-
-    private List<Profile> parseProfiles(String propertyKey) {
-        String profilesString = properties.getProperty(propertyKey);
-        if (profilesString == null || profilesString.isEmpty()) {
-            logger.warn("Профили для ключа {} не найдены", propertyKey);
-            return List.of();
-        }
-        
-        return Arrays.stream(profilesString.split(","))
-                .map(String::trim)
-                .map(profileName -> {
-                    try {
-                        return Profile.valueOf(profileName);
-                    } catch (IllegalArgumentException e) {
-                        logger.error("Неизвестный профиль: {}", profileName, e);
-                        return null;
-                    }
-                })
-                .filter(profile -> profile != null)
-                .collect(Collectors.toList());
+        return profileParser.getBaAndOther();
     }
 }
