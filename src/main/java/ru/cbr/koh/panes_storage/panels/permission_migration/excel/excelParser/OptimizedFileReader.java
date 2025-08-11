@@ -43,8 +43,7 @@ public class OptimizedFileReader {
     private final int profileStartColumn;
     private final boolean enableParallelProcessing;
     
-    // Кеши для оптимизации производительности
-    private Map<String, String> politicsCache;
+    private Map<Integer, String> politicsCache;
     private Map<Integer, ExcelUtils.TreeTypeData> treeTypesCache;
 
     public OptimizedFileReader(File file, char rowSelector, int profileStartColumn) {
@@ -73,7 +72,6 @@ public class OptimizedFileReader {
                 throw new ExcelParsingException("Лист 'Дерево' не найден в файле: " + file.getPath());
             }
             
-            // Инициализация кешей для оптимизации
             initializeCaches(workbook);
             
             var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn);

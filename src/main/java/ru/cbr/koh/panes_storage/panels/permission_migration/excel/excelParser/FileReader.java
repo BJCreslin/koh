@@ -7,11 +7,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.cbr.koh.exceptions.ExcelParsingException;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
-import ru.cbr.koh.exceptions.ExcelParsingException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,11 @@ public class FileReader {
     private static final int TOP_SPACE = 6;
 
     public static final int NAME_COLUMN_NUMBER = 10;
-    public static final int NEED_SAVE_COLUMN_NUMBER = 28;
+    public static final int NEED_SAVE_COLUMN_NUMBER = 30;
+    public static final int ORDER_COLUMN_NUMBER = 12;
+    public static final int PROFILE_COLUMN_NUMBER = 14;
+
+
     public static final String BANK_DEPENDENT = "**";
     public static final String INCLUDE_ROW_SYMBOL = "i";
 
@@ -37,9 +41,9 @@ public class FileReader {
 
     private final char rowSelector;
     private final int profileStartColumn;
-    
+
     // Кеши для оптимизации производительности
-    private Map<String, String> politicsCache;
+    private Map<Integer, String> politicsCache;
     private Map<Integer, ExcelUtils.TreeTypeData> treeTypesCache;
 
     private final List<Permission> permissionDialogObjects = new ArrayList<>();
@@ -58,18 +62,18 @@ public class FileReader {
         try (InputStream inputStream = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(inputStream);
             Sheet treeSheet = workbook.getSheet("Дерево");
-            
+
             if (treeSheet == null) {
                 throw new ExcelParsingException("Лист 'Дерево' не найден в файле: " + file.getPath());
             }
-            
+
             // Инициализация кешей для оптимизации
             initializeCaches(workbook);
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
-            var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn);
-            
+            var profileHeaderManager = new ProfileHeaderManager(treeSheet, PROFILE_COLUMN_NUMBER);
+
             for (Row row : treeSheet) {
                 if (row.getRowNum() < TOP_SPACE) {
                     continue;
@@ -91,7 +95,7 @@ public class FileReader {
                     ExcelUtils.NumberPosition politicNumber = ExcelUtils.findLastNumber(value);
 
                     if (politicNumber.number() != null) {
-                        value = (value.substring(0, politicNumber.position()) + 
+                        value = (value.substring(0, politicNumber.position()) +
                                 value.substring(politicNumber.position() + politicNumber.number().length())).trim();
                         valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
                     }
@@ -152,7 +156,7 @@ public class FileReader {
         } else {
             politicsCache = Map.of();
         }
-        
+
         // Кеширование типов дерева
         Sheet matrixSheet = workbook.getSheet("Матрица распределения прав АД");
         if (matrixSheet != null) {
@@ -161,7 +165,7 @@ public class FileReader {
             treeTypesCache = Map.of();
         }
     }
-    
+
     private String getBankPolitic(String key) {
         return "GET_KO_LIST_" + key.replaceAll("[#-]", "_").toUpperCase(Locale.ROOT);
     }
@@ -169,12 +173,12 @@ public class FileReader {
     private boolean isNeedSave(Row row) {
         Cell cell = row.getCell(NEED_SAVE_COLUMN_NUMBER);
         String cellValue = ExcelUtils.getCellValue(cell);
-        return !cellValue.isEmpty() && cellValue.equalsIgnoreCase(String.valueOf(rowSelector));
+        return !cellValue.isEmpty() && (cellValue.equalsIgnoreCase(String.valueOf(rowSelector)) || cellValue.equalsIgnoreCase(INCLUDE_ROW_SYMBOL));
     }
 
     private List<TreeType> getTreeType(int rowNumber) {
         List<TreeType> types = new ArrayList<>();
-        
+
         ExcelUtils.TreeTypeData data = treeTypesCache.get(rowNumber);
         if (data != null) {
             if (data.hasKO()) {
@@ -184,7 +188,7 @@ public class FileReader {
                 types.add(TreeType.GIBR);
             }
         }
-        
+
         return types;
     }
 
@@ -201,13 +205,9 @@ public class FileReader {
         if (politicNumber.number() == null) {
             return "";
         }
-        
+
         return politicsCache.getOrDefault(politicNumber.number(), "");
     }
-
-
-
-
 
     private List<Profile> getProfiles(ProfileHeaderManager profileHeaderManager, Row row) {
         List<Profile> profiles = new ArrayList<>();
