@@ -6,11 +6,6 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
         
-        <!-- File Appender -->
-        <File name="FileAppender" fileName="logs/koh-application.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-        </File>
-        
         <!-- Rolling File Appender -->
         <RollingFile name="RollingFileAppender"
                      fileName="logs/koh-application.log"
