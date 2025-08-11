@@ -36,6 +36,8 @@ public class Permission {
 
     private final List<TreeType> treeType;
 
+    private final int order;
+
     public List<TreeType> getTreeType() {
         return treeType;
     }
@@ -47,7 +49,8 @@ public class Permission {
                       String name,
                       List<Profile> profiles,
                       String description,
-                      List<TreeType> treeType) {
+                      List<TreeType> treeType,
+                      int order) {
         this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
@@ -61,6 +64,7 @@ public class Permission {
         this.abacPermPresUserAction = abacPermPresUserAction;
         koPermission = abacPermPresUserAction != null;
         this.description = description;
+        this.order = order;
     }
 
     public Permission(PermissionDialogObject object) {
@@ -71,7 +75,8 @@ public class Permission {
                 object.getName(),
                 null,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                object.getOrder());
     }
 
     public Permission(PermissionDialogObject object, List<Profile> profiles) {
@@ -82,7 +87,8 @@ public class Permission {
                 object.getName(),
                 profiles,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                object.getOrder());
     }
 
     private String getParent(String key) {
@@ -139,20 +145,24 @@ public class Permission {
         return description;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
 
     @Override
     public String toString() {
         return
                 "parent= " + parent + "\n" +
-                "type= " + type + "\n" +
-                "name= " + name + "\n" +
-                "relKey= " + relKey + "\n" +
-                "key= " + key + "\n" +
-                "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
-                "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
-                "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
-                "koPermission= " + koPermission + "\n" +
-                "description= " + description + "\n" +
-                "treeType= " + treeType ;
+                        "type= " + type + "\n" +
+                        "name= " + name + "\n" +
+                        "relKey= " + relKey + "\n" +
+                        "key= " + key + "\n" +
+                        "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
+                        "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
+                        "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
+                        "koPermission= " + koPermission + "\n" +
+                        "description= " + description + "\n" +
+                        "treeType= " + treeType;
     }
 }

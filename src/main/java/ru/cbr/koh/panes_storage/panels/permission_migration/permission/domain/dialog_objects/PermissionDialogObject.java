@@ -24,6 +24,8 @@ public class PermissionDialogObject {
 
     private List<TreeType> treeType;
 
+    private int order = 10;
+
     public PermissionDialogObject(String key, PermissionType permissionType, String groupAction, String userAction, String name, String description, List<TreeType> treeType) {
         this.key = key;
         this.permissionType = permissionType;
@@ -60,6 +62,10 @@ public class PermissionDialogObject {
 
     public List<TreeType> getTreeType() {
         return treeType;
+    }
+
+    public int getOrder() {
+        return order;
     }
 
     @Override

@@ -14,6 +14,7 @@ public class TreeMigration {
                     <column name="secur_elem_id"
                         valueComputed="(SELECT id FROM secur_elem WHERE key = '%s')"/>
                 %s</insert>
+                
 """;
 
 
@@ -34,7 +35,7 @@ public class TreeMigration {
 
     private String getDescription(String description) {
         if (description != null && !description.isBlank()) {
-            return String.format(" <column name=\"description\" value = '%s'/>" + "\n", description);
+            return String.format(" <column name=\"description\" value = '%s'/>", description);
         }
         return "";
     }

@@ -30,15 +30,13 @@ public class FileReader {
 
     public static final int NAME_COLUMN_NUMBER = 10;
     public static final int NEED_SAVE_COLUMN_NUMBER = 30;
-    public static final int ORDER_COLUMN_NUMBER = 12;
+    public static final Integer ORDER_COLUMN_NUMBER = 12;
     public static final int PROFILE_COLUMN_NUMBER = 14;
     public static final int PROFILE_ROW_NUMBER = 3;
 
     public static final int MATRIX_CO_COLUMN_NUMBER = 14;
     public static final int MATRIX_GIBR_COLUMN_NUMBER = 15;
     public static final String MATRIX_TREE_SYMBOL = "+";
-
-
 
 
     public static final String BANK_DEPENDENT_SYMBOLS = "**";
@@ -113,25 +111,25 @@ public class FileReader {
 
                     String relKey = valueShiftPair.value();
 
-                    if (!key.isBlank()) {
+                    if (!key.isBlank() && isNeedSave(row)) {
                         String politic = getPolitic(politicNumber);
                         List<Profile> profiles = getProfiles(profileHeaderManager, row);
                         String name = ExcelUtils.getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                         String description = getDescription(row);
                         List<TreeType> types = getTreeType(row.getRowNum());
-                        if (isNeedSave(row)) {
-                            logger.info("Saving permission with key: {}", key);
-                            permissionDialogObjects.add(
-                                    new Permission(
-                                            key,
-                                            PermissionType.getPermissionType(relKey),
-                                            politic,
-                                            isBankDependent ? getBankPolitic(key) : "userAction",
-                                            name,
-                                            profiles,
-                                            description,
-                                            types));
-                        }
+                        int order = getOrder(row);
+                        logger.info("Saving permission with key: {}", key);
+                        permissionDialogObjects.add(
+                                new Permission(
+                                        key,
+                                        PermissionType.getPermissionType(relKey),
+                                        politic,
+                                        isBankDependent ? getBankPolitic(key) : "userAction",
+                                        name,
+                                        profiles,
+                                        description,
+                                        types,
+                                        order));
                     }
                 } catch (Exception e) {
                     logger.error("Ошибка обработки строки {}: {}", row.getRowNum(), e.getMessage(), e);
@@ -149,6 +147,17 @@ public class FileReader {
             }
             logger.error("Неожиданная ошибка при парсинге файла: {}", file.getPath(), e);
             throw new ExcelParsingException("Неожиданная ошибка при парсинге файла: " + file.getPath(), e);
+        }
+    }
+
+    private int getOrder(Row row) {
+        if (ORDER_COLUMN_NUMBER == null) {
+            return 10;
+        }
+        if (row.getCell(ORDER_COLUMN_NUMBER) == null) {
+            return 10;
+        } else {
+            return ExcelUtils.getCellValueAsInt(row.getCell(ORDER_COLUMN_NUMBER), 10);
         }
     }
 

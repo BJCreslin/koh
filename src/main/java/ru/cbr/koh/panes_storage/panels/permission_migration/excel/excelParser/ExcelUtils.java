@@ -35,6 +35,23 @@ public final class ExcelUtils {
         };
     }
 
+    public static int getCellValueAsInt(Cell cell, int defaultValue) {
+        if (cell == null) return defaultValue;
+
+        switch (cell.getCellType()) {
+            case NUMERIC:
+                return (int) cell.getNumericCellValue();
+            case STRING:
+                try {
+                    return (int) Double.parseDouble(cell.getStringCellValue());
+                } catch (NumberFormatException e) {
+                    return defaultValue;
+                }
+            default:
+                return defaultValue;
+        }
+    }
+
     /**
      * Находит последнее число в строке
      */
