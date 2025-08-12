@@ -36,7 +36,7 @@ public class SecureElemMigration {
                            <column name="abac_perm_pres_group_action" value="%s"/>
                            <column name="abac_perm_pres_user_action" value="%s"/>
                            %s
-                           <column name="order_no"  value="%d"/>
+                           <column name="order_no_in_node"  value="%d"/>
                         </insert>
                        \s
            \s""";
