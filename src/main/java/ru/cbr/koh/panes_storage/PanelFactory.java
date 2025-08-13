@@ -39,3 +39,4 @@ public class PanelFactory {
         return new PanelContext(strategy);
     }
 }
+

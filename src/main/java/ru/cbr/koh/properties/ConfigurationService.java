@@ -4,15 +4,15 @@ import org.apache.commons.math3.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.cbr.koh.exceptions.ConfigurationException;
+import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Properties;
-import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 public class ConfigurationService implements ConfigurationProvider {
-    
+
     private static final Logger logger = LogManager.getLogger(ConfigurationService.class);
     private static final String CONFIG_FILE = "config.properties";
     private static final Properties properties = new Properties();
@@ -31,13 +31,10 @@ public class ConfigurationService implements ConfigurationProvider {
     private String abacFileName;
     private String abacAttributeCodeFilePath;
     private String pathExcel;
-    
+
     // Migration configuration fields
-    private String migrationKeyText;
-    private String migrationAuthor;
-    private String migrationStoryNumber;
     private String migrationTabName;
-    
+
     // Profile parser
     private final ProfileParser profileParser;
 
@@ -76,10 +73,10 @@ public class ConfigurationService implements ConfigurationProvider {
             this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical", "600"));
             this.title = properties.getProperty("window.title", "Default Title");
 
-            this.author = properties.getProperty("story.author");
+            this.author = properties.getProperty("migration.author");
             this.storyNumber = properties.getProperty("story.number");
             this.storyName = properties.getProperty("story.name");
-            this.storyKey = properties.getProperty("story.key");
+            this.storyKey = properties.getProperty("migration.keyText");
             this.shouldWriteAbacFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile", "false"));
             this.fromExcel = Boolean.parseBoolean(properties.getProperty("story.fromExcel", "false"));
 
@@ -87,13 +84,10 @@ public class ConfigurationService implements ConfigurationProvider {
             this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
 
             this.pathExcel = properties.getProperty("story.pathExcel");
-            
+
             // Migration configuration
-            this.migrationKeyText = properties.getProperty("migration.keyText");
-            this.migrationAuthor = properties.getProperty("migration.author");
-            this.migrationStoryNumber = properties.getProperty("migration.storyNumber");
             this.migrationTabName = properties.getProperty("migration.tabName");
-            
+
             logger.debug("Поля конфигурации успешно инициализированы");
         } catch (NumberFormatException e) {
             logger.error("Ошибка парсинга числовых значений из properties", e);
@@ -106,12 +100,12 @@ public class ConfigurationService implements ConfigurationProvider {
     public String getString(String key) {
         return properties.getProperty(key);
     }
-    
+
     @Override
     public String getString(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
     }
-    
+
     @Override
     public int getInt(String key, int defaultValue) {
         String value = properties.getProperty(key);
@@ -125,7 +119,7 @@ public class ConfigurationService implements ConfigurationProvider {
             return defaultValue;
         }
     }
-    
+
     @Override
     public boolean getBoolean(String key, boolean defaultValue) {
         String value = properties.getProperty(key);
@@ -134,7 +128,7 @@ public class ConfigurationService implements ConfigurationProvider {
         }
         return Boolean.parseBoolean(value);
     }
-    
+
     @Override
     public void setProperty(String key, String value) {
         properties.setProperty(key, value);
@@ -148,7 +142,7 @@ public class ConfigurationService implements ConfigurationProvider {
             logger.error("Ошибка при сохранении свойства", e);
         }
     }
-    
+
     // Статические методы для совместимости с ConfigManager
     public static String getProperty(String key) {
         return properties.getProperty(key);
@@ -243,15 +237,15 @@ public class ConfigurationService implements ConfigurationProvider {
 
     // Migration configuration getters
     public String getMigrationKeyText() {
-        return migrationKeyText;
+        return storyKey;
     }
 
     public String getMigrationAuthor() {
-        return migrationAuthor;
+        return author;
     }
 
     public String getMigrationStoryNumber() {
-        return migrationStoryNumber;
+        return storyNumber;
     }
 
     public String getMigrationTabName() {

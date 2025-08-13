@@ -16,6 +16,7 @@ import static ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelPa
 public final class ExcelUtils {
 
     private static final Pattern POLITIC_NUMBER_PATTERN = Pattern.compile("\\b\\d+\\b");
+    public static final int START_POLITICS_ROW = 1;
 
     private ExcelUtils() {
         // Утилитный класс
@@ -76,12 +77,12 @@ public final class ExcelUtils {
         Map<Integer, String> politicsCache = new HashMap<>();
 
         for (Row row : politicsSheet) {
-            if (row.getRowNum() < 3) {
+            if (row.getRowNum() < START_POLITICS_ROW) {
                 continue;
             }
             var cellValue = getCellValue(row.getCell(0));
             if (cellValue != null && !cellValue.isBlank()) {
-                Integer number = Integer.parseInt(cellValue.replace(".0", "").trim());
+                Integer number = getCellValueAsInt(row.getCell(0), 0);
                 String politic = getCellValue(row.getCell(1));
 
                 if (!politic.isEmpty()) {

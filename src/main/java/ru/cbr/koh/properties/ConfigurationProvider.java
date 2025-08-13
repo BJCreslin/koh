@@ -143,3 +143,4 @@ public interface ConfigurationProvider {
      */
     List<Profile> getBaAndOther();
 }
+

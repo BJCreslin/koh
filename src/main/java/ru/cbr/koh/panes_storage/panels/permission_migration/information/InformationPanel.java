@@ -82,14 +82,14 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
 
     private String getAuthor() {
         if (info == null) {
-            return ConfigurationService.getProperty("story.author");
+            return ConfigurationService.getProperty("migration.author");
         }
         return info.author();
     }
 
     private String getKey() {
         if (info == null) {
-            return ConfigurationService.getProperty("story.key");
+            return ConfigurationService.getProperty("migration.keyText");
         }
         return info.keyText();
     }
