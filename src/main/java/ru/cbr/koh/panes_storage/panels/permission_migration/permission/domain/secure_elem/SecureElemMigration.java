@@ -17,7 +17,7 @@ public class SecureElemMigration {
                                     value="%s"/>
                             <column name="abac_perm_pres_group_action" value="%s"/>
                             %s
-                            <column name="order_no"  value="%s"/>
+                            <column name="order_no_in_node"  value="%s"/>
                         </insert>
                        \s
            \s""";

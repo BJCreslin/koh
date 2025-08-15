@@ -36,6 +36,9 @@ public final class ExcelUtils {
         };
     }
 
+    /**
+     * Получает значение ячейки как целое число
+     */
     public static int getCellValueAsInt(Cell cell, int defaultValue) {
         if (cell == null) return defaultValue;
 
