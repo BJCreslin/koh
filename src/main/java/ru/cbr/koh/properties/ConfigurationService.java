@@ -76,7 +76,7 @@ public class ConfigurationService implements ConfigurationProvider {
             this.author = properties.getProperty("migration.author");
             this.storyNumber = properties.getProperty("story.number");
             this.storyName = properties.getProperty("story.name");
-            this.storyKey = properties.getProperty("migration.keyText");
+            this.storyKey = properties.getProperty("story.key");
             this.shouldWriteAbacFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile", "false"));
             this.fromExcel = Boolean.parseBoolean(properties.getProperty("story.fromExcel", "false"));
 

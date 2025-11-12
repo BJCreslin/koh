@@ -89,7 +89,7 @@ public class InformationPanel implements PaneInterface, SaveablePanel {
 
     private String getKey() {
         if (info == null) {
-            return ConfigurationService.getProperty("migration.keyText");
+            return ConfigurationService.getProperty("story.key");
         }
         return info.keyText();
     }
