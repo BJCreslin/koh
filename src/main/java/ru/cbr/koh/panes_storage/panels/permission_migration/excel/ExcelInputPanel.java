@@ -28,7 +28,7 @@ public class ExcelInputPanel implements PaneInterface {
 
     private static final Logger logger = LogManager.getLogger(ExcelInputPanel.class);
     private char rowSelector = 'i'; // символ для выбора строки значений (по умолчанию 'i')
-    private int profileStartColumn = 11; // номер столбца, с которого начинаются профили (по умолчанию 11)
+    private int profileStartColumn;
 
     private File file;
     private final InformationPanel informationPanel;
@@ -36,8 +36,11 @@ public class ExcelInputPanel implements PaneInterface {
     public ExcelInputPanel(InformationPanel informationPanel) {
         this.informationPanel = informationPanel;
         var profileStartColumnString = ConfigurationService.getProperty("excel.profileStartColumn");
+        // номер столбца, с которого начинаются профили (по умолчанию 14)
         if (profileStartColumnString != null) {
             profileStartColumn = Integer.parseInt(profileStartColumnString);
+        } else {
+            profileStartColumn = 14;
         }
     }
 
@@ -265,7 +268,7 @@ public class ExcelInputPanel implements PaneInterface {
         infoText.setText(
                 "Инструкции по использованию:\n\n" +
                         "1. Настройте символ выбора строки (по умолчанию 'i')\n" +
-                        "2. Укажите начальный столбец профилей (по умолчанию 11)\n" +
+                        "2. Укажите начальный столбец профилей (по умолчанию 14)\n" +
                         "3. Выберите Excel файл с разрешениями (.xlsx)\n" +
                         "4. Система автоматически создаст changelog миграции\n\n" +
                         "Примечание: Убедитесь, что Excel файл содержит правильную структуру данных " +

@@ -22,7 +22,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
+/**
+ * Сервис чтения файла с данными доступа
+ * и формирование данных для миграции
+ *
+ */
 public class FileReader {
 
     private static final Logger logger = LogManager.getLogger(FileReader.class);
@@ -31,7 +35,6 @@ public class FileReader {
     public static final int NAME_COLUMN_NUMBER = 10;
     public static final int NEED_SAVE_COLUMN_NUMBER = 30;
     public static final Integer ORDER_COLUMN_NUMBER = 12;
-    public static final int PROFILE_COLUMN_NUMBER = 14;
     public static final int PROFILE_ROW_NUMBER = 3;
 
     public static final int MATRIX_CO_COLUMN_NUMBER = 14;
@@ -77,7 +80,7 @@ public class FileReader {
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
-            var profileHeaderManager = new ProfileHeaderManager(treeSheet, PROFILE_COLUMN_NUMBER, PROFILE_ROW_NUMBER);
+            var profileHeaderManager = new ProfileHeaderManager(treeSheet, profileStartColumn, PROFILE_ROW_NUMBER);
 
             for (Row row : treeSheet) {
                 if (row.getRowNum() < TOP_SPACE) {
@@ -124,7 +127,7 @@ public class FileReader {
                                         key,
                                         PermissionType.getPermissionType(relKey),
                                         politic,
-                                        isBankDependent ? getBankPolitic(key) : "userAction",
+                                        isBankDependent ? getBankPolitic(key) : null,
                                         name,
                                         profiles,
                                         description,
@@ -222,7 +225,7 @@ public class FileReader {
             return "";
         }
 
-        return politicsCache.getOrDefault(politicNumber.number(), "");
+        return politicsCache.getOrDefault(Integer.valueOf(politicNumber.number()), "");
     }
 
     private List<Profile> getProfiles(ProfileHeaderManager profileHeaderManager, Row row) {
