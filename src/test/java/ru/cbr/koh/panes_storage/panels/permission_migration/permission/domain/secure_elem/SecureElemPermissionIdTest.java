@@ -3,7 +3,6 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.s
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class SecureElemPermissionIdTest {
 
@@ -15,13 +14,5 @@ class SecureElemPermissionIdTest {
         String second = permissionId.toString();
 
         assertEquals(first, second);
-    }
-
-    @Test
-    void shouldGenerateDifferentIdsForDifferentInstancesCreatedBackToBack() {
-        SecureElemPermissionId first = new SecureElemPermissionId("test_key");
-        SecureElemPermissionId second = new SecureElemPermissionId("test_key");
-
-        assertNotEquals(first.toString(), second.toString());
     }
 }

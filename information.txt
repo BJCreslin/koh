@@ -1,5 +1,5 @@
 #KOH information state
-#Mon Mar 09 15:46:03 GMT+07:00 2026
+#Mon Mar 09 20:11:59 GMT+07:00 2026
 author=KreslinVYU
 fromExcel=true
 keyText=collateral_conclusion
