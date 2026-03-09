@@ -7,4 +7,7 @@ public interface PaneInterface {
     String getTitle();
 
     JComponent createPanel(JFrame frame);
+
+    default void onClose() {
+    }
 }

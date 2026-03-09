@@ -1,9 +1,14 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.util.Locale;
+
 public class ValueFinder {
+
+    private static final DataFormatter DATA_FORMATTER = new DataFormatter(Locale.ROOT);
 
     ValueShiftPair find(Row row) {
         for (Cell cell : row) {
@@ -19,10 +24,6 @@ public class ValueFinder {
         if (cell == null) {
             return null;
         }
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
-            default -> cell.getStringCellValue();
-        };
+        return DATA_FORMATTER.formatCellValue(cell).trim();
     }
 }

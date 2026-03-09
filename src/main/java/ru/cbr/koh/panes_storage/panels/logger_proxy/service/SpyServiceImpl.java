@@ -1,90 +1,117 @@
 package ru.cbr.koh.panes_storage.panels.logger_proxy.service;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class SpyServiceImpl implements SpyService {
 
-    private static final String POM_XML = "/application-ppod/pom.xml";
-    private static final String YAML_XML = "/application-ppod/src/main/resources/application.yml";
-    private static final String PROPERTY_FILE = "/application-ppod/src/main/resources/spy.properties";
+    private static final String APPLICATION_YML = "application-ppod/src/main/resources/application.yml";
+    private static final String APPLICATION_YAML = "application-ppod/src/main/resources/application.yaml";
+    private static final String APPLICATION_PROPERTIES = "application-ppod/src/main/resources/application.properties";
 
+    private static final String START_MARKER = "# === KOH SQL LOGGING START ===";
+    private static final String END_MARKER = "# === KOH SQL LOGGING END ===";
 
-    private static final String ORIGINAL_POM_XML_FILENAME = "original_pom.txt";
-    private static final String REPLACEMENT_POM_XML_FILENAME = "replacement_pom.txt";
+    private static final String YAML_BLOCK = String.join("\n",
+            START_MARKER,
+            "logging.level.org.hibernate.SQL: DEBUG",
+            "logging.level.org.hibernate.orm.jdbc.bind: TRACE",
+            "logging.level.org.hibernate.type.descriptor.sql.BasicBinder: TRACE",
+            "spring.jpa.properties.hibernate.format_sql: true",
+            END_MARKER);
 
-    private static final String ORIGINAL_YAML_FILENAME = "original_yaml.txt";
-    private static final String REPLACEMENT_YAML_FILENAME = "replacement_yaml.txt";
-
-    private static final String ORIGINAL_PROPERTIES_FILENAME = "spy.properties";
+    private static final String PROPERTIES_BLOCK = String.join("\n",
+            START_MARKER,
+            "logging.level.org.hibernate.SQL=DEBUG",
+            "logging.level.org.hibernate.orm.jdbc.bind=TRACE",
+            "logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE",
+            "spring.jpa.properties.hibernate.format_sql=true",
+            END_MARKER);
 
     @Override
     public void addLoggerProxy(String dossierKoDirectory) {
-        replaceDataInFile(dossierKoDirectory + POM_XML, ORIGINAL_YAML_FILENAME, REPLACEMENT_POM_XML_FILENAME);
-        replaceDataInFile(dossierKoDirectory + YAML_XML, ORIGINAL_POM_XML_FILENAME, REPLACEMENT_YAML_FILENAME);
-        createSpyPropertiesFile(dossierKoDirectory, PROPERTY_FILE);
-    }
-
-    private void createSpyPropertiesFile(String dossierKoDirectory, String propertyFile) {
-
-        URL originalPomResource = SpyServiceImpl.class.getClassLoader().getResource(ORIGINAL_PROPERTIES_FILENAME);
-        if (originalPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + ORIGINAL_PROPERTIES_FILENAME);
-        }
-        try {
-            Path propertiespath = Paths.get(originalPomResource.toURI());
-            String content = Files.readString(propertiespath);
-
-            Path destinationPath = Paths.get(dossierKoDirectory + propertyFile);
-            Files.writeString(destinationPath, content);
-
-        } catch (IOException | URISyntaxException e) {
-            throw new IllegalArgumentException("Файл не найден: " + propertyFile);
-        }
-
+        Path configPath = resolveSpringConfigPath(Path.of(dossierKoDirectory));
+        String block = isPropertiesFile(configPath) ? PROPERTIES_BLOCK : YAML_BLOCK;
+        String content = readFile(configPath);
+        writeFile(configPath, addManagedBlock(content, block));
     }
 
     @Override
     public void removeLoggerProxy(String dossierKoDirectory) {
-        replaceDataInFile(dossierKoDirectory + POM_XML, REPLACEMENT_POM_XML_FILENAME, ORIGINAL_POM_XML_FILENAME);
-        replaceDataInFile(dossierKoDirectory + YAML_XML, REPLACEMENT_YAML_FILENAME, ORIGINAL_YAML_FILENAME);
+        Path configPath = resolveSpringConfigPath(Path.of(dossierKoDirectory));
+        String content = readFile(configPath);
+        writeFile(configPath, removeManagedBlock(content));
     }
 
-    void replaceDataInFile(String filePath, String findTextFileName, String replaceTextFilename) {
-        Path path = Paths.get(filePath);
+    @Override
+    public boolean isLoggerProxyEnabled(String dossierKoDirectory) {
+        Path configPath = resolveSpringConfigPath(Path.of(dossierKoDirectory));
+        String content = readFile(configPath);
+        return content.contains(START_MARKER) && content.contains(END_MARKER);
+    }
 
-        URL originalPomResource = SpyServiceImpl.class.getClassLoader().getResource(findTextFileName);
-        if (originalPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + findTextFileName);
+    private Path resolveSpringConfigPath(Path rootPath) {
+        Path ymlPath = rootPath.resolve(APPLICATION_YML);
+        if (Files.exists(ymlPath)) {
+            return ymlPath;
         }
 
-        URL replacementPomResource = SpyServiceImpl.class.getClassLoader().getResource(replaceTextFilename);
-
-        if (replacementPomResource == null) {
-            throw new IllegalArgumentException("Файл не найден: " + replaceTextFilename);
+        Path yamlPath = rootPath.resolve(APPLICATION_YAML);
+        if (Files.exists(yamlPath)) {
+            return yamlPath;
         }
 
+        Path propertiesPath = rootPath.resolve(APPLICATION_PROPERTIES);
+        if (Files.exists(propertiesPath)) {
+            return propertiesPath;
+        }
+
+        throw new IllegalArgumentException("Не найден application.yml/.yaml/.properties в application-ppod/src/main/resources");
+    }
+
+    private boolean isPropertiesFile(Path path) {
+        return path.getFileName() != null && path.getFileName().toString().endsWith(".properties");
+    }
+
+    private String addManagedBlock(String content, String block) {
+        String cleaned = removeManagedBlock(content).stripTrailing();
+        if (cleaned.isEmpty()) {
+            return block + "\n";
+        }
+        return cleaned + "\n\n" + block + "\n";
+    }
+
+    private String removeManagedBlock(String content) {
+        int start = content.indexOf(START_MARKER);
+        int end = content.indexOf(END_MARKER);
+        if (start == -1 || end == -1 || end < start) {
+            return content;
+        }
+
+        int blockEnd = end + END_MARKER.length();
+        if (blockEnd < content.length() && content.charAt(blockEnd) == '\n') {
+            blockEnd++;
+        }
+        if (start > 0 && content.charAt(start - 1) == '\n') {
+            start--;
+        }
+        return content.substring(0, start) + content.substring(blockEnd);
+    }
+
+    private String readFile(Path path) {
         try {
-            String content = Files.readString(path);
+            return Files.readString(path);
+        } catch (IOException e) {
+            throw new IllegalStateException("Не удалось прочитать файл: " + path, e);
+        }
+    }
 
-            Path originalPomPath = Paths.get(originalPomResource.toURI());
-            String searchText = Files.readString(originalPomPath);
-
-            Path replacementTextPath = Paths.get(replacementPomResource.toURI());
-            String replacementText = Files.readString(replacementTextPath);
-
-
-            content = content.replace(searchText, replacementText);
+    private void writeFile(Path path, String content) {
+        try {
             Files.writeString(path, content);
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Не удалось записать файл: " + path, e);
         }
     }
-
 }

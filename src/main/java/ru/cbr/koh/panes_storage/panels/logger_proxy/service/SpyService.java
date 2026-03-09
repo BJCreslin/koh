@@ -5,4 +5,6 @@ public interface SpyService {
     void addLoggerProxy(String dossierKoDirectory);
 
     void removeLoggerProxy(String dossierKoDirectory);
+
+    boolean isLoggerProxyEnabled(String dossierKoDirectory);
 }

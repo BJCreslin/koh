@@ -1,52 +1,50 @@
 package ru.cbr.koh.properties;
 
-import org.apache.commons.math3.util.Pair;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
-public class ConfigManager {
-    private static final Properties properties = new Properties();
+public final class ConfigManager {
+
     private static final String CONFIG_FILE = "config.properties";
+    private static final Path CONFIG_PATH = Path.of(CONFIG_FILE);
+    private static final Properties PROPERTIES = new Properties();
 
     static {
-        try (InputStream inStream = ConfigManager.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
-            properties.load(inStream);
-        } catch (IOException e) {
-            System.err.println("Не удалось загрузить " + CONFIG_FILE);
-            e.printStackTrace();
-        }
+        loadProperties();
     }
 
-    // Метод для получения значения свойства по ключу
-    public static String getProperty(String key) {
-        return properties.getProperty(key);
+    private ConfigManager() {
     }
 
-    // Метод для обновления значения свойства и сохранения изменений
-    public static void setProperty(String key, String value) {
-        properties.setProperty(key, value);
+    public static synchronized String getProperty(String key) {
+        return PROPERTIES.getProperty(key);
+    }
+
+    public static synchronized void setProperty(String key, String value) {
+        PROPERTIES.setProperty(key, value);
         saveProperties();
     }
 
-    // Метод для записи изменений в файл
+    private static void loadProperties() {
+        if (!Files.exists(CONFIG_PATH)) {
+            throw new IllegalStateException("Файл конфигурации не найден: " + CONFIG_PATH.toAbsolutePath());
+        }
+        try (InputStream input = Files.newInputStream(CONFIG_PATH)) {
+            PROPERTIES.load(input);
+        } catch (IOException e) {
+            throw new IllegalStateException("Не удалось загрузить " + CONFIG_PATH.toAbsolutePath(), e);
+        }
+    }
+
     private static void saveProperties() {
-        try (OutputStream output = new FileOutputStream(CONFIG_FILE)) {
-            properties.store(output, "Обновлённые свойства");
+        try (OutputStream output = Files.newOutputStream(CONFIG_PATH)) {
+            PROPERTIES.store(output, "Updated properties");
         } catch (IOException e) {
-            System.err.println("Ошибка сохранения файла " + CONFIG_FILE);
-            e.printStackTrace();
+            throw new IllegalStateException("Ошибка сохранения файла " + CONFIG_PATH.toAbsolutePath(), e);
         }
-    }
-
-    public static void setProperties(List<Pair<String, String>> propers) {
-        for (Pair<String, String> property : propers) {
-            properties.setProperty(property.getFirst(), property.getSecond());
-        }
-        saveProperties();
     }
 }

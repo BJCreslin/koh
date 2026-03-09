@@ -8,20 +8,17 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.se
 import ru.cbr.koh.panes_storage.panels.permission_migration.profile.Profile;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ChangeSet {
-    private Profile profile;
-    private List<Permission> permissions;
-    private SecureElemPermissionId permissionId;
-    private Information information;
+    private final Profile profile;
+    private final List<Permission> permissions;
+    private final SecureElemPermissionId permissionId;
+    private final Information information;
 
-    private String content;
+    private final String content;
 
     public ChangeSet(Profile profile, List<Permission> permissions, SecureElemPermissionId permissionId, Information information) {
         this.profile = profile;
@@ -47,16 +44,13 @@ public class ChangeSet {
     }
 
     private static String getChangeSetTempleFileContent() {
-        URL resource = ChangeLog.class.getClassLoader().getResource("changeSetTemplate.xml");
-        if (resource == null) {
-            throw new RuntimeException("File not found!");
-        }
-        try {
-            Path path = Paths.get(resource.toURI());
-            List<String> fileLines = Files.readAllLines(path);
-            return String.join("\n", fileLines);
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
+        try (InputStream input = ChangeLog.class.getClassLoader().getResourceAsStream("changeSetTemplate.xml")) {
+            if (input == null) {
+                throw new IllegalStateException("File not found: changeSetTemplate.xml");
+            }
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load changeSetTemplate.xml", e);
         }
     }
 

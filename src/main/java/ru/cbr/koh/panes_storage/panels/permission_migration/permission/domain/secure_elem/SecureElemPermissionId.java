@@ -5,16 +5,16 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.ba
 
 public class SecureElemPermissionId extends PermissionIdAbstract {
 
-    private final String textPart;
+    private final String generatedId;
 
     private static final String ID_TEMPLATE = "%s_add_permissions_to_%s";
 
     public SecureElemPermissionId(String textPart) {
-        this.textPart = textPart;
+        this.generatedId = super.create(textPart, ID_TEMPLATE);
     }
 
     @Override
     public String toString() {
-        return super.create(textPart, ID_TEMPLATE);
+        return generatedId;
     }
 }

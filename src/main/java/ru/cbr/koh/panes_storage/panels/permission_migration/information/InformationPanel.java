@@ -2,37 +2,40 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.information;
 
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
-import ru.cbr.koh.properties.ConfigManager;
+import ru.cbr.koh.properties.ApplicationProperties;
 import ru.cbr.koh.properties.PropertiesService;
+import ru.cbr.koh.ui.BusinessTheme;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-
 
 public class InformationPanel implements PaneInterface {
-
-    private static final String FILE_NAME = "information.txt";
 
     public static final int RIGHT_MARGIN = 40;
     public static final int LEFT_MARGIN = 10;
     public static final int DELIMITER_HEIGHT = 30;
 
-    private final PropertiesService properties = PropertiesService.getInstance();
+    private final ApplicationProperties properties;
+    private final InformationStorage informationStorage;
+    private final Information savedInformation;
 
-    private static JTextField textField;
+    private JTextField textField;
+    private JTextField authorField;
+    private JTextField storyNumberField;
+    private JTextField tabNameField;
+    private JCheckBox saveAbacPoliciesCheckBox;
+    private JCheckBox saveAbacAttributeCodeCheckBox;
+    private JCheckBox excelInputCheckBox;
 
-    private static JTextField authorField;
+    public InformationPanel() {
+        this(PropertiesService.getInstance(), new InformationStorage());
+    }
 
-    private static JTextField storyNumberField;
-
-    private static JTextField tabNameField;
-
-    private static JCheckBox checkBox;
-
-    private static JCheckBox excelInputCheckBox;
-
-    private Information info;
+    public InformationPanel(ApplicationProperties properties, InformationStorage informationStorage) {
+        this.properties = properties;
+        this.informationStorage = informationStorage;
+        this.savedInformation = informationStorage.load().orElse(null);
+    }
 
     @Override
     public String getTitle() {
@@ -42,51 +45,51 @@ public class InformationPanel implements PaneInterface {
     @Override
     public JComponent createPanel(JFrame frame) {
         JPanel panel = new JPanel();
+        panel.setBorder(BusinessTheme.pagePadding());
         GroupLayout layout = new GroupLayout(panel);
         panel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
+        JLabel keyLabel = new JLabel("Key prefix");
+        BusinessTheme.styleFormLabel(keyLabel);
 
-        JLabel keyLabel = new JLabel();
-        keyLabel.setText("Key prefix");
+        textField = new JTextField(getKey());
 
-        textField = new JTextField();
-        textField.setText(getKey());
+        JLabel authorLabel = new JLabel("Author");
+        BusinessTheme.styleFormLabel(authorLabel);
 
-        JLabel authorLabel = new JLabel();
-        authorLabel.setText("Author");
+        authorField = new JTextField(getAuthor());
 
-        authorField = new JTextField();
-        authorField.setText(getAuthor());
+        JLabel storyNumberLabel = new JLabel("Story number");
+        BusinessTheme.styleFormLabel(storyNumberLabel);
 
+        storyNumberField = new JTextField(getStoryNumber());
 
-        JLabel storyNumberLabel = new JLabel();
-        storyNumberLabel.setText("Story number");
+        JLabel tabNameLabel = new JLabel("Story name");
+        BusinessTheme.styleFormLabel(tabNameLabel);
 
-        storyNumberField = new JTextField();
-        storyNumberField.setText(getStoryNumber());
-
-        JLabel tabNameLabel = new JLabel();
-        tabNameLabel.setText("Story name");
-
-        tabNameField = new JTextField();
-        tabNameField.setText(getStoryName());
-
+        tabNameField = new JTextField(getStoryName());
 
         excelInputCheckBox = new JCheckBox("Input data from excel");
         excelInputCheckBox.setSelected(getDefaultExcelInputCheckBox());
 
-        checkBox = new JCheckBox("Save abac's politics to file");
-        checkBox.setSelected(getCheckboxState());
+        saveAbacPoliciesCheckBox = new JCheckBox("Save abac's politics to file");
+        saveAbacPoliciesCheckBox.setSelected(getSaveAbacPoliciesCheckboxState());
 
-        Dimension txtFieldSize = new Dimension(properties.getHorizontalSize() - RIGHT_MARGIN,
+        saveAbacAttributeCodeCheckBox = new JCheckBox("Save ABAC attribute code to file");
+        saveAbacAttributeCodeCheckBox.setSelected(getAbacAttributeCodeCheckboxState());
+
+        Dimension txtFieldSize = new Dimension(
+                properties.getHorizontalSize() - RIGHT_MARGIN,
                 textField.getPreferredSize().height);
+
         textField.setPreferredSize(txtFieldSize);
         authorField.setPreferredSize(txtFieldSize);
         storyNumberField.setPreferredSize(txtFieldSize);
         tabNameField.setPreferredSize(txtFieldSize);
-        checkBox.setPreferredSize(txtFieldSize);
+        saveAbacPoliciesCheckBox.setPreferredSize(txtFieldSize);
+        saveAbacAttributeCodeCheckBox.setPreferredSize(txtFieldSize);
         excelInputCheckBox.setPreferredSize(txtFieldSize);
 
         layout.setHorizontalGroup(
@@ -98,7 +101,8 @@ public class InformationPanel implements PaneInterface {
                                         .addComponent(authorField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(storyNumberField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(tabNameField, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(checkBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(saveAbacPoliciesCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(saveAbacAttributeCodeCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(excelInputCheckBox, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addGap(10))
                         .addGroup(layout.createSequentialGroup()
@@ -142,9 +146,9 @@ public class InformationPanel implements PaneInterface {
                                 .addComponent(tabNameField))
                         .addGap(DELIMITER_HEIGHT)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(tabNameLabel))
+                                .addComponent(saveAbacPoliciesCheckBox))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(checkBox))
+                                .addComponent(saveAbacAttributeCodeCheckBox))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(excelInputCheckBox))
         );
@@ -152,84 +156,85 @@ public class InformationPanel implements PaneInterface {
         return panel;
     }
 
-    private String getStoryName() {
-        if (info == null) {
-            return ConfigManager.getProperty("story.name");
+    @Override
+    public void onClose() {
+        if (textField == null) {
+            return;
         }
-        return info.storyText();
+        informationStorage.save(getInformation());
     }
 
-    private String getStoryNumber() {
-        if (info == null) {
-            return ConfigManager.getProperty("story.number");
+    public Information getInformation() {
+        if (textField == null) {
+            return new Information(
+                    getKey(),
+                    getAuthor(),
+                    getStoryNumber(),
+                    getStoryName(),
+                    getSaveAbacPoliciesCheckboxState(),
+                    getAbacAttributeCodeCheckboxState(),
+                    getDefaultExcelInputCheckBox());
         }
-        return info.storyNumber();
-    }
-
-    private String getAuthor() {
-        if (info == null) {
-            return ConfigManager.getProperty("story.author");
-        }
-        return info.author();
-    }
-
-    private String getKey() {
-        if (info == null) {
-            return ConfigManager.getProperty("story.key");
-        }
-        return info.keyText();
-    }
-
-    private boolean getCheckboxState() {
-        if (info == null) {
-            return properties.getSaveAbacPolitics();
-        }
-        return info.shouldWriteAbakFile();
-    }
-
-    public static Information getInformation() {
         return new Information(
                 textField.getText(),
                 authorField.getText(),
                 storyNumberField.getText(),
                 tabNameField.getText(),
-                checkBox.isSelected(),
-                checkBox.isSelected(),
+                saveAbacPoliciesCheckBox.isSelected(),
+                saveAbacAttributeCodeCheckBox.isSelected(),
                 excelInputCheckBox.isSelected());
-    }
-
-    public static void setInformation() {
-        Information information = getInformation();
-        try (FileOutputStream fileOut = new FileOutputStream(FILE_NAME);
-             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-
-            out.writeObject(information);
-
-        } catch (IOException i) {
-            i.printStackTrace();
-        }
-    }
-
-    public InformationPanel() {
-        info = null;
-        try (FileInputStream fileIn = new FileInputStream(FILE_NAME);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            info = (Information) in.readObject();
-        } catch (IOException ignored) {
-
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public boolean getDefaultExcelInputCheckBox() {
-        if (info == null) {
-            return properties.getFromExcel();
-        }
-        return info.fromExcel();
     }
 
     public JCheckBox getExcelInputCheckBox() {
         return excelInputCheckBox;
+    }
+
+    private String getStoryName() {
+        if (savedInformation == null) {
+            return properties.getStoryName();
+        }
+        return savedInformation.storyText();
+    }
+
+    private String getStoryNumber() {
+        if (savedInformation == null) {
+            return properties.getStoryNumber();
+        }
+        return savedInformation.storyNumber();
+    }
+
+    private String getAuthor() {
+        if (savedInformation == null) {
+            return properties.getAuthor();
+        }
+        return savedInformation.author();
+    }
+
+    private String getKey() {
+        if (savedInformation == null) {
+            return properties.getStoryKey();
+        }
+        return savedInformation.keyText();
+    }
+
+    private boolean getSaveAbacPoliciesCheckboxState() {
+        if (savedInformation == null) {
+            return properties.getSaveAbacPolitics();
+        }
+        return savedInformation.shouldWriteAbakFile();
+    }
+
+    private boolean getAbacAttributeCodeCheckboxState() {
+        if (savedInformation == null) {
+            return properties.getSaveAbacAttributeCode();
+        }
+        return savedInformation.shouldWriteAbacAttributeCode();
+    }
+
+    private boolean getDefaultExcelInputCheckBox() {
+        if (savedInformation == null) {
+            return properties.getFromExcel();
+        }
+        return savedInformation.fromExcel();
     }
 }

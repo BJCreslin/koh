@@ -16,6 +16,9 @@ public class ProfileHeaderManager {
 
     ProfileHeaderManager(Sheet treeSheet, int profileStartColumn) {
         Row row = treeSheet.getRow(profileRowNumber);
+        if (row == null) {
+            return;
+        }
         int shift = 0;
         while (true) {
             var cellValue = ValueFinder.getCellValue(row.getCell(profileStartColumn + shift));
@@ -34,4 +37,3 @@ public class ProfileHeaderManager {
         return headerMap.get(shift);
     }
 }
-

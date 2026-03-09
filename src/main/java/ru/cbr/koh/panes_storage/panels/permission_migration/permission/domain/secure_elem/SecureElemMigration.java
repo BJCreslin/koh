@@ -46,24 +46,24 @@ public class SecureElemMigration {
         if (permission.isKoPermission()) {
             return String.format(CHANGE_TEMPLATE_KO,
                     permission.getParent(),
-                    permission.getType().name().trim(),
-                    permission.getName().trim(),
-                    permission.getRelKey().trim(),
-                    permission.getKey().trim(),
-                    permission.getAbacPermPresAttrCode().trim(),
-                    permission.getAbacPermPresGroupAction().trim(),
-                    permission.getAbacPermPresUserAction().trim(),
-                    getDescription(permission.getDescription().trim())
+                    sanitize(permission.getType().name()),
+                    sanitize(permission.getName()),
+                    sanitize(permission.getRelKey()),
+                    sanitize(permission.getKey()),
+                    sanitize(permission.getAbacPermPresAttrCode()),
+                    sanitize(permission.getAbacPermPresGroupAction()),
+                    sanitize(permission.getAbacPermPresUserAction()),
+                    getDescription(permission.getDescription())
             ) + "\n";
         } else {
             return String.format(CHANGE_TEMPLATE,
-                    permission.getParent(),
-                    permission.getType().name(),
-                    permission.getName(),
-                    permission.getRelKey(),
-                    permission.getKey(),
-                    permission.getAbacPermPresAttrCode(),
-                    permission.getAbacPermPresGroupAction(),
+                    sanitize(permission.getParent()),
+                    sanitize(permission.getType().name()),
+                    sanitize(permission.getName()),
+                    sanitize(permission.getRelKey()),
+                    sanitize(permission.getKey()),
+                    sanitize(permission.getAbacPermPresAttrCode()),
+                    sanitize(permission.getAbacPermPresGroupAction()),
                     getDescription(permission.getDescription())
             ) + "\n";
         }
@@ -74,5 +74,9 @@ public class SecureElemMigration {
             return String.format(" <column name=\"description\" value = '%s'/>" + "\n", description);
         }
         return "";
+    }
+
+    private String sanitize(String value) {
+        return value == null ? "" : value.trim();
     }
 }
