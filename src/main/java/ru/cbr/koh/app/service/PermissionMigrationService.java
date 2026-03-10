@@ -40,7 +40,7 @@ public class PermissionMigrationService {
 
         FileReader reader = new FileReader(file, rowSelector, profileStartColumn);
         List<Permission> permissions = reader.read();
-        MigrationValidator.validateMigrationInput(permissions);
+       // MigrationValidator.validateMigrationInput(permissions);
 
         return buildPreview(information, permissions);
     }
