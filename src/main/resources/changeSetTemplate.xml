@@ -8,7 +8,7 @@
     <comment>
         %s Добавление пермишинов для вкладки %s профиля %s (%s)
     </comment>
-    %s
+        %s
     <rollback>
         %s
     </rollback>

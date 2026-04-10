@@ -97,7 +97,8 @@ public class FileReader {
                                         name,
                                         profiles,
                                         description,
-                                        types));
+                                        types,
+                                        bankDependent));
                     }
                 }
             }

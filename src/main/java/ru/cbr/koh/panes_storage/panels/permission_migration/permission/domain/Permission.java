@@ -36,6 +36,30 @@ public class Permission {
 
     private final List<TreeType> treeType;
 
+    public Permission(String key,
+                      PermissionType type,
+                      String abacPermPresGroupAction,
+                      String abacPermPresUserAction,
+                      String name,
+                      List<Profile> profiles,
+                      String description,
+                      List<TreeType> treeType,
+                      boolean bankDependent) {
+        this.treeType = treeType;
+        String[] parts = key.split("#");
+        this.relKey = parts[parts.length - 1];
+        this.key = key;
+        this.parent = getParent(key);
+        this.abacPermPresAttrCode = PREFIX + key.replace("#", "_");
+        this.type = type;
+        this.abacPermPresGroupAction = abacPermPresGroupAction;
+        this.name = name;
+        this.profiles = profiles;
+        this.abacPermPresUserAction = abacPermPresUserAction;
+        koPermission = bankDependent;
+        this.description = description;
+    }
+
     public List<TreeType> getTreeType() {
         return treeType;
     }
@@ -144,15 +168,15 @@ public class Permission {
     public String toString() {
         return
                 "parent= " + parent + "\n" +
-                "type= " + type + "\n" +
-                "name= " + name + "\n" +
-                "relKey= " + relKey + "\n" +
-                "key= " + key + "\n" +
-                "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
-                "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
-                "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
-                "koPermission= " + koPermission + "\n" +
-                "description= " + description + "\n" +
-                "treeType= " + treeType ;
+                        "type= " + type + "\n" +
+                        "name= " + name + "\n" +
+                        "relKey= " + relKey + "\n" +
+                        "key= " + key + "\n" +
+                        "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
+                        "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
+                        "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
+                        "koPermission= " + koPermission + "\n" +
+                        "description= " + description + "\n" +
+                        "treeType= " + treeType;
     }
 }

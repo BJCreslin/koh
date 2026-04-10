@@ -1,0 +1,203 @@
+2025-08-15 07:25:40.351 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-08-15 07:25:40.353 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-08-15 07:25:40.354 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-08-15 07:25:40.363 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-08-15 07:25:40.668 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-08-15 07:25:40.675 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-08-15 07:26:17.261 [AWT-EventQueue-0] ERROR ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Ошибка при обработке Excel файла: 2.xlsx
+ru.cbr.koh.exceptions.ExcelParsingException: Лист 'Дерево' не найден в файле: /home/69kreslinvyu@region.cbr.ru/Загрузки/Telegram Desktop/2.xlsx
+	at ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader.read(FileReader.java:72) ~[classes/:?]
+	at ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel.createChangelogMigration(ExcelInputPanel.java:160) ~[classes/:?]
+	at ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel.lambda$createModernFileButton$1(ExcelInputPanel.java:228) ~[classes/:?]
+	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1972) ~[?:?]
+	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2313) ~[?:?]
+	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:405) ~[?:?]
+	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:262) ~[?:?]
+	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:279) ~[?:?]
+	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:297) ~[?:?]
+	at java.awt.Component.processMouseEvent(Component.java:6626) ~[?:?]
+	at javax.swing.JComponent.processMouseEvent(JComponent.java:3389) ~[?:?]
+	at java.awt.Component.processEvent(Component.java:6391) ~[?:?]
+	at java.awt.Container.processEvent(Container.java:2266) ~[?:?]
+	at java.awt.Component.dispatchEventImpl(Component.java:5001) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2324) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4833) ~[?:?]
+	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4948) ~[?:?]
+	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4575) ~[?:?]
+	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4516) ~[?:?]
+	at java.awt.Container.dispatchEventImpl(Container.java:2310) ~[?:?]
+	at java.awt.Window.dispatchEventImpl(Window.java:2780) ~[?:?]
+	at java.awt.Component.dispatchEvent(Component.java:4833) ~[?:?]
+	at java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773) ~[?:?]
+	at java.awt.EventQueue$4.run(EventQueue.java:722) ~[?:?]
+	at java.awt.EventQueue$4.run(EventQueue.java:716) ~[?:?]
+	at java.security.AccessController.doPrivileged(AccessController.java:399) [?:?]
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86) ~[?:?]
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:97) ~[?:?]
+	at java.awt.EventQueue$5.run(EventQueue.java:746) ~[?:?]
+	at java.awt.EventQueue$5.run(EventQueue.java:744) ~[?:?]
+	at java.security.AccessController.doPrivileged(AccessController.java:399) [?:?]
+	at java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86) [?:?]
+	at java.awt.EventQueue.dispatchEvent(EventQueue.java:743) [?:?]
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203) [?:?]
+	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124) [?:?]
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113) [?:?]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109) [?:?]
+	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101) [?:?]
+	at java.awt.EventDispatchThread.run(EventDispatchThread.java:90) [?:?]
+2025-08-15 07:26:22.281 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-08-15 07:27:21.323 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Без имени 2.xlsx
+2025-08-15 07:27:21.324 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:29:19.444 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-12 07:29:19.451 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-12 07:29:19.454 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-12 07:29:19.461 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-12 07:29:19.867 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:29:19.874 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:33:32.780 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:34:49.739 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:35:30.253 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 07:35:30.255 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:37:10.016 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:37:12.483 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 07:37:12.485 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:38:38.430 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:38:41.799 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 07:38:41.800 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:39:07.724 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:39:14.528 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:39:34.771 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 07:39:36.497 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 07:39:36.499 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:08:02.880 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-12 08:08:02.883 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-12 08:08:02.884 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-12 08:08:02.889 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-12 08:08:03.159 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:08:03.167 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:08:18.350 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:08:39.032 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 08:08:39.034 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:10:14.245 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 08:10:16.749 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-12 08:10:16.750 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 09:53:49.124 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-12 09:53:49.127 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-12 09:53:49.128 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-12 09:53:49.132 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-12 09:53:49.510 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 09:53:49.512 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-12 09:55:07.234 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:40:20.709 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 11:40:20.716 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 11:40:20.723 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 11:40:20.745 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 11:40:21.723 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:40:21.733 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:42:41.093 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:43:20.352 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 11:43:20.356 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 11:43:20.357 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 11:43:20.504 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 11:43:20.506 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:53:33.684 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 11:55:31.030 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 11:55:31.045 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 11:55:34.907 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 11:55:34.910 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 11:55:34.911 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 11:55:34.915 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 11:55:35.186 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:55:35.188 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:55:43.227 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 11:57:49.593 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:00:42.232 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:00:43.956 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:01:03.688 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:01:03.688 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:01:40.713 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:01:43.981 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:01:43.982 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:01:43.983 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:01:44.056 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:01:44.057 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:02:58.997 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:02:59.000 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:02:59.001 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:02:59.004 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:02:59.252 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:02:59.254 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:03:13.761 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:03:18.305 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:05:16.620 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:05:28.580 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:05:28.591 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:05:30.230 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:05:30.231 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:12:12.341 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:12:12.344 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:12:12.345 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:12:12.349 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:12:12.594 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:12:12.595 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:12:27.689 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.information.InformationPanel - Информация успешно сохранена в information.txt
+2025-11-13 12:12:27.690 [AWT-EventQueue-0] INFO  ru.cbr.koh.main_window.MainWindow - Приложение завершается корректно
+2025-11-13 12:15:14.241 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:15:14.244 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:15:14.246 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:15:14.251 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:15:14.477 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:15:14.478 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:16:18.749 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:16:18.754 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:16:18.755 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:16:18.947 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:16:18.948 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:20:05.459 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:20:05.461 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:20:05.462 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:20:05.466 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:20:05.671 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:20:05.674 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:21:06.934 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:21:06.937 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:21:06.938 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:21:07.093 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:21:07.094 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:21:21.742 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:21:21.745 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:21:21.746 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:21:21.749 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:21:21.998 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:21:22.000 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:27:58.134 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:27:58.164 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:27:58.183 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:28:02.059 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-13 12:28:02.061 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-13 12:28:02.062 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-13 12:28:02.066 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-13 12:28:02.315 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:28:02.316 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-13 12:28:24.057 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-13 12:28:24.065 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-13 12:28:24.067 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-13 12:28:24.192 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-13 12:28:24.193 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-14 04:18:33.163 [main] INFO  ru.cbr.koh.GUIApplication - Запуск GUI приложения...
+2025-11-14 04:18:33.166 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Начинаем валидацию ресурсов приложения...
+2025-11-14 04:18:33.168 [main] INFO  ru.cbr.koh.utils.ResourceValidator - Все обязательные ресурсы найдены
+2025-11-14 04:18:33.172 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно загружена из config.properties
+2025-11-14 04:18:33.386 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-14 04:18:33.394 [main] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-14 04:18:51.588 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-14 04:18:51.591 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-14 04:18:51.591 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-14 04:18:51.714 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-14 04:18:51.714 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-14 04:20:09.216 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
+2025-11-14 04:20:11.816 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab
+2025-11-14 04:20:11.816 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators
+2025-11-14 04:20:11.817 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader - Saving permission with key: credit-organisation-card#financial-analysis-tab#balance-tab#balance-indicators#view
+2025-11-14 04:20:11.866 [AWT-EventQueue-0] INFO  ru.cbr.koh.panes_storage.panels.permission_migration.excel.ExcelInputPanel - Changelog успешно создан из файла: Баланс. Соло - Часть 1.xlsx
+2025-11-14 04:20:11.866 [AWT-EventQueue-0] INFO  ru.cbr.koh.properties.ConfigurationService - Конфигурация успешно сохранена в config.properties
