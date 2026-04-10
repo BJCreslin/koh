@@ -1,5 +1,5 @@
 #KOH information state
-#Tue Mar 10 11:05:33 MSK 2026
+#Thu Apr 09 10:38:35 MSK 2026
 storyText=Заключения САР по залогам
 author=KreslinVYU
 shouldWriteAbacFile=true
