@@ -42,4 +42,15 @@ class LogParserServiceTest {
         assertEquals("Form303Scheduler", events.get(0).loggerName());
         assertEquals("asyncForm303SchedulerExecutor-1", events.get(0).executorName());
     }
+
+    @Test
+    void shouldKeepLongMessageAsSingleEvent() {
+        String longMessage = "x".repeat(12_000);
+        String content = "28.04.2026 04:01:11,980 WARN  [SomeScheduler executor-1] " + longMessage;
+
+        List<ParsedLogEvent> events = parserService.parse(content);
+
+        assertEquals(1, events.size());
+        assertEquals(12_000, events.get(0).message().length());
+    }
 }

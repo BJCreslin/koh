@@ -1,5 +1,6 @@
 package ru.cbr.koh.panes_storage.panels.application_logs;
 
+import org.springframework.data.domain.Page;
 import ru.cbr.koh.app.AppContext;
 import ru.cbr.koh.logs.domain.ErrorGroupEntity;
 import ru.cbr.koh.logs.domain.LogEventEntity;
@@ -13,12 +14,13 @@ import ru.cbr.koh.ui.BusinessTheme;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 public class ApplicationLogsPanel implements PaneInterface {
 
@@ -35,6 +37,8 @@ public class ApplicationLogsPanel implements PaneInterface {
     private JTextField toDateField;
     private JTextField schedulerLoggerField;
     private JTextField schedulerExecutorField;
+    private PaginationControls eventsPagination;
+    private PaginationControls schedulerPagination;
 
     public ApplicationLogsPanel(AppContext appContext) {
         this.appContext = appContext;
@@ -95,7 +99,12 @@ public class ApplicationLogsPanel implements PaneInterface {
 
     private JComponent createEventsPanel(JFrame frame) {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
-        panel.add(createFilters(), BorderLayout.NORTH);
+        JPanel header = new JPanel(new BorderLayout(4, 4));
+        header.setOpaque(false);
+        header.add(createFilters(), BorderLayout.NORTH);
+        eventsPagination = new PaginationControls(this::refreshEvents);
+        header.add(eventsPagination, BorderLayout.SOUTH);
+        panel.add(header, BorderLayout.NORTH);
 
         eventsModel = new DefaultTableModel(
                 new Object[]{"id", "time", "level", "logger", "executor", "attention", "message"}, 0) {
@@ -130,7 +139,10 @@ public class ApplicationLogsPanel implements PaneInterface {
         toDateField = new JTextField(10);
         JButton applyButton = new JButton("Применить");
         BusinessTheme.styleSecondaryButton(applyButton);
-        applyButton.addActionListener(e -> refreshEvents());
+        applyButton.addActionListener(e -> {
+            eventsPagination.reset();
+            refreshEvents();
+        });
 
         filters.add(new JLabel("Level"));
         filters.add(levelFilter);
@@ -166,6 +178,17 @@ public class ApplicationLogsPanel implements PaneInterface {
         };
         JTable table = new JTable(groupsModel);
         table.setAutoCreateRowSorter(true);
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                int viewRow = table.rowAtPoint(event.getPoint());
+                if (event.getClickCount() == 2 && viewRow >= 0) {
+                    int modelRow = table.convertRowIndexToModel(viewRow);
+                    Long groupId = (Long) groupsModel.getValueAt(modelRow, 0);
+                    showGroupMessage(frame, groupId);
+                }
+            }
+        });
 
         panel.add(actions, BorderLayout.NORTH);
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -181,7 +204,10 @@ public class ApplicationLogsPanel implements PaneInterface {
         schedulerExecutorField = new JTextField(20);
         JButton applyButton = new JButton("Применить");
         BusinessTheme.styleSecondaryButton(applyButton);
-        applyButton.addActionListener(e -> refreshSchedulerEvents());
+        applyButton.addActionListener(e -> {
+            schedulerPagination.reset();
+            refreshSchedulerEvents();
+        });
 
         filters.add(new JLabel("Class"));
         filters.add(schedulerLoggerField);
@@ -198,7 +224,13 @@ public class ApplicationLogsPanel implements PaneInterface {
         JTable table = new JTable(schedulerModel);
         table.setAutoCreateRowSorter(true);
 
-        panel.add(filters, BorderLayout.NORTH);
+        JPanel header = new JPanel(new BorderLayout(4, 4));
+        header.setOpaque(false);
+        header.add(filters, BorderLayout.NORTH);
+        schedulerPagination = new PaginationControls(this::refreshSchedulerEvents);
+        header.add(schedulerPagination, BorderLayout.SOUTH);
+
+        panel.add(header, BorderLayout.NORTH);
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
         return panel;
     }
@@ -283,11 +315,18 @@ public class ApplicationLogsPanel implements PaneInterface {
         }
         eventsModel.setRowCount(0);
         LogLevel level = selectedLevel();
-        List<LogEventEntity> events = facade.searchEvents(level, attentionFilter.isSelected(), parseFromDate(), parseToDate());
-        for (LogEventEntity event : events) {
+        Page<LogEventEntity> events = facade.searchEvents(
+                level,
+                attentionFilter.isSelected(),
+                parseFromDate(),
+                parseToDate(),
+                eventsPagination.pageIndex(),
+                eventsPagination.pageSize());
+        eventsPagination.update(events);
+        for (LogEventEntity event : events.getContent()) {
             eventsModel.addRow(new Object[]{
                     event.getId(),
-                    event.getEventTimestamp(),
+                    LogTableFormat.timestamp(event.getEventTimestamp()),
                     event.getLevel(),
                     event.getLoggerName(),
                     event.getExecutorName(),
@@ -306,9 +345,9 @@ public class ApplicationLogsPanel implements PaneInterface {
             groupsModel.addRow(new Object[]{
                     group.getId(),
                     group.getCount(),
-                    group.getFirstSeen(),
-                    group.getLastSeen(),
-                    group.getPreviousSeen(),
+                    LogTableFormat.timestamp(group.getFirstSeen()),
+                    LogTableFormat.timestamp(group.getLastSeen()),
+                    LogTableFormat.timestamp(group.getPreviousSeen()),
                     group.isAttention(),
                     group.getExceptionClass(),
                     source(group),
@@ -322,10 +361,16 @@ public class ApplicationLogsPanel implements PaneInterface {
             return;
         }
         schedulerModel.setRowCount(0);
-        for (LogEventEntity event : facade.schedulerEvents(schedulerLoggerField.getText(), schedulerExecutorField.getText())) {
+        Page<LogEventEntity> events = facade.schedulerEvents(
+                schedulerLoggerField.getText(),
+                schedulerExecutorField.getText(),
+                schedulerPagination.pageIndex(),
+                schedulerPagination.pageSize());
+        schedulerPagination.update(events);
+        for (LogEventEntity event : events.getContent()) {
             schedulerModel.addRow(new Object[]{
                     event.getId(),
-                    event.getEventTimestamp(),
+                    LogTableFormat.timestamp(event.getEventTimestamp()),
                     event.getLoggerName(),
                     event.getExecutorName(),
                     trim(event.getMessage(), 260)
@@ -385,15 +430,27 @@ public class ApplicationLogsPanel implements PaneInterface {
     }
 
     private void showEventDetails(JFrame frame, Long id) {
-        facade.searchEvents(null, false, null, null).stream()
-                .filter(event -> event.getId().equals(id))
-                .findFirst()
-                .ifPresent(event -> {
-                    JTextArea textArea = new JTextArea(event.getMessage() + System.lineSeparator() + event.getStackTrace());
-                    textArea.setEditable(false);
-                    textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-                    JOptionPane.showMessageDialog(frame, new JScrollPane(textArea), "Log event " + id, JOptionPane.INFORMATION_MESSAGE);
-                });
+        LogEventEntity event = facade.eventById(id);
+        JTextArea textArea = new JTextArea(event.getMessage() + System.lineSeparator() + event.getStackTrace());
+        textArea.setEditable(false);
+        textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        JOptionPane.showMessageDialog(frame, new JScrollPane(textArea), "Log event " + id, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void showGroupMessage(JFrame frame, Long id) {
+        ErrorGroupEntity group = facade.errorGroupById(id);
+        JTextArea textArea = new JTextArea(detailsText(group.getSampleMessage(), group.getSampleStackTrace()));
+        textArea.setEditable(false);
+        textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        JOptionPane.showMessageDialog(frame, new JScrollPane(textArea), "Group " + id, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private String detailsText(String message, String stackTrace) {
+        String safeMessage = message == null ? "" : message;
+        if (stackTrace == null || stackTrace.isBlank()) {
+            return safeMessage;
+        }
+        return safeMessage + System.lineSeparator() + stackTrace;
     }
 
     private void showIngestionResult(JFrame frame, LogIngestionResult result) {
@@ -510,5 +567,78 @@ public class ApplicationLogsPanel implements PaneInterface {
             return value;
         }
         return value.substring(0, maxLength - 3) + "...";
+    }
+
+    private static final class PaginationControls extends JPanel {
+
+        private final JComboBox<Integer> pageSizeCombo = new JComboBox<>(new Integer[]{20, 50, 100});
+        private final JLabel pageLabel = new JLabel();
+        private final JButton previousButton = new JButton("Назад");
+        private final JButton nextButton = new JButton("Вперед");
+        private final Runnable refreshAction;
+        private int pageIndex;
+        private int totalPages;
+
+        private PaginationControls(Runnable refreshAction) {
+            super(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+            this.refreshAction = refreshAction;
+            setOpaque(false);
+            pageSizeCombo.setSelectedItem(20);
+            BusinessTheme.styleSecondaryButton(previousButton);
+            BusinessTheme.styleSecondaryButton(nextButton);
+
+            previousButton.addActionListener(e -> {
+                if (pageIndex > 0) {
+                    pageIndex--;
+                    refreshAction.run();
+                }
+            });
+            nextButton.addActionListener(e -> {
+                if (pageIndex + 1 < totalPages) {
+                    pageIndex++;
+                    refreshAction.run();
+                }
+            });
+            pageSizeCombo.addActionListener(e -> {
+                reset();
+                refreshAction.run();
+            });
+
+            add(new JLabel("Строк на странице"));
+            add(pageSizeCombo);
+            add(previousButton);
+            add(pageLabel);
+            add(nextButton);
+            updateLabel(0, 0);
+        }
+
+        private int pageIndex() {
+            return pageIndex;
+        }
+
+        private int pageSize() {
+            return (Integer) pageSizeCombo.getSelectedItem();
+        }
+
+        private void reset() {
+            pageIndex = 0;
+        }
+
+        private void update(Page<?> page) {
+            totalPages = page.getTotalPages();
+            if (totalPages > 0 && pageIndex >= totalPages) {
+                pageIndex = totalPages - 1;
+                refreshAction.run();
+                return;
+            }
+            updateLabel(page.getTotalElements(), totalPages);
+        }
+
+        private void updateLabel(long totalElements, int pages) {
+            int currentPage = pages == 0 ? 0 : pageIndex + 1;
+            pageLabel.setText("Страница " + currentPage + " из " + pages + ", всего " + totalElements);
+            previousButton.setEnabled(pageIndex > 0);
+            nextButton.setEnabled(pageIndex + 1 < pages);
+        }
     }
 }
