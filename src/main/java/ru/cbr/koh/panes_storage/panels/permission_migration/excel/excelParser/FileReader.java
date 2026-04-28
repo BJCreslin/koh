@@ -25,9 +25,8 @@ public class FileReader {
     private static final int TOP_SPACE = 6;
 
     public static final int NAME_COLUMN_NUMBER = 10;
-    public static final int NEED_SAVE_COLUMN_NUMBER = 28;
+    public static final int NEED_SAVE_COLUMN_NUMBER = 30;
     public static final String BANK_DEPENDENT = "**";
-    public static final String INCLUDE_ROW_SYMBOL = "i";
 
     private final File file;
     private final char rowSelector;
@@ -98,7 +97,8 @@ public class FileReader {
                                         name,
                                         profiles,
                                         description,
-                                        types));
+                                        types,
+                                        bankDependent));
                     }
                 }
             }

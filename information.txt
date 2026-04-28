@@ -1,9 +1,9 @@
 #KOH information state
-#Mon Mar 09 20:11:59 GMT+07:00 2026
+#Fri Apr 10 12:16:27 MSK 2026
+storyText=Заключения САР по залогам
 author=KreslinVYU
-fromExcel=true
-keyText=collateral_conclusion
-shouldWriteAbacAttributeCode=true
 shouldWriteAbacFile=true
-storyNumber=11982 (12083)
-storyText=Заключения САР по залоговым объектам
+keyText=collateral_conclusion
+storyNumber=PDKO-1234(5678)
+shouldWriteAbacAttributeCode=true
+fromExcel=true
