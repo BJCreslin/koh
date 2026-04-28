@@ -18,6 +18,7 @@ public final class LogViewerSpringContext {
         if (context == null) {
             context = new SpringApplicationBuilder(LogViewerSpringConfig.class)
                     .web(WebApplicationType.NONE)
+                    .headless(false)
                     .properties(defaultProperties())
                     .run();
         }

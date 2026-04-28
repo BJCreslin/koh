@@ -17,6 +17,10 @@ public class SwingErrorHandler implements ErrorHandler {
             details = exception.getClass().getSimpleName();
         }
 
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+
         JOptionPane.showMessageDialog(
                 parent,
                 userMessage + "\n\n" + details,

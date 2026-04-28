@@ -4,18 +4,17 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -24,16 +23,12 @@ public class RemoteLogArchiveService {
     private static final String SHARE_ID = "bEYYcqor7bacZLD";
     private static final String PASSWORD = "qwerty$4qwerty$4";
     private static final String DAV_URL = "https://cloud.cod.tom.ru/public.php/dav/files/" + SHARE_ID + "/";
+    private static final String AUTHORIZATION = "Basic " + Base64.getEncoder()
+            .encodeToString((SHARE_ID + ":" + PASSWORD).getBytes(StandardCharsets.UTF_8));
     private static final Pattern HREF = Pattern.compile("<d:href>(.*?)</d:href>|<a:href>(.*?)</a:href>|<href>(.*?)</href>");
 
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(30))
-            .authenticator(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(SHARE_ID, PASSWORD.toCharArray());
-                }
-            })
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
@@ -44,6 +39,7 @@ public class RemoteLogArchiveService {
             Files.createDirectories(targetPath.getParent());
             HttpRequest request = HttpRequest.newBuilder(URI.create(DAV_URL + fileName))
                     .GET()
+                    .header("Authorization", AUTHORIZATION)
                     .timeout(Duration.ofMinutes(5))
                     .build();
             HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(targetPath));
@@ -83,6 +79,7 @@ public class RemoteLogArchiveService {
         try {
             HttpRequest request = HttpRequest.newBuilder(URI.create(DAV_URL))
                     .method("PROPFIND", HttpRequest.BodyPublishers.ofString(body))
+                    .header("Authorization", AUTHORIZATION)
                     .header("Depth", "1")
                     .header("Content-Type", "application/xml")
                     .timeout(Duration.ofMinutes(2))
