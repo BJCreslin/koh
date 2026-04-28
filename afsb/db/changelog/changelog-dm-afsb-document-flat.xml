@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="afsb-document-flat-001-create-table" author="codex">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DM_AFSB_DOCUMENT_FLAT"/>
+            </not>
+        </preConditions>
+
+        <sqlFile
+                path="../sql/001_create_dm_afsb_document_flat.sql"
+                relativeToChangelogFile="true"
+                splitStatements="true"
+                stripComments="false"/>
+
+        <rollback>
+            <sql>DROP TABLE dm_afsb_document_flat CASCADE CONSTRAINTS</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="afsb-document-flat-002-create-procedure" author="codex" runOnChange="true">
+        <sqlFile
+                path="../sql/002_create_prc_reload_dm_afsb_document_flat.sql"
+                relativeToChangelogFile="true"
+                splitStatements="false"
+                endDelimiter="/"
+                stripComments="false"/>
+
+        <rollback>
+            <sql>DROP PROCEDURE prc_reload_dm_afsb_document_flat</sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
