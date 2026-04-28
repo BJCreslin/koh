@@ -3,6 +3,7 @@ package ru.cbr.koh.logs.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.cbr.koh.logs.domain.LogEventEntity;
 import ru.cbr.koh.logs.domain.LogLevel;
 
@@ -25,7 +26,10 @@ public interface LogEventRepository extends JpaRepository<LogEventEntity, Long> 
               and e.schedulerEvent = false
             order by e.eventTimestamp desc
             """)
-    List<LogEventEntity> search(LogLevel level, boolean attentionOnly, LocalDateTime fromDate, LocalDateTime toDate);
+    List<LogEventEntity> search(@Param("level") LogLevel level,
+                                @Param("attentionOnly") boolean attentionOnly,
+                                @Param("fromDate") LocalDateTime fromDate,
+                                @Param("toDate") LocalDateTime toDate);
 
     @Query("""
             select e from LogEventEntity e
@@ -34,7 +38,8 @@ public interface LogEventRepository extends JpaRepository<LogEventEntity, Long> 
               and (:executor is null or lower(e.executorName) like lower(concat('%', :executor, '%')))
             order by e.eventTimestamp desc
             """)
-    List<LogEventEntity> searchSchedulerEvents(String logger, String executor);
+    List<LogEventEntity> searchSchedulerEvents(@Param("logger") String logger,
+                                               @Param("executor") String executor);
 
     @Modifying
     void deleteByEventTimestampBefore(LocalDateTime before);
