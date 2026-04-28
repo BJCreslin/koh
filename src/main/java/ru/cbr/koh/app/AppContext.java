@@ -4,6 +4,8 @@ import ru.cbr.koh.app.async.UiTaskRunner;
 import ru.cbr.koh.app.error.ErrorHandler;
 import ru.cbr.koh.app.error.SwingErrorHandler;
 import ru.cbr.koh.app.service.PermissionMigrationService;
+import ru.cbr.koh.logs.LogViewerSpringContext;
+import ru.cbr.koh.logs.service.ApplicationLogFacade;
 import ru.cbr.koh.properties.ApplicationProperties;
 
 public class AppContext {
@@ -12,6 +14,7 @@ public class AppContext {
     private final ErrorHandler errorHandler;
     private final UiTaskRunner taskRunner;
     private final PermissionMigrationService permissionMigrationService;
+    private final ApplicationLogFacade applicationLogFacade;
 
     public AppContext(ApplicationProperties properties) {
         this(properties, new SwingErrorHandler(), new PermissionMigrationService());
@@ -24,6 +27,7 @@ public class AppContext {
         this.errorHandler = errorHandler;
         this.taskRunner = new UiTaskRunner(errorHandler);
         this.permissionMigrationService = permissionMigrationService;
+        this.applicationLogFacade = LogViewerSpringContext.getBean(ApplicationLogFacade.class);
     }
 
     public ApplicationProperties getProperties() {
@@ -40,5 +44,9 @@ public class AppContext {
 
     public PermissionMigrationService getPermissionMigrationService() {
         return permissionMigrationService;
+    }
+
+    public ApplicationLogFacade getApplicationLogFacade() {
+        return applicationLogFacade;
     }
 }
