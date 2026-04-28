@@ -34,7 +34,26 @@ public class RemoteLogArchiveService {
 
     public Path downloadLatestZpeArchive() {
         String fileName = findLatestZpeArchiveName();
-        Path targetPath = Path.of("koh-log-viewer-db", "downloads", fileName);
+        Path targetPath = resolveDownloadPath(fileName);
+        if (isValidCachedArchive(targetPath)) {
+            return targetPath;
+        }
+        return downloadArchive(fileName, targetPath);
+    }
+
+    Path resolveDownloadPath(String fileName) {
+        return Path.of("koh-log-viewer-db", "downloads", fileName);
+    }
+
+    boolean isValidCachedArchive(Path targetPath) {
+        try {
+            return Files.isRegularFile(targetPath) && Files.size(targetPath) > 0;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    Path downloadArchive(String fileName, Path targetPath) {
         try {
             Files.createDirectories(targetPath.getParent());
             HttpRequest request = HttpRequest.newBuilder(URI.create(DAV_URL + fileName))
@@ -55,7 +74,7 @@ public class RemoteLogArchiveService {
         }
     }
 
-    private String findLatestZpeArchiveName() {
+    String findLatestZpeArchiveName() {
         String listing = readDavListing();
         Optional<String> latest = HREF.matcher(listing).results()
                 .map(matchResult -> firstNotNull(matchResult.group(1), matchResult.group(2), matchResult.group(3)))

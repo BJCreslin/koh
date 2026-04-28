@@ -34,7 +34,7 @@ public class LogEventEntity {
 
     private String executorName;
 
-    @Column(length = 4096)
+    @Lob
     private String message;
 
     @Lob

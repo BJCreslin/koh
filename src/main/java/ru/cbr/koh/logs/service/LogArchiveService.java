@@ -41,11 +41,21 @@ public class LogArchiveService {
     }
 
     private Path safeResolve(Path targetDir, String entryName) throws IOException {
-        Path outputPath = targetDir.resolve(entryName).normalize();
-        if (!outputPath.startsWith(targetDir.normalize())) {
+        String normalizedEntryName = normalizeZipEntryName(entryName);
+        Path normalizedTargetDir = targetDir.toAbsolutePath().normalize();
+        Path outputPath = normalizedTargetDir.resolve(normalizedEntryName).normalize();
+        if (!outputPath.startsWith(normalizedTargetDir)) {
             throw new IOException("Zip entry выходит за пределы директории распаковки: " + entryName);
         }
         return outputPath;
+    }
+
+    private String normalizeZipEntryName(String entryName) {
+        String normalized = entryName.replace('\\', '/');
+        while (normalized.startsWith("/")) {
+            normalized = normalized.substring(1);
+        }
+        return normalized;
     }
 
     private Path findDossierLog(Path targetDir) {

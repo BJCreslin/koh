@@ -1,5 +1,7 @@
 package ru.cbr.koh.logs.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.cbr.koh.logs.domain.ErrorGroupEntity;
@@ -57,15 +59,38 @@ public class ApplicationLogFacade {
                                              boolean attentionOnly,
                                              LocalDateTime fromDate,
                                              LocalDateTime toDate) {
-        return logEventRepository.search(level, attentionOnly, fromDate, toDate);
+        return searchEvents(level, attentionOnly, fromDate, toDate, 0, 500).getContent();
+    }
+
+    public Page<LogEventEntity> searchEvents(LogLevel level,
+                                             boolean attentionOnly,
+                                             LocalDateTime fromDate,
+                                             LocalDateTime toDate,
+                                             int page,
+                                             int size) {
+        return logEventRepository.search(level, attentionOnly, fromDate, toDate, PageRequest.of(page, size));
+    }
+
+    public LogEventEntity eventById(Long id) {
+        return logEventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Событие не найдено: " + id));
     }
 
     public List<ErrorGroupEntity> errorGroups() {
         return errorGroupRepository.findTop500ByOrderByLastSeenDesc();
     }
 
+    public ErrorGroupEntity errorGroupById(Long id) {
+        return errorGroupRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Группа не найдена: " + id));
+    }
+
     public List<LogEventEntity> schedulerEvents(String logger, String executor) {
-        return logEventRepository.searchSchedulerEvents(blankToNull(logger), blankToNull(executor));
+        return schedulerEvents(logger, executor, 0, 500).getContent();
+    }
+
+    public Page<LogEventEntity> schedulerEvents(String logger, String executor, int page, int size) {
+        return logEventRepository.searchSchedulerEvents(blankToNull(logger), blankToNull(executor), PageRequest.of(page, size));
     }
 
     public List<SchedulerPresetEntity> schedulerPresets() {

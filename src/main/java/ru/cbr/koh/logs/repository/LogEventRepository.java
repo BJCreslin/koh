@@ -1,5 +1,7 @@
 package ru.cbr.koh.logs.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,14 +10,11 @@ import ru.cbr.koh.logs.domain.LogEventEntity;
 import ru.cbr.koh.logs.domain.LogLevel;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public interface LogEventRepository extends JpaRepository<LogEventEntity, Long> {
 
     Optional<LogEventEntity> findByEventHash(String eventHash);
-
-    List<LogEventEntity> findTop500BySchedulerEventTrueOrderByEventTimestampDesc();
 
     @Query("""
             select e from LogEventEntity e
@@ -26,10 +25,11 @@ public interface LogEventRepository extends JpaRepository<LogEventEntity, Long> 
               and e.schedulerEvent = false
             order by e.eventTimestamp desc
             """)
-    List<LogEventEntity> search(@Param("level") LogLevel level,
+    Page<LogEventEntity> search(@Param("level") LogLevel level,
                                 @Param("attentionOnly") boolean attentionOnly,
                                 @Param("fromDate") LocalDateTime fromDate,
-                                @Param("toDate") LocalDateTime toDate);
+                                @Param("toDate") LocalDateTime toDate,
+                                Pageable pageable);
 
     @Query("""
             select e from LogEventEntity e
@@ -38,8 +38,9 @@ public interface LogEventRepository extends JpaRepository<LogEventEntity, Long> 
               and (:executor is null or lower(e.executorName) like lower(concat('%', :executor, '%')))
             order by e.eventTimestamp desc
             """)
-    List<LogEventEntity> searchSchedulerEvents(@Param("logger") String logger,
-                                               @Param("executor") String executor);
+    Page<LogEventEntity> searchSchedulerEvents(@Param("logger") String logger,
+                                               @Param("executor") String executor,
+                                               Pageable pageable);
 
     @Modifying
     void deleteByEventTimestampBefore(LocalDateTime before);
