@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,12 +35,20 @@ class RemoteLogArchiveServiceTest {
     }
 
     @Test
+    void shouldBuildAuthorizationFromProvidedPassword() {
+        String expected = "Basic " + Base64.getEncoder()
+                .encodeToString("bEYYcqor7bacZLD:runtime-password".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals(expected, service.buildAuthorization("runtime-password"));
+    }
+
+    @Test
     void shouldUseCachedLatestArchiveWhenItAlreadyExists() throws Exception {
         Path archive = Files.createTempFile("zpe-all-logs", ".zip");
         Files.writeString(archive, "zip-content");
         TestRemoteLogArchiveService testService = new TestRemoteLogArchiveService(archive);
 
-        Path result = testService.downloadLatestZpeArchive();
+        Path result = testService.downloadLatestZpeArchive("runtime-password");
 
         assertEquals(archive, result);
         assertFalse(testService.downloadCalled);
@@ -51,7 +61,7 @@ class RemoteLogArchiveServiceTest {
         Path archive = Files.createTempFile("zpe-all-logs", ".zip");
         TestRemoteLogArchiveService testService = new TestRemoteLogArchiveService(archive);
 
-        Path result = testService.downloadLatestZpeArchive();
+        Path result = testService.downloadLatestZpeArchive("runtime-password");
 
         assertEquals(archive, result);
         assertTrue(testService.downloadCalled);
@@ -69,7 +79,7 @@ class RemoteLogArchiveServiceTest {
         }
 
         @Override
-        String findLatestZpeArchiveName() {
+        String findLatestZpeArchiveName(String authorization) {
             return "20260428094428-zpe-all-logs.zip";
         }
 
@@ -79,7 +89,7 @@ class RemoteLogArchiveServiceTest {
         }
 
         @Override
-        Path downloadArchive(String fileName, Path targetPath) {
+        Path downloadArchive(String fileName, Path targetPath, String authorization) {
             downloadCalled = true;
             return targetPath;
         }
