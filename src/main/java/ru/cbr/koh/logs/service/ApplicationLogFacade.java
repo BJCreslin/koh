@@ -45,8 +45,8 @@ public class ApplicationLogFacade {
         this.schedulerPresetRepository = schedulerPresetRepository;
     }
 
-    public LogIngestionResult downloadAndIngestLatest() {
-        Path archivePath = remoteLogArchiveService.downloadLatestZpeArchive();
+    public LogIngestionResult downloadAndIngestLatest(String password) {
+        Path archivePath = remoteLogArchiveService.downloadLatestZpeArchive(password);
         Path logFilePath = logArchiveService.unpackAndFindDossierLog(archivePath);
         return ingestionService.ingest(logFilePath);
     }

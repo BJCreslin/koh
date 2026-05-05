@@ -21,10 +21,7 @@ import java.util.regex.Pattern;
 public class RemoteLogArchiveService {
 
     private static final String SHARE_ID = "bEYYcqor7bacZLD";
-    private static final String PASSWORD = "qwerty$4qwerty$4";
     private static final String DAV_URL = "https://cloud.cod.tom.ru/public.php/dav/files/" + SHARE_ID + "/";
-    private static final String AUTHORIZATION = "Basic " + Base64.getEncoder()
-            .encodeToString((SHARE_ID + ":" + PASSWORD).getBytes(StandardCharsets.UTF_8));
     private static final Pattern HREF = Pattern.compile("<d:href>(.*?)</d:href>|<a:href>(.*?)</a:href>|<href>(.*?)</href>");
 
     private final HttpClient httpClient = HttpClient.newBuilder()
@@ -32,13 +29,19 @@ public class RemoteLogArchiveService {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-    public Path downloadLatestZpeArchive() {
-        String fileName = findLatestZpeArchiveName();
+    public Path downloadLatestZpeArchive(String password) {
+        String authorization = buildAuthorization(password);
+        String fileName = findLatestZpeArchiveName(authorization);
         Path targetPath = resolveDownloadPath(fileName);
         if (isValidCachedArchive(targetPath)) {
             return targetPath;
         }
-        return downloadArchive(fileName, targetPath);
+        return downloadArchive(fileName, targetPath, authorization);
+    }
+
+    String buildAuthorization(String password) {
+        return "Basic " + Base64.getEncoder()
+                .encodeToString((SHARE_ID + ":" + password).getBytes(StandardCharsets.UTF_8));
     }
 
     Path resolveDownloadPath(String fileName) {
@@ -53,12 +56,12 @@ public class RemoteLogArchiveService {
         }
     }
 
-    Path downloadArchive(String fileName, Path targetPath) {
+    Path downloadArchive(String fileName, Path targetPath, String authorization) {
         try {
             Files.createDirectories(targetPath.getParent());
             HttpRequest request = HttpRequest.newBuilder(URI.create(DAV_URL + fileName))
                     .GET()
-                    .header("Authorization", AUTHORIZATION)
+                    .header("Authorization", authorization)
                     .timeout(Duration.ofMinutes(5))
                     .build();
             HttpResponse<Path> response = httpClient.send(request, HttpResponse.BodyHandlers.ofFile(targetPath));
@@ -74,8 +77,8 @@ public class RemoteLogArchiveService {
         }
     }
 
-    String findLatestZpeArchiveName() {
-        String listing = readDavListing();
+    String findLatestZpeArchiveName(String authorization) {
+        String listing = readDavListing(authorization);
         Optional<String> latest = HREF.matcher(listing).results()
                 .map(matchResult -> firstNotNull(matchResult.group(1), matchResult.group(2), matchResult.group(3)))
                 .map(this::extractFileName)
@@ -84,7 +87,7 @@ public class RemoteLogArchiveService {
         return latest.orElseThrow(() -> new IllegalStateException("Не найден файл *zpe-all-logs.zip в WebDAV"));
     }
 
-    private String readDavListing() {
+    private String readDavListing(String authorization) {
         String body = """
                 <?xml version="1.0" encoding="utf-8" ?>
                 <d:propfind xmlns:d="DAV:">
@@ -98,7 +101,7 @@ public class RemoteLogArchiveService {
         try {
             HttpRequest request = HttpRequest.newBuilder(URI.create(DAV_URL))
                     .method("PROPFIND", HttpRequest.BodyPublishers.ofString(body))
-                    .header("Authorization", AUTHORIZATION)
+                    .header("Authorization", authorization)
                     .header("Depth", "1")
                     .header("Content-Type", "application/xml")
                     .timeout(Duration.ofMinutes(2))

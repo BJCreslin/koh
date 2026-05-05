@@ -269,16 +269,41 @@ public class ApplicationLogsPanel implements PaneInterface {
     }
 
     private void runDownloadAndIngest(JFrame frame) {
+        char[] password = requestCloudPassword(frame);
+        if (password.length == 0) {
+            return;
+        }
         appContext.getTaskRunner().runWithProgress(
                 frame,
                 "Logs",
                 "Скачиваем и разбираем последний zpe-all-logs.zip...",
                 () -> {
-                    LogIngestionResult result = facade.downloadAndIngestLatest();
-                    SwingUtilities.invokeLater(() -> showIngestionResult(frame, result));
+                    try {
+                        LogIngestionResult result = facade.downloadAndIngestLatest(String.valueOf(password));
+                        SwingUtilities.invokeLater(() -> showIngestionResult(frame, result));
+                    } finally {
+                        java.util.Arrays.fill(password, '\0');
+                    }
                 },
                 this::refreshAll,
                 "Не удалось скачать или разобрать логи");
+    }
+
+    private char[] requestCloudPassword(JFrame frame) {
+        JPasswordField passwordField = new JPasswordField(24);
+        JPanel panel = new JPanel(new GridLayout(1, 2, 8, 8));
+        panel.add(new JLabel("Пароль"));
+        panel.add(passwordField);
+        int result = JOptionPane.showConfirmDialog(
+                frame,
+                panel,
+                "Доступ к архиву логов",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) {
+            return new char[0];
+        }
+        return passwordField.getPassword();
     }
 
     private void ingestLocalLog(JFrame frame) {
