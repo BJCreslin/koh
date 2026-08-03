@@ -36,6 +36,8 @@ public class Permission {
 
     private final List<TreeType> treeType;
 
+    private final Integer orderNoInNode;
+
     public Permission(String key,
                       PermissionType type,
                       String abacPermPresGroupAction,
@@ -44,7 +46,8 @@ public class Permission {
                       List<Profile> profiles,
                       String description,
                       List<TreeType> treeType,
-                      boolean bankDependent) {
+                      boolean bankDependent,
+                      Integer orderNoInNode) {
         this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
@@ -58,6 +61,7 @@ public class Permission {
         this.abacPermPresUserAction = abacPermPresUserAction;
         koPermission = bankDependent;
         this.description = description;
+        this.orderNoInNode = orderNoInNode;
     }
 
     public List<TreeType> getTreeType() {
@@ -71,7 +75,8 @@ public class Permission {
                       String name,
                       List<Profile> profiles,
                       String description,
-                      List<TreeType> treeType) {
+                      List<TreeType> treeType,
+                      Integer orderNoInNode) {
         this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
@@ -85,6 +90,7 @@ public class Permission {
         this.abacPermPresUserAction = abacPermPresUserAction;
         koPermission = abacPermPresUserAction != null;
         this.description = description;
+        this.orderNoInNode = orderNoInNode;
     }
 
     public Permission(PermissionDialogObject object) {
@@ -95,7 +101,8 @@ public class Permission {
                 object.getName(),
                 null,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                null);
     }
 
     public Permission(PermissionDialogObject object, List<Profile> profiles) {
@@ -106,7 +113,8 @@ public class Permission {
                 object.getName(),
                 profiles,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                null);
     }
 
     private String getParent(String key) {
@@ -163,6 +171,9 @@ public class Permission {
         return description;
     }
 
+    public Integer getOrderNoInNode() {
+        return orderNoInNode;
+    }
 
     @Override
     public String toString() {
@@ -177,6 +188,7 @@ public class Permission {
                         "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
                         "koPermission= " + koPermission + "\n" +
                         "description= " + description + "\n" +
-                        "treeType= " + treeType;
+                        "treeType= " + treeType + "\n" +
+                        "orderNoInNode= " + orderNoInNode;
     }
 }

@@ -1,9 +1,9 @@
 #KOH information state
-#Tue Apr 28 21:49:37 GMT+07:00 2026
+#Mon Aug 03 12:25:48 MSK 2026
+storyText=плашки во всех вкладках с выгрузкой в файл и гиперссылками в разделе карточки КО «Ценные бумаги»
 author=KreslinVYU
-fromExcel=true
-keyText=collateral_conclusion
-shouldWriteAbacAttributeCode=true
 shouldWriteAbacFile=true
-storyNumber=PDKO-1234(5678)
-storyText=Заключения САР по залогам
+keyText=mutual_funds_tab
+storyNumber=PDKO-4145(4134)
+shouldWriteAbacAttributeCode=true
+fromExcel=true

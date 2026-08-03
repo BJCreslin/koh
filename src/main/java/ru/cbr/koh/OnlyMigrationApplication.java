@@ -75,7 +75,8 @@ public class OnlyMigrationApplication {
                                 "Раздел \"5.4 Капитал\"",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -90,7 +91,8 @@ public class OnlyMigrationApplication {
                                 "Раздел \"5.4.2 Субординированные инструменты\"",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -105,7 +107,8 @@ public class OnlyMigrationApplication {
                                 "Право на просмотр информации: &#13;&#10;1) Таблица с данными &#13;&#10;2) Выгрузка в excel &#13;&#10;3) Оценка ставки",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -120,7 +123,8 @@ public class OnlyMigrationApplication {
                                 "Право на добавление инструментов",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -135,7 +139,8 @@ public class OnlyMigrationApplication {
                                 "Субординированные инструменты",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -150,7 +155,8 @@ public class OnlyMigrationApplication {
                                 "Право на просмотр информации: &#13;&#10;1) Таблица с данными &#13;&#10;2) Выгрузка в excel &#13;&#10;3) Оценка ставки",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                         ,
                         new Permission(
@@ -165,7 +171,8 @@ public class OnlyMigrationApplication {
                                 "Право на добавление инструментов",
                                 List.of(
                                         TreeType.KO, TreeType.GIBR
-                                )
+                                ),
+                                null
                         )
                 );
 

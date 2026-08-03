@@ -16,7 +16,7 @@ public class SecureElemMigration {
                 <column name="abac_perm_pres_attr_code"
                         value="%s"/>
                 <column name="abac_perm_pres_group_action" value="%s"/>
-            %s</insert>
+            %s%s</insert>
 """;
 
     private static final String CHANGE_TEMPLATE_KO = """
@@ -32,7 +32,7 @@ public class SecureElemMigration {
                <column name="securable_by_ko" valueNumeric="1"/>
                <column name="abac_perm_pres_group_action" value="%s"/>
                <column name="abac_perm_pres_user_action" value="%s"/>
-            %s</insert>
+            %s%s</insert>
 """;
 
     private final Permission permission;
@@ -53,6 +53,7 @@ public class SecureElemMigration {
                     sanitize(permission.getAbacPermPresAttrCode()),
                     sanitize(permission.getAbacPermPresGroupAction()),
                     sanitize(permission.getAbacPermPresUserAction()),
+                    getOrderNoInNode(permission.getOrderNoInNode()),
                     getDescription(permission.getDescription())
             ) + "\n";
         } else {
@@ -64,9 +65,17 @@ public class SecureElemMigration {
                     sanitize(permission.getKey()),
                     sanitize(permission.getAbacPermPresAttrCode()),
                     sanitize(permission.getAbacPermPresGroupAction()),
+                    getOrderNoInNode(permission.getOrderNoInNode()),
                     getDescription(permission.getDescription())
             ) + "\n";
         }
+    }
+
+    private String getOrderNoInNode(Integer orderNoInNode) {
+        if (orderNoInNode != null) {
+            return String.format(" <column name=\"order_no_in_node\" valueNumeric=\"%d\"/>" + "\n", orderNoInNode);
+        }
+        return "";
     }
 
     private String getDescription(String description) {

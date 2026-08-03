@@ -25,6 +25,8 @@ public class FileReader {
     private static final int TOP_SPACE = 6;
 
     public static final int NAME_COLUMN_NUMBER = 10;
+    public static final int KEY_COLUMN_NUMBER = 11;
+    public static final int ORDER_NO_COLUMN_NUMBER = 12;
     public static final int NEED_SAVE_COLUMN_NUMBER = 30;
     public static final String BANK_DEPENDENT = "**";
 
@@ -77,16 +79,27 @@ public class FileReader {
                     valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
                 }
 
-                keysStack.push(valueShiftPair);
-                String key = keysStack.getKey();
-                String relKey = valueShiftPair.value();
+                String keyFromColumn = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
+                String key;
+                String relKey;
+
+                if (keyFromColumn != null && !keyFromColumn.isBlank()) {
+                    key = keyFromColumn;
+                    String[] parts = key.split("#");
+                    relKey = parts[parts.length - 1];
+                } else {
+                    keysStack.push(valueShiftPair);
+                    key = keysStack.getKey();
+                    relKey = valueShiftPair.value();
+                }
 
                 if (!key.isBlank()) {
                     String politic = getPolitic(workbook, politicNumber);
                     List<Profile> profiles = getProfiles(profileHeaderManager, row);
                     String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                     String description = getDescription(row);
-                    List<TreeType> types = getTreeType(workbook, row.getRowNum());
+                    List<TreeType> types = getTreeType(workbook, row.getRowNum() + 1);
+                    Integer orderNoInNode = getOrderNoInNode(row);
                     if (isNeedSave(row)) {
                         permissionDialogObjects.add(
                                 new Permission(
@@ -98,7 +111,8 @@ public class FileReader {
                                         profiles,
                                         description,
                                         types,
-                                        bankDependent));
+                                        bankDependent,
+                                        orderNoInNode));
                     }
                 }
             }
@@ -119,6 +133,9 @@ public class FileReader {
         return cellValue.equalsIgnoreCase(String.valueOf(rowSelector));
     }
 
+    private static final int KO_TREE_TYPE_COLUMN = 14;
+    private static final int GIBR_TREE_TYPE_COLUMN = 15;
+
     private List<TreeType> getTreeType(Workbook workbook, int rowNumber) {
         Sheet sheet = workbook.getSheet("Матрица распределения прав АД");
         List<TreeType> types = new ArrayList<>();
@@ -126,14 +143,14 @@ public class FileReader {
             return types;
         }
         for (Row row : sheet) {
-            if (row.getRowNum() < rowNumber) {
+            if (row.getRowNum() + 1 < rowNumber) {
                 continue;
             }
-            String cellValue = getCellValue(row.getCell(12));
+            String cellValue = getCellValue(row.getCell(KO_TREE_TYPE_COLUMN));
             if (cellValue.contains("+")) {
                 types.add(TreeType.KO);
             }
-            cellValue = getCellValue(row.getCell(13));
+            cellValue = getCellValue(row.getCell(GIBR_TREE_TYPE_COLUMN));
             if (cellValue.contains("+")) {
                 types.add(TreeType.GIBR);
             }
@@ -148,6 +165,18 @@ public class FileReader {
             return null;
         }
         return description.replace("\n", " &#13;&#10;");
+    }
+
+    private Integer getOrderNoInNode(Row row) {
+        String cellValue = getCellValue(row.getCell(ORDER_NO_COLUMN_NUMBER));
+        if (cellValue == null || cellValue.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(cellValue.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private String getPolitic(Workbook workbook, Pair<String, Integer> politicNumber) {
