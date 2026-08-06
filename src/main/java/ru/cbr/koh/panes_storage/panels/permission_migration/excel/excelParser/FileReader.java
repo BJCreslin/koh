@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.KeyCandidate;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
@@ -79,17 +80,19 @@ public class FileReader {
                     valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
                 }
 
-                String keyFromColumn = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
+                String excelKey = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
                 String key;
                 String relKey;
+                String computedKey = null;
 
-                if (keyFromColumn != null && !keyFromColumn.isBlank()) {
-                    key = keyFromColumn;
+                if (excelKey != null && !excelKey.isBlank()) {
+                    key = excelKey;
                     String[] parts = key.split("#");
                     relKey = parts[parts.length - 1];
                 } else {
                     keysStack.push(valueShiftPair);
                     key = keysStack.getKey();
+                    computedKey = key;
                     relKey = valueShiftPair.value();
                 }
 
@@ -101,18 +104,28 @@ public class FileReader {
                     List<TreeType> types = getTreeType(workbook, row.getRowNum() + 1);
                     Integer orderNoInNode = getOrderNoInNode(row);
                     if (isNeedSave(row)) {
-                        permissionDialogObjects.add(
-                                new Permission(
-                                        key,
-                                        PermissionType.getPermissionType(relKey),
-                                        politic,
-                                        bankDependent ? getBankPolitic(key) : "userAction",
-                                        name,
-                                        profiles,
-                                        description,
-                                        types,
-                                        bankDependent,
-                                        orderNoInNode));
+                        Permission p = new Permission(
+                                key,
+                                PermissionType.getPermissionType(relKey),
+                                politic,
+                                bankDependent ? getBankPolitic(key) : "userAction",
+                                name,
+                                profiles,
+                                description,
+                                types,
+                                bankDependent,
+                                orderNoInNode);
+                        if (computedKey != null) {
+                            final String ek = excelKey;
+                            final String ck = computedKey;
+                            KeyCandidate candidate = KeyCandidate.builder()
+                                    .excelKey(ek)
+                                    .computedKey(ck)
+                                    .build()
+                                    .resolve();
+                            p.withKeyCandidate(candidate);
+                        }
+                        permissionDialogObjects.add(p);
                     }
                 }
             }

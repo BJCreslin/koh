@@ -1,6 +1,7 @@
 package ru.cbr.koh.app.service;
 
 import ru.cbr.koh.app.validation.MigrationValidator;
+import ru.cbr.koh.panes_storage.panels.permission_migration.KeyValidator;
 import ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser.FileReader;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.panes_storage.panels.permission_migration.output.GeneratedFile;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PermissionMigrationService {
 
@@ -36,12 +38,25 @@ public class PermissionMigrationService {
                                              char rowSelector,
                                              int profileStartColumn,
                                              Information information) {
+        return readAndValidate(file, rowSelector, profileStartColumn, information).preview();
+    }
+
+    public ExcelReadResult readAndValidate(File file,
+                                           char rowSelector,
+                                           int profileStartColumn,
+                                           Information information) {
         MigrationValidator.validateInformation(information);
 
         FileReader reader = new FileReader(file, rowSelector, profileStartColumn);
         List<Permission> permissions = reader.read();
-       // MigrationValidator.validateMigrationInput(permissions);
 
+        Map<String, Map<String, List<Permission>>> conflicts = new KeyValidator().getConflicts(permissions);
+        MigrationPreview preview = buildPreview(information, permissions);
+
+        return new ExcelReadResult(preview, permissions, conflicts);
+    }
+
+    public MigrationPreview buildPreviewFromPermissions(List<Permission> permissions, Information information) {
         return buildPreview(information, permissions);
     }
 

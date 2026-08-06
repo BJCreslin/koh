@@ -1,11 +1,13 @@
 package ru.cbr.koh.panes_storage.panels.permission_migration.excel;
 
 import ru.cbr.koh.app.async.UiTaskRunner;
+import ru.cbr.koh.app.service.ExcelReadResult;
 import ru.cbr.koh.app.service.MigrationPreview;
 import ru.cbr.koh.app.service.PermissionMigrationService;
 import ru.cbr.koh.panes_storage.PaneInterface;
 import ru.cbr.koh.panes_storage.panels.permission_migration.information.domain.Information;
 import ru.cbr.koh.panes_storage.panels.permission_migration.preview.FilesPreviewDialog;
+import ru.cbr.koh.panes_storage.panels.permission_migration.preview.KeyConflictDialog;
 import ru.cbr.koh.properties.ApplicationProperties;
 import ru.cbr.koh.ui.BusinessTheme;
 
@@ -126,7 +128,12 @@ public class ExcelInputPanel implements PaneInterface {
 
     private void createChangelogMigration(JFrame frame, JPanel panel) {
         if (taskRunner == null) {
-            MigrationPreview preview = migrationService.previewFromExcel(file, rowSelector, profileStartColumn, informationSupplier.get());
+            Information information = informationSupplier.get();
+            ExcelReadResult readResult = migrationService.readAndValidate(file, rowSelector, profileStartColumn, information);
+            MigrationPreview preview = resolveConflictsAndRebuild(frame, readResult, information);
+            if (preview == null) {
+                return;
+            }
             if (FilesPreviewDialog.show(frame, preview.files())) {
                 migrationService.savePreview(preview);
             }
@@ -137,9 +144,25 @@ public class ExcelInputPanel implements PaneInterface {
                 frame,
                 "Build Preview",
                 "Читаем Excel и формируем предпросмотр...",
-                () -> migrationService.previewFromExcel(file, rowSelector, profileStartColumn, informationSupplier.get()),
-                preview -> confirmAndSavePreview(frame, panel, preview),
+                () -> migrationService.readAndValidate(file, rowSelector, profileStartColumn, informationSupplier.get()),
+                readResult -> {
+                    MigrationPreview preview = resolveConflictsAndRebuild(frame, readResult, informationSupplier.get());
+                    if (preview != null) {
+                        confirmAndSavePreview(frame, panel, preview);
+                    }
+                },
                 "Не удалось создать предпросмотр из Excel");
+    }
+
+    private MigrationPreview resolveConflictsAndRebuild(JFrame frame, ExcelReadResult readResult, Information information) {
+        if (readResult.conflicts() != null && !readResult.conflicts().isEmpty()) {
+            boolean resolved = KeyConflictDialog.show(frame, readResult.conflicts());
+            if (!resolved) {
+                return null;
+            }
+            return migrationService.buildPreviewFromPermissions(readResult.permissions(), information);
+        }
+        return readResult.preview();
     }
 
     private void confirmAndSavePreview(JFrame frame, JPanel panel, MigrationPreview preview) {
