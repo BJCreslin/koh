@@ -49,7 +49,7 @@ public class KeyValidator {
         }
         String[] parts = key.split("#");
         for (String part : parts) {
-            if (!part.matches("[a-z0-9]+")) {
+            if (!part.matches("[a-z0-9+-]+")) {
                 return true;
             }
         }

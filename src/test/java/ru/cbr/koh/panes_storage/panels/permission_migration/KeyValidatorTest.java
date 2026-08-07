@@ -164,11 +164,18 @@ class KeyValidatorTest {
 
     @Test
     void specialCharsAreInvalid() {
-        assertTrue(KeyValidator.hasInvalidCharacters("a-b"));
         assertTrue(KeyValidator.hasInvalidCharacters("a b"));
         assertTrue(KeyValidator.hasInvalidCharacters("a$b"));
         assertTrue(KeyValidator.hasInvalidCharacters("a_b"));
         assertTrue(KeyValidator.hasInvalidCharacters("a.b"));
+    }
+
+    @Test
+    void hyphenAndPlusAreAllowed() {
+        assertFalse(KeyValidator.hasInvalidCharacters("a-b"));
+        assertFalse(KeyValidator.hasInvalidCharacters("a+b"));
+        assertFalse(KeyValidator.hasInvalidCharacters("my-co-list"));
+        assertFalse(KeyValidator.hasInvalidCharacters("a-b+c#d-e"));
     }
 
     @Test
