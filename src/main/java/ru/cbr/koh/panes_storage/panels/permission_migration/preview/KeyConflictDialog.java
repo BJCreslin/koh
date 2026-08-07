@@ -5,6 +5,7 @@ import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Pe
 import ru.cbr.koh.ui.BusinessTheme;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -16,8 +17,9 @@ public final class KeyConflictDialog {
 
     private static final int COL_EXCEL = 0;
     private static final int COL_COMPUTED = 1;
-    private static final int COL_ROWS = 2;
-    private static final int COL_CHOICE = 3;
+    private static final int COL_CHOICE = 2;
+
+    private static final String DEFAULT_FONT_FAMILY = "SansSerif";
 
     private KeyConflictDialog() {
     }
@@ -27,7 +29,7 @@ public final class KeyConflictDialog {
             return true;
         }
 
-        JDialog dialog = new JDialog(parent, "Resolve key conflicts", Dialog.ModalityType.APPLICATION_MODAL);
+        JDialog dialog = new JDialog(parent, "Разрешение конфликтов ключей", Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setLayout(new BorderLayout(10, 10));
 
@@ -57,6 +59,8 @@ public final class KeyConflictDialog {
         table.setRowHeight(24);
         table.getTableHeader().setReorderingAllowed(false);
 
+        configureKeyColumn(table, COL_EXCEL, "#c62828");
+        configureKeyColumn(table, COL_COMPUTED, "#1565c0");
         configureChoiceColumn(table);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -93,7 +97,7 @@ public final class KeyConflictDialog {
 
     private static DefaultTableModel buildModel(Map<String, Map<String, List<Permission>>> conflicts) {
         DefaultTableModel model = new DefaultTableModel(
-                new Object[]{"Excel ключ", "Вычисленный ключ", "Затронуто строк", "Выбор"}, 0) {
+                new Object[]{"Excel ключ", "Вычисленный ключ", "Выбор"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == COL_CHOICE;
@@ -105,12 +109,16 @@ public final class KeyConflictDialog {
                 model.addRow(new Object[]{
                         excelEntry.getKey(),
                         computedEntry.getKey(),
-                        computedEntry.getValue().size(),
                         "excel"
                 });
             }
         }
         return model;
+    }
+
+    private static void configureKeyColumn(JTable table, int columnIndex, String diffColor) {
+        TableColumn column = table.getColumnModel().getColumn(columnIndex);
+        column.setCellRenderer(new KeyDiffRenderer(columnIndex, diffColor));
     }
 
     private static void configureChoiceColumn(JTable table) {
@@ -166,5 +174,66 @@ public final class KeyConflictDialog {
             return null;
         }
         return computedMap.get(computedKey);
+    }
+
+    private static final class KeyDiffRenderer extends DefaultTableCellRenderer {
+        private final int otherColumn;
+        private final String diffColor;
+
+        KeyDiffRenderer(int otherColumn, String diffColor) {
+            this.otherColumn = otherColumn;
+            this.diffColor = diffColor;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (!(component instanceof JLabel label)) {
+                return component;
+            }
+            String myKey = value == null ? "" : value.toString();
+            Object otherValue = table.getValueAt(row, otherColumn);
+            String otherKey = otherValue == null ? "" : otherValue.toString();
+            label.setText(renderDiff(myKey, otherKey));
+            return label;
+        }
+
+        private String renderDiff(String myKey, String otherKey) {
+            String[] mine = myKey.split("#", -1);
+            String[] others = otherKey.split("#", -1);
+            StringBuilder sb = new StringBuilder("<html><span style='font-family: ")
+                    .append(DEFAULT_FONT_FAMILY)
+                    .append(";'>");
+            int max = Math.max(mine.length, others.length);
+            for (int i = 0; i < mine.length; i++) {
+                if (i > 0) {
+                    sb.append("<span style='color: #9e9e9e;'>#</span>");
+                }
+                boolean matches = i < others.length && mine[i].equals(others[i]);
+                if (matches) {
+                    sb.append(escape(mine[i]));
+                } else {
+                    sb.append("<span style='color: ").append(diffColor).append("; font-weight: bold;'>")
+                            .append(escape(mine[i]))
+                            .append("</span>");
+                }
+            }
+            if (mine.length < others.length) {
+                for (int i = mine.length; i < others.length; i++) {
+                    sb.append("<span style='color: #9e9e9e;'>#</span>");
+                    sb.append("<span style='color: ").append(diffColor).append("; font-style: italic;'>")
+                            .append(escape(others[i]))
+                            .append("</span>");
+                }
+            }
+            sb.append("</span></html>");
+            return sb.toString();
+        }
+
+        private static String escape(String text) {
+            return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        }
     }
 }
