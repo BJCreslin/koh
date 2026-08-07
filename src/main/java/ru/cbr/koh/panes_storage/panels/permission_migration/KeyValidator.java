@@ -42,4 +42,17 @@ public class KeyValidator {
             candidate.selectComputed();
         }
     }
+
+    public static boolean hasInvalidCharacters(String key) {
+        if (key == null || key.isEmpty()) {
+            return false;
+        }
+        String[] parts = key.split("#");
+        for (String part : parts) {
+            if (!part.matches("[a-z0-9]+")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

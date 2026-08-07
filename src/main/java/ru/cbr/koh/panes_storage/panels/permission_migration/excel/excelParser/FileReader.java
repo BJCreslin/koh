@@ -7,6 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.cbr.koh.panes_storage.panels.permission_migration.KeyValidator;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.KeyCandidate;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
@@ -83,6 +84,17 @@ public class FileReader {
                 String excelKey = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
                 keysStack.push(valueShiftPair);
                 String computedKey = keysStack.getKey();
+
+                if (KeyValidator.hasInvalidCharacters(computedKey)) {
+                    throw new IllegalArgumentException(
+                            "Недопустимые символы в вычисленном ключе на строке " + (row.getRowNum() + 1)
+                                    + ": \"" + computedKey + "\". Ключ должен содержать только латиницу в нижнем регистре и цифры.");
+                }
+                if (KeyValidator.hasInvalidCharacters(excelKey)) {
+                    throw new IllegalArgumentException(
+                            "Недопустимые символы в Excel-ключе на строке " + (row.getRowNum() + 1)
+                                    + ": \"" + excelKey + "\". Ключ должен содержать только латиницу в нижнем регистре и цифры.");
+                }
 
                 String key;
                 String relKey;

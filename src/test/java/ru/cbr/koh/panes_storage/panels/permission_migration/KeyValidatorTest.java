@@ -138,4 +138,41 @@ class KeyValidatorTest {
         Map<String, Map<String, List<Permission>>> conflicts = validator.getConflicts(new ArrayList<>(List.of(p)));
         assertTrue(conflicts.isEmpty());
     }
+
+    @Test
+    void validKeyReturnsNoInvalidCharacters() {
+        assertFalse(KeyValidator.hasInvalidCharacters("a#b#c"));
+        assertFalse(KeyValidator.hasInvalidCharacters("abc"));
+        assertFalse(KeyValidator.hasInvalidCharacters("123"));
+        assertFalse(KeyValidator.hasInvalidCharacters("abc123#def456"));
+        assertFalse(KeyValidator.hasInvalidCharacters(""));
+    }
+
+    @Test
+    void uppercaseIsInvalid() {
+        assertTrue(KeyValidator.hasInvalidCharacters("A#b"));
+        assertTrue(KeyValidator.hasInvalidCharacters("ABC"));
+        assertTrue(KeyValidator.hasInvalidCharacters("aBc"));
+    }
+
+    @Test
+    void cyrillicIsInvalid() {
+        assertTrue(KeyValidator.hasInvalidCharacters("абв"));
+        assertTrue(KeyValidator.hasInvalidCharacters("abc#абв"));
+        assertTrue(KeyValidator.hasInvalidCharacters("А"));
+    }
+
+    @Test
+    void specialCharsAreInvalid() {
+        assertTrue(KeyValidator.hasInvalidCharacters("a-b"));
+        assertTrue(KeyValidator.hasInvalidCharacters("a b"));
+        assertTrue(KeyValidator.hasInvalidCharacters("a$b"));
+        assertTrue(KeyValidator.hasInvalidCharacters("a_b"));
+        assertTrue(KeyValidator.hasInvalidCharacters("a.b"));
+    }
+
+    @Test
+    void nullIsNotInvalid() {
+        assertFalse(KeyValidator.hasInvalidCharacters(null));
+    }
 }
