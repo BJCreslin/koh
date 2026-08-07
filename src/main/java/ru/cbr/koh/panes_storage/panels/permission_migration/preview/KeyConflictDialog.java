@@ -56,12 +56,16 @@ public final class KeyConflictDialog {
                 return column == COL_CHOICE;
             }
         };
-        table.setRowHeight(24);
+        table.setRowHeight(32);
         table.getTableHeader().setReorderingAllowed(false);
 
         configureKeyColumn(table, COL_EXCEL, "#c62828");
         configureKeyColumn(table, COL_COMPUTED, "#1565c0");
         configureChoiceColumn(table);
+
+        table.getColumnModel().getColumn(COL_EXCEL).setPreferredWidth(380);
+        table.getColumnModel().getColumn(COL_COMPUTED).setPreferredWidth(380);
+        table.getColumnModel().getColumn(COL_CHOICE).setPreferredWidth(90);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(900, 400));
@@ -176,7 +180,7 @@ public final class KeyConflictDialog {
         return computedMap.get(computedKey);
     }
 
-    private static final class KeyDiffRenderer extends DefaultTableCellRenderer {
+    private static final class KeyDiffRenderer implements javax.swing.table.TableCellRenderer {
         private final int otherColumn;
         private final String diffColor;
 
@@ -189,46 +193,54 @@ public final class KeyConflictDialog {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (!(component instanceof JLabel label)) {
-                return component;
-            }
             String myKey = value == null ? "" : value.toString();
             Object otherValue = table.getValueAt(row, otherColumn);
             String otherKey = otherValue == null ? "" : otherValue.toString();
-            label.setText(renderDiff(myKey, otherKey));
-            return label;
+
+            JTextPane textPane = new JTextPane();
+            textPane.setContentType("text/html");
+            textPane.setText(renderDiff(myKey, otherKey));
+            textPane.setOpaque(true);
+            textPane.setEditable(false);
+            textPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+
+            if (isSelected) {
+                textPane.setBackground(table.getSelectionBackground());
+                textPane.setForeground(table.getSelectionForeground());
+            } else {
+                textPane.setBackground(table.getBackground());
+                textPane.setForeground(table.getForeground());
+            }
+
+            return textPane;
         }
 
         private String renderDiff(String myKey, String otherKey) {
             String[] mine = myKey.split("#", -1);
             String[] others = otherKey.split("#", -1);
-            StringBuilder sb = new StringBuilder("<html><span style='font-family: ")
-                    .append(DEFAULT_FONT_FAMILY)
-                    .append(";'>");
-            int max = Math.max(mine.length, others.length);
+            StringBuilder sb = new StringBuilder("<html><body style='font-family: sans-serif; margin: 0; padding: 0;'>");
             for (int i = 0; i < mine.length; i++) {
                 if (i > 0) {
-                    sb.append("<span style='color: #9e9e9e;'>#</span>");
+                    sb.append("<font color='#9e9e9e'>#</font>");
                 }
                 boolean matches = i < others.length && mine[i].equals(others[i]);
                 if (matches) {
                     sb.append(escape(mine[i]));
                 } else {
-                    sb.append("<span style='color: ").append(diffColor).append("; font-weight: bold;'>")
+                    sb.append("<font color='").append(diffColor).append("'><b>")
                             .append(escape(mine[i]))
-                            .append("</span>");
+                            .append("</b></font>");
                 }
             }
             if (mine.length < others.length) {
                 for (int i = mine.length; i < others.length; i++) {
-                    sb.append("<span style='color: #9e9e9e;'>#</span>");
-                    sb.append("<span style='color: ").append(diffColor).append("; font-style: italic;'>")
+                    sb.append("<font color='#9e9e9e'>#</font>");
+                    sb.append("<font color='").append(diffColor).append("'><i>")
                             .append(escape(others[i]))
-                            .append("</span>");
+                            .append("</i></font>");
                 }
             }
-            sb.append("</span></html>");
+            sb.append("</body></html>");
             return sb.toString();
         }
 
