@@ -38,15 +38,39 @@ public final class KeyConflictDialog {
         JPanel content = new JPanel(new BorderLayout(8, 8));
         content.setBorder(BusinessTheme.pagePadding());
 
+        JPanel northPanel = new JPanel();
+        northPanel.setLayout(new BoxLayout(northPanel, BoxLayout.Y_AXIS));
+
         JLabel title = BusinessTheme.createPageTitle("Конфликты ключей secur_elem.key");
-        content.add(title, BorderLayout.NORTH);
+        northPanel.add(title);
 
         JLabel description = new JLabel("<html>Обнаружены расхождения между ключом из Excel и вычисленным ключом по дереву. " +
                 "Выберите для каждой строки, какой ключ использовать. Нажмите «Применить» для сохранения выбора.</html>");
-        description.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
-        content.add(description, BorderLayout.NORTH);
+        description.setBorder(BorderFactory.createEmptyBorder(4, 0, 8, 0));
+        description.setAlignmentX(Component.LEFT_ALIGNMENT);
+        northPanel.add(description);
+
+        JPanel bulkPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JLabel bulkLabel = new JLabel("Массовое назначение:");
+        bulkLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 4));
+        JButton allExcelButton = new JButton("Excel для всех");
+        JButton allComputedButton = new JButton("Computed для всех");
+        BusinessTheme.styleSecondaryButton(allExcelButton);
+        BusinessTheme.styleSecondaryButton(allComputedButton);
 
         DefaultTableModel model = buildModel(conflicts);
+
+        allExcelButton.addActionListener(e -> setAllChoices(model, "excel"));
+        allComputedButton.addActionListener(e -> setAllChoices(model, "computed"));
+
+        bulkPanel.add(bulkLabel);
+        bulkPanel.add(allExcelButton);
+        bulkPanel.add(allComputedButton);
+        bulkPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bulkPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
+        northPanel.add(bulkPanel);
+
+        content.add(northPanel, BorderLayout.NORTH);
         JTable table = new JTable(model) {
             @Override
             public Class<?> getColumnClass(int column) {
@@ -94,11 +118,17 @@ public final class KeyConflictDialog {
 
         dialog.add(content, BorderLayout.CENTER);
         dialog.add(actions, BorderLayout.SOUTH);
-        dialog.setSize(950, 550);
+        dialog.setSize(950, 600);
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
 
         return accepted[0];
+    }
+
+    private static void setAllChoices(DefaultTableModel model, String choice) {
+        for (int row = 0; row < model.getRowCount(); row++) {
+            model.setValueAt(choice, row, COL_CHOICE);
+        }
     }
 
     private static DefaultTableModel buildModel(Map<String, Map<String, List<Permission>>> conflicts) {
