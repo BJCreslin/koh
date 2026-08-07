@@ -21,6 +21,8 @@ public final class KeyConflictDialog {
 
     private static final String DEFAULT_FONT_FAMILY = "SansSerif";
 
+    private static final Color HIGHLIGHT_COLOR = new Color(0xE8F5E9);
+
     private KeyConflictDialog() {
     }
 
@@ -105,6 +107,14 @@ public final class KeyConflictDialog {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == COL_CHOICE;
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int row, int column) {
+                super.setValueAt(aValue, row, column);
+                if (column == COL_CHOICE) {
+                    fireTableRowsUpdated(row, row);
+                }
             }
         };
 
@@ -196,6 +206,12 @@ public final class KeyConflictDialog {
             String myKey = value == null ? "" : value.toString();
             Object otherValue = table.getValueAt(row, otherColumn);
             String otherKey = otherValue == null ? "" : otherValue.toString();
+            Object choiceValue = table.getValueAt(row, COL_CHOICE);
+            String choice = choiceValue == null ? "" : choiceValue.toString();
+
+            boolean isSelectedByChoice =
+                    (column == COL_EXCEL && "excel".equals(choice))
+                            || (column == COL_COMPUTED && "computed".equals(choice));
 
             JTextPane textPane = new JTextPane();
             textPane.setContentType("text/html");
@@ -204,13 +220,20 @@ public final class KeyConflictDialog {
             textPane.setEditable(false);
             textPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
+            Color background;
+            Color foreground;
             if (isSelected) {
-                textPane.setBackground(table.getSelectionBackground());
-                textPane.setForeground(table.getSelectionForeground());
+                background = table.getSelectionBackground();
+                foreground = table.getSelectionForeground();
+            } else if (isSelectedByChoice) {
+                background = HIGHLIGHT_COLOR;
+                foreground = table.getForeground();
             } else {
-                textPane.setBackground(table.getBackground());
-                textPane.setForeground(table.getForeground());
+                background = table.getBackground();
+                foreground = table.getForeground();
             }
+            textPane.setBackground(background);
+            textPane.setForeground(foreground);
 
             return textPane;
         }
