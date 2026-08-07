@@ -85,8 +85,8 @@ public class FileReader {
                 keysStack.push(valueShiftPair);
                 String computedKey = keysStack.getKey();
 
-                boolean isNewRow = excelKey.isBlank();
-                if (isNewRow && KeyValidator.hasInvalidCharacters(computedKey)) {
+                boolean excelKeyBlank = excelKey == null || excelKey.isBlank();
+                if (excelKeyBlank && isNeedSave(row) && KeyValidator.hasInvalidCharacters(computedKey)) {
                     throw new IllegalArgumentException(
                             "Недопустимые символы в вычисленном ключе на строке " + (row.getRowNum() + 1)
                                     + ": \"" + computedKey + "\". Ключ должен содержать только латиницу в нижнем регистре, цифры, '+' и '-'.");

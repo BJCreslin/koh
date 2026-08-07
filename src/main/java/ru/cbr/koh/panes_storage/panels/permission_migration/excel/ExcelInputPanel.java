@@ -156,7 +156,8 @@ public class ExcelInputPanel implements PaneInterface {
 
     private MigrationPreview resolveConflictsAndRebuild(JFrame frame, ExcelReadResult readResult, Information information) {
         if (readResult.conflicts() != null && !readResult.conflicts().isEmpty()) {
-            boolean resolved = KeyConflictDialog.show(frame, readResult.conflicts());
+            String excelFileName = this.file != null ? this.file.getName() : "unknown";
+            boolean resolved = KeyConflictDialog.show(frame, readResult.conflicts(), excelFileName);
             if (!resolved) {
                 return null;
             }

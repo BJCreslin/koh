@@ -9,6 +9,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +32,7 @@ public final class KeyConflictDialog {
     private KeyConflictDialog() {
     }
 
-    public static boolean show(Window parent, Map<String, Map<String, List<Permission>>> conflicts) {
+    public static boolean show(Window parent, Map<String, Map<String, List<Permission>>> conflicts, String excelFileName) {
         if (conflicts == null || conflicts.isEmpty()) {
             return true;
         }
@@ -63,9 +69,14 @@ public final class KeyConflictDialog {
         allExcelButton.addActionListener(e -> setAllChoices(model, "excel"));
         allComputedButton.addActionListener(e -> setAllChoices(model, "computed"));
 
+        JButton exportButton = new JButton("Экспорт...");
+        BusinessTheme.styleSecondaryButton(exportButton);
+        exportButton.addActionListener(e -> exportConflicts(model, excelFileName));
+
         bulkPanel.add(bulkLabel);
         bulkPanel.add(allExcelButton);
         bulkPanel.add(allComputedButton);
+        bulkPanel.add(exportButton);
         bulkPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         bulkPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 8, 0));
         northPanel.add(bulkPanel);
@@ -92,6 +103,8 @@ public final class KeyConflictDialog {
         table.getColumnModel().getColumn(COL_EXCEL).setPreferredWidth(380);
         table.getColumnModel().getColumn(COL_COMPUTED).setPreferredWidth(380);
         table.getColumnModel().getColumn(COL_CHOICE).setPreferredWidth(90);
+
+        addCopyActions(table, model);
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setPreferredSize(new Dimension(900, 400));
@@ -128,6 +141,81 @@ public final class KeyConflictDialog {
     private static void setAllChoices(DefaultTableModel model, String choice) {
         for (int row = 0; row < model.getRowCount(); row++) {
             model.setValueAt(choice, row, COL_CHOICE);
+        }
+    }
+
+    private static void addCopyActions(JTable table, DefaultTableModel model) {
+        InputMap inputMap = table.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = table.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyCell");
+        actionMap.put("copyCell", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                int row = table.getSelectedRow();
+                int col = table.getSelectedColumn();
+                if (row < 0 || col < 0) return;
+                if (col == COL_CHOICE) return;
+                String value = model.getValueAt(row, col).toString();
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(new StringSelection(value), null);
+            }
+        });
+
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem copyItem = new JMenuItem("Копировать значение");
+        copyItem.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            int col = table.getSelectedColumn();
+            if (row < 0 || col < 0) return;
+            if (col == COL_CHOICE) return;
+            String value = model.getValueAt(row, col).toString();
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(new StringSelection(value), null);
+        });
+        popup.add(copyItem);
+
+        table.setComponentPopupMenu(popup);
+    }
+
+    private static void exportConflicts(DefaultTableModel model, String excelFileName) {
+        String baseName = excelFileName != null ? excelFileName : "unknown";
+        if (baseName.endsWith(".xlsx")) {
+            baseName = baseName.substring(0, baseName.length() - 5);
+        } else if (baseName.endsWith(".xls")) {
+            baseName = baseName.substring(0, baseName.length() - 4);
+        }
+        String fileName = "AbacProfiles_" + baseName + ".txt";
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Экспорт конфликтов ключей");
+        chooser.setSelectedFile(new java.io.File(fileName));
+
+        int result = chooser.showSaveDialog(null);
+        if (result != JFileChooser.APPROVE_OPTION) return;
+
+        File file = chooser.getSelectedFile();
+        if (!file.getName().endsWith(".txt")) {
+            file = new java.io.File(file.getAbsolutePath() + ".txt");
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
+            writer.write("Excel ключ\tВычисленный ключ\tВыбор\n");
+            for (int row = 0; row < model.getRowCount(); row++) {
+                String excelKey = model.getValueAt(row, COL_EXCEL).toString();
+                String computedKey = model.getValueAt(row, COL_COMPUTED).toString();
+                String choice = model.getValueAt(row, COL_CHOICE).toString();
+                writer.write(excelKey + "\t" + computedKey + "\t" + choice + "\n");
+            }
+            JOptionPane.showMessageDialog(null,
+                    "Конфликты сохранены в файл:\n" + file.getAbsolutePath(),
+                    "Экспорт завершён",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null,
+                    "Не удалось сохранить файл: " + ex.getMessage(),
+                    "Ошибка экспорта",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
