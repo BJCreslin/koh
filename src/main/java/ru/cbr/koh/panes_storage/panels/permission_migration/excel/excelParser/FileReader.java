@@ -81,19 +81,29 @@ public class FileReader {
                 }
 
                 String excelKey = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
+                keysStack.push(valueShiftPair);
+                String computedKey = keysStack.getKey();
+
                 String key;
                 String relKey;
-                String computedKey = null;
+                KeyCandidate candidate = null;
 
                 if (excelKey != null && !excelKey.isBlank()) {
                     key = excelKey;
                     String[] parts = key.split("#");
                     relKey = parts[parts.length - 1];
-                } else {
-                    keysStack.push(valueShiftPair);
-                    key = keysStack.getKey();
-                    computedKey = key;
+                    if (!computedKey.isBlank() && !computedKey.equals(excelKey)) {
+                        candidate = KeyCandidate.builder()
+                                .excelKey(excelKey)
+                                .computedKey(computedKey)
+                                .build()
+                                .resolve();
+                    }
+                } else if (!computedKey.isBlank()) {
+                    key = computedKey;
                     relKey = valueShiftPair.value();
+                } else {
+                    continue;
                 }
 
                 if (!key.isBlank()) {
@@ -115,14 +125,7 @@ public class FileReader {
                                 types,
                                 bankDependent,
                                 orderNoInNode);
-                        if (computedKey != null) {
-                            final String ek = excelKey;
-                            final String ck = computedKey;
-                            KeyCandidate candidate = KeyCandidate.builder()
-                                    .excelKey(ek)
-                                    .computedKey(ck)
-                                    .build()
-                                    .resolve();
+                        if (candidate != null) {
                             p.withKeyCandidate(candidate);
                         }
                         permissionDialogObjects.add(p);
