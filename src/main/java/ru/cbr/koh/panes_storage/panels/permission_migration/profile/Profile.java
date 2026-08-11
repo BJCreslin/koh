@@ -42,6 +42,10 @@ public enum Profile {
         return name;
     }
 
+    public String getCode() {
+        return name();
+    }
+
     public static Profile getProfileByName(String name) {
         for (Profile profile : Profile.values()) {
             if (profile.getName().equals(name)) {
@@ -49,6 +53,25 @@ public enum Profile {
             }
         }
         return null;
+    }
+
+    public static Profile getByCode(String code) {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        try {
+            return Profile.valueOf(code);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    public static Profile getByCodeOrDisplayName(String token) {
+        Profile byCode = getByCode(token);
+        if (byCode != null) {
+            return byCode;
+        }
+        return getProfileByName(token);
     }
 
     public static Profile getProfileById(int id) {

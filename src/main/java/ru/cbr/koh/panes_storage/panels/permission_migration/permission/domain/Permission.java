@@ -36,6 +36,36 @@ public class Permission {
 
     private final List<TreeType> treeType;
 
+    private final Integer orderNoInNode;
+
+    private KeyCandidate keyCandidate;
+
+    public Permission(String key,
+                      PermissionType type,
+                      String abacPermPresGroupAction,
+                      String abacPermPresUserAction,
+                      String name,
+                      List<Profile> profiles,
+                      String description,
+                      List<TreeType> treeType,
+                      boolean bankDependent,
+                      Integer orderNoInNode) {
+        this.treeType = treeType;
+        String[] parts = key.split("#");
+        this.relKey = parts[parts.length - 1];
+        this.key = key;
+        this.parent = getParent(key);
+        this.abacPermPresAttrCode = PREFIX + key.replace("#", "_");
+        this.type = type;
+        this.abacPermPresGroupAction = abacPermPresGroupAction;
+        this.name = name;
+        this.profiles = profiles;
+        this.abacPermPresUserAction = abacPermPresUserAction;
+        koPermission = bankDependent;
+        this.description = description;
+        this.orderNoInNode = orderNoInNode;
+    }
+
     public List<TreeType> getTreeType() {
         return treeType;
     }
@@ -47,7 +77,8 @@ public class Permission {
                       String name,
                       List<Profile> profiles,
                       String description,
-                      List<TreeType> treeType) {
+                      List<TreeType> treeType,
+                      Integer orderNoInNode) {
         this.treeType = treeType;
         String[] parts = key.split("#");
         this.relKey = parts[parts.length - 1];
@@ -61,6 +92,7 @@ public class Permission {
         this.abacPermPresUserAction = abacPermPresUserAction;
         koPermission = abacPermPresUserAction != null;
         this.description = description;
+        this.orderNoInNode = orderNoInNode;
     }
 
     public Permission(PermissionDialogObject object) {
@@ -71,7 +103,8 @@ public class Permission {
                 object.getName(),
                 null,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                null);
     }
 
     public Permission(PermissionDialogObject object, List<Profile> profiles) {
@@ -82,21 +115,27 @@ public class Permission {
                 object.getName(),
                 profiles,
                 object.getDescription(),
-                object.getTreeType());
+                object.getTreeType(),
+                null);
     }
 
     private String getParent(String key) {
-        String parentLast = key.replace(relKey, "");
-        if (parentLast.isEmpty()) {
-            return parentLast;
+        String[] parts = key.split("#");
+        if (parts.length <= 1) {
+            return "";
         }
-        StringBuilder sb = new StringBuilder(parentLast);
-        sb.deleteCharAt(sb.length() - 1);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length - 1; i++) {
+            if (i > 0) {
+                sb.append("#");
+            }
+            sb.append(parts[i]);
+        }
         return sb.toString();
     }
 
     public String getParent() {
-        return parent;
+        return getParent(getKey());
     }
 
     public PermissionType getType() {
@@ -108,10 +147,14 @@ public class Permission {
     }
 
     public String getRelKey() {
-        return relKey;
+        String[] parts = getKey().split("#");
+        return parts[parts.length - 1];
     }
 
     public String getKey() {
+        if (keyCandidate != null && keyCandidate.getSelectedKey() != null) {
+            return keyCandidate.getSelectedKey();
+        }
         return key;
     }
 
@@ -139,20 +182,52 @@ public class Permission {
         return description;
     }
 
+    public Integer getOrderNoInNode() {
+        return orderNoInNode;
+    }
+
+    public Permission withKeyCandidate(KeyCandidate candidate) {
+        this.keyCandidate = candidate;
+        return this;
+    }
+
+    public boolean hasKeyCandidate() {
+        return keyCandidate != null;
+    }
+
+    public KeyCandidate getKeyCandidate() {
+        return keyCandidate;
+    }
+
+    public boolean hasKeyConflict() {
+        return keyCandidate != null && keyCandidate.hasConflict();
+    }
+
+    public void resolveKey(String key) {
+        if (keyCandidate == null || key == null) {
+            return;
+        }
+        if (key.equals(keyCandidate.getComputedKey())) {
+            keyCandidate.selectComputed();
+        } else {
+            keyCandidate.resolve();
+        }
+    }
 
     @Override
     public String toString() {
         return
                 "parent= " + parent + "\n" +
-                "type= " + type + "\n" +
-                "name= " + name + "\n" +
-                "relKey= " + relKey + "\n" +
-                "key= " + key + "\n" +
-                "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
-                "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
-                "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
-                "koPermission= " + koPermission + "\n" +
-                "description= " + description + "\n" +
-                "treeType= " + treeType ;
+                        "type= " + type + "\n" +
+                        "name= " + name + "\n" +
+                        "relKey= " + relKey + "\n" +
+                        "key= " + key + "\n" +
+                        "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
+                        "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
+                        "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
+                        "koPermission= " + koPermission + "\n" +
+                        "description= " + description + "\n" +
+                        "treeType= " + treeType + "\n" +
+                        "orderNoInNode= " + orderNoInNode;
     }
 }

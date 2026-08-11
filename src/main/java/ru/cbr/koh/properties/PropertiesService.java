@@ -1,139 +1,148 @@
 package ru.cbr.koh.properties;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
+public final class PropertiesService implements ApplicationProperties {
 
-public class PropertiesService {
+    private static final PropertiesService INSTANCE = new PropertiesService();
 
-    public static final String PROPERTIES_FILE = "config.properties";
-
-    private static PropertiesService instance;
-
-    private static final Properties properties = new Properties();
+    private PropertiesService() {
+    }
 
     public static PropertiesService getInstance() {
-        if (instance == null) {
-            instance = new PropertiesService();
-        }
-        return instance;
+        return INSTANCE;
     }
 
-    private int horizontalSize;
-    private int verticalSize;
-    private String title;
-    private String author;
-    private String storyNumber;
-    private String storyName;
-    private String storyKey;
-    private Boolean shouldWriteAbakFile;
-    private Boolean fromExcel;
-    private String abacFileName;
-    private String abacAttributeCodeFilePath;
-    private String pathExcel;
-
-
-    public PropertiesService() {
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
-            assert in != null;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-                properties.load(reader);
-
-                setPropertiesFields(properties);
-
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    @Override
+    public String get(String key) {
+        return ConfigManager.getProperty(key);
     }
 
-    public static String getProperty(String key) {
-        return properties.getProperty(key);
+    @Override
+    public void set(String key, String value) {
+        ConfigManager.setProperty(key, value);
     }
 
-    public static void setProperty(String key, String value) {
-        properties.setProperty(key, value);
-        saveProperties();
-    }
-
-    private static void saveProperties() {
-        try (OutputStream output = new FileOutputStream(PROPERTIES_FILE)) {
-            properties.store(output, "Обновлённые свойства");
-        } catch (IOException e) {
-            System.err.println("Ошибка сохранения файла " + PROPERTIES_FILE);
-            e.printStackTrace();
-        }
-    }
-
-    private void setPropertiesFields(Properties properties) {
-        this.horizontalSize = Integer.parseInt(properties.getProperty("window.size.horizontal"));
-        this.verticalSize = Integer.parseInt(properties.getProperty("window.size.vertical"));
-        this.title = properties.getProperty("window.title");
-
-        this.author = properties.getProperty("story.author");
-        this.storyNumber = properties.getProperty("story.number");
-        this.storyName = properties.getProperty("story.name");
-        this.storyKey = properties.getProperty("story.key");
-        this.shouldWriteAbakFile = Boolean.parseBoolean(properties.getProperty("story.shouldWriteAbacFile"));
-        this.fromExcel = Boolean.parseBoolean(properties.getProperty("story.fromExcel"));
-
-        this.abacFileName = properties.getProperty("abac.fileName");
-        this.abacAttributeCodeFilePath = properties.getProperty("abac.attributeCodeFilePath");
-
-        this.pathExcel = properties.getProperty("story.pathExcel");
-    }
-
+    @Override
     public int getHorizontalSize() {
-        return horizontalSize;
+        return getRequiredInt("window.horizontalSize");
     }
 
+    @Override
     public int getVerticalSize() {
-        return verticalSize;
+        return getRequiredInt("window.verticalSize");
     }
 
+    @Override
     public String getTitle() {
-        return title;
+        return getRequired("window.title");
     }
 
+    @Override
     public String getAuthor() {
-        return author;
+        return getRequired("story.author");
     }
 
+    @Override
     public String getStoryNumber() {
-        return storyNumber;
+        return getRequired("story.number");
     }
 
+    @Override
     public String getStoryName() {
-        return storyName;
+        return getRequired("story.name");
     }
 
+    @Override
     public String getStoryKey() {
-        return storyKey;
+        return getRequired("story.key");
     }
 
+    @Override
     public boolean getSaveAbacPolitics() {
-        return shouldWriteAbakFile != null && shouldWriteAbakFile;
+        return getRequiredBoolean("story.shouldWriteAbacFile");
     }
 
+    @Override
+    public boolean getSaveAbacAttributeCode() {
+        return getRequiredBoolean("story.shouldWriteAbacAttributeCode");
+    }
+
+    @Override
     public String getAbacFileName() {
-        return abacFileName;
+        return getRequired("abac.fileName");
     }
 
+    @Override
     public String getAbacAttributeCodeFilePath() {
-        return abacAttributeCodeFilePath;
+        return getRequired("abac.attributeCodeFilePath");
     }
 
+    @Override
     public boolean getFromExcel() {
-        return fromExcel != null && fromExcel;
+        return getRequiredBoolean("story.fromExcel");
     }
 
+    @Override
     public String getPathExcel() {
-        return pathExcel;
+        return getRequired("project.pathExcel");
     }
 
+    @Override
+    public char getExcelRowSelector() {
+        String value = getRequired("excel.rowSelector").trim();
+        if (value.length() != 1) {
+            throw new IllegalStateException("Ключ excel.rowSelector должен содержать ровно один символ: " + value);
+        }
+        return value.charAt(0);
+    }
+
+    @Override
+    public void setExcelRowSelector(char rowSelector) {
+        set("excel.rowSelector", String.valueOf(rowSelector));
+    }
+
+    @Override
+    public int getExcelProfileStartColumn() {
+        return getRequiredInt("excel.profileStartColumn");
+    }
+
+    @Override
+    public void setExcelProfileStartColumn(int profileStartColumn) {
+        if (profileStartColumn < 1) {
+            throw new IllegalArgumentException("excel.profileStartColumn должен быть >= 1");
+        }
+        set("excel.profileStartColumn", String.valueOf(profileStartColumn));
+    }
+
+    @Override
     public void setPathExcel(String pathExcel) {
-        if (pathExcel != null && !pathExcel.isEmpty()) {
-            this.pathExcel = pathExcel;
+        if (pathExcel == null || pathExcel.isBlank()) {
+            throw new IllegalArgumentException("project.pathExcel не может быть пустым");
+        }
+        set("project.pathExcel", pathExcel);
+    }
+
+    private String getRequired(String key) {
+        String value = ConfigManager.getProperty(key);
+        if (value == null) {
+            throw new IllegalStateException("Отсутствует обязательный ключ: " + key + " в config.properties");
+        }
+        return value;
+    }
+
+    private boolean getRequiredBoolean(String key) {
+        String value = getRequired(key);
+        if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+            return Boolean.parseBoolean(value);
+        }
+        throw new IllegalStateException("Некорректное boolean-значение для ключа " + key + ": " + value);
+    }
+
+    private int getRequiredInt(String key) {
+        String value = getRequired(key);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            throw new IllegalStateException("Некорректное integer-значение для ключа " + key + ": " + value, ex);
         }
     }
 }

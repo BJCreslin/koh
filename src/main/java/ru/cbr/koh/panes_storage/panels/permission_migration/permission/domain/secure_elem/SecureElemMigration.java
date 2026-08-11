@@ -16,7 +16,7 @@ public class SecureElemMigration {
                 <column name="abac_perm_pres_attr_code"
                         value="%s"/>
                 <column name="abac_perm_pres_group_action" value="%s"/>
-            %s</insert>
+            %s%s</insert>
 """;
 
     private static final String CHANGE_TEMPLATE_KO = """
@@ -32,7 +32,7 @@ public class SecureElemMigration {
                <column name="securable_by_ko" valueNumeric="1"/>
                <column name="abac_perm_pres_group_action" value="%s"/>
                <column name="abac_perm_pres_user_action" value="%s"/>
-            %s</insert>
+            %s%s</insert>
 """;
 
     private final Permission permission;
@@ -46,27 +46,36 @@ public class SecureElemMigration {
         if (permission.isKoPermission()) {
             return String.format(CHANGE_TEMPLATE_KO,
                     permission.getParent(),
-                    permission.getType().name().trim(),
-                    permission.getName().trim(),
-                    permission.getRelKey().trim(),
-                    permission.getKey().trim(),
-                    permission.getAbacPermPresAttrCode().trim(),
-                    permission.getAbacPermPresGroupAction().trim(),
-                    permission.getAbacPermPresUserAction().trim(),
-                    getDescription(permission.getDescription().trim())
+                    sanitize(permission.getType().name()),
+                    sanitize(permission.getName()),
+                    sanitize(permission.getRelKey()),
+                    sanitize(permission.getKey()),
+                    sanitize(permission.getAbacPermPresAttrCode()),
+                    sanitize(permission.getAbacPermPresGroupAction()),
+                    sanitize(permission.getAbacPermPresUserAction()),
+                    getOrderNoInNode(permission.getOrderNoInNode()),
+                    getDescription(permission.getDescription())
             ) + "\n";
         } else {
             return String.format(CHANGE_TEMPLATE,
-                    permission.getParent(),
-                    permission.getType().name(),
-                    permission.getName(),
-                    permission.getRelKey(),
-                    permission.getKey(),
-                    permission.getAbacPermPresAttrCode(),
-                    permission.getAbacPermPresGroupAction(),
+                    sanitize(permission.getParent()),
+                    sanitize(permission.getType().name()),
+                    sanitize(permission.getName()),
+                    sanitize(permission.getRelKey()),
+                    sanitize(permission.getKey()),
+                    sanitize(permission.getAbacPermPresAttrCode()),
+                    sanitize(permission.getAbacPermPresGroupAction()),
+                    getOrderNoInNode(permission.getOrderNoInNode()),
                     getDescription(permission.getDescription())
             ) + "\n";
         }
+    }
+
+    private String getOrderNoInNode(Integer orderNoInNode) {
+        if (orderNoInNode != null) {
+            return String.format(" <column name=\"order_no_in_node\" valueNumeric=\"%d\"/>" + "\n", orderNoInNode);
+        }
+        return "";
     }
 
     private String getDescription(String description) {
@@ -74,5 +83,9 @@ public class SecureElemMigration {
             return String.format(" <column name=\"description\" value = '%s'/>" + "\n", description);
         }
         return "";
+    }
+
+    private String sanitize(String value) {
+        return value == null ? "" : value.trim();
     }
 }

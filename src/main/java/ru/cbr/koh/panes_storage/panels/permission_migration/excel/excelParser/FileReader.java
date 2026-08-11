@@ -2,10 +2,13 @@ package ru.cbr.koh.panes_storage.panels.permission_migration.excel.excelParser;
 
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ru.cbr.koh.panes_storage.panels.permission_migration.KeyValidator;
+import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.KeyCandidate;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.domain.Permission;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.PermissionType;
 import ru.cbr.koh.panes_storage.panels.permission_migration.permission.enums.TreeType;
@@ -19,25 +22,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 public class FileReader {
 
     private static final int TOP_SPACE = 6;
 
     public static final int NAME_COLUMN_NUMBER = 10;
-    public static final int NEED_SAVE_COLUMN_NUMBER = 28;
+    public static final int KEY_COLUMN_NUMBER = 11;
+    public static final int ORDER_NO_COLUMN_NUMBER = 12;
+    public static final int NEED_SAVE_COLUMN_NUMBER = 30;
     public static final String BANK_DEPENDENT = "**";
-    public static final String INCLUDE_ROW_SYMBOL = "i";
-    private static final String permissionsFileName = "permissions.txt";
 
     private final File file;
-
     private final char rowSelector;
     private final int profileStartColumn;
-
-    List<ParserPermission> parserPermissions = new ArrayList<>();
-
-    List<Permission> permissionDialogObjects = new ArrayList<>();
+    private final DataFormatter dataFormatter = new DataFormatter(Locale.ROOT);
 
     public FileReader(File file, char rowSelector, int profileStartColumn) {
         this.file = file;
@@ -46,10 +44,14 @@ public class FileReader {
     }
 
     public List<Permission> read() {
-        try (InputStream inputStream = new FileInputStream(file)) {
+        List<Permission> permissionDialogObjects = new ArrayList<>();
 
-            Workbook workbook = new XSSFWorkbook(inputStream);
+        try (InputStream inputStream = new FileInputStream(file);
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet treeSheet = workbook.getSheet("Дерево");
+            if (treeSheet == null) {
+                throw new IllegalArgumentException("Лист \"Дерево\" не найден в выбранном Excel-файле");
+            }
 
             var valueFinder = new ValueFinder();
             var keysStack = new KeysStack();
@@ -74,42 +76,74 @@ public class FileReader {
                 Pair<String, Integer> politicNumber = getPoliticNumber(value);
 
                 if (politicNumber.getFirst() != null) {
-                    value =
-                            (value.substring(0, politicNumber.getSecond()) + value.substring(politicNumber.getSecond() + politicNumber.getFirst().length())).trim();
+                    value = (value.substring(0, politicNumber.getSecond())
+                            + value.substring(politicNumber.getSecond() + politicNumber.getFirst().length())).trim();
                     valueShiftPair = new ValueShiftPair(valueShiftPair.shift(), value);
                 }
 
+                String excelKey = getCellValue(row.getCell(KEY_COLUMN_NUMBER));
                 keysStack.push(valueShiftPair);
-                String key = keysStack.getKey();
-                System.out.println(key);
+                String computedKey = keysStack.getKey();
 
-                String relKey = valueShiftPair.value();
+                boolean excelKeyBlank = excelKey == null || excelKey.isBlank();
+                if (excelKeyBlank && isNeedSave(row) && KeyValidator.hasInvalidCharacters(computedKey)) {
+                    throw new IllegalArgumentException(
+                            "Недопустимые символы в вычисленном ключе на строке " + (row.getRowNum() + 1)
+                                    + ": \"" + computedKey + "\". Ключ должен содержать только латиницу в нижнем регистре, цифры, '+' и '-'.");
+                }
 
-                if (!key.isBlank() && !key.isEmpty()) {
+                String key;
+                String relKey;
+                KeyCandidate candidate = null;
+
+                if (excelKey != null && !excelKey.isBlank()) {
+                    key = excelKey;
+                    String[] parts = key.split("#");
+                    relKey = parts[parts.length - 1];
+                    if (!computedKey.isBlank() && !computedKey.equals(excelKey)) {
+                        candidate = KeyCandidate.builder()
+                                .excelKey(excelKey)
+                                .computedKey(computedKey)
+                                .build()
+                                .resolve();
+                    }
+                } else if (!computedKey.isBlank()) {
+                    key = computedKey;
+                    relKey = valueShiftPair.value();
+                } else {
+                    continue;
+                }
+
+                if (!key.isBlank()) {
                     String politic = getPolitic(workbook, politicNumber);
                     List<Profile> profiles = getProfiles(profileHeaderManager, row);
                     String name = getCellValue(row.getCell(NAME_COLUMN_NUMBER));
                     String description = getDescription(row);
-                    List<TreeType> types = getTreeType(workbook, row.getRowNum());
+                    List<TreeType> types = getTreeType(workbook, row.getRowNum() + 1);
+                    Integer orderNoInNode = getOrderNoInNode(row);
                     if (isNeedSave(row)) {
-                        System.out.println(key);
-                        permissionDialogObjects.add(
-                                new Permission(
-                                        key,
-                                        PermissionType.getPermissionType(relKey),
-                                        politic,
-                                        bankDependent ? getBankPolitic(key) : "userAction",
-                                        name,
-                                        profiles,
-                                        description,
-                                        types));
+                        Permission p = new Permission(
+                                key,
+                                PermissionType.getPermissionType(relKey),
+                                politic,
+                                bankDependent ? getBankPolitic(key) : "userAction",
+                                name,
+                                profiles,
+                                description,
+                                types,
+                                bankDependent,
+                                orderNoInNode);
+                        if (candidate != null) {
+                            p.withKeyCandidate(candidate);
+                        }
+                        permissionDialogObjects.add(p);
                     }
                 }
             }
             return permissionDialogObjects;
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Не удалось прочитать Excel-файл: " + file.getAbsolutePath(), e);
         }
     }
 
@@ -120,29 +154,34 @@ public class FileReader {
     private boolean isNeedSave(Row row) {
         Cell cell = row.getCell(NEED_SAVE_COLUMN_NUMBER);
         String cellValue = getCellValue(cell);
-        return cellValue != null && cellValue.equalsIgnoreCase(String.valueOf(rowSelector));
+        return cellValue.equalsIgnoreCase(String.valueOf(rowSelector));
     }
+
+    private static final int KO_TREE_TYPE_COLUMN = 14;
+    private static final int GIBR_TREE_TYPE_COLUMN = 15;
 
     private List<TreeType> getTreeType(Workbook workbook, int rowNumber) {
         Sheet sheet = workbook.getSheet("Матрица распределения прав АД");
         List<TreeType> types = new ArrayList<>();
+        if (sheet == null) {
+            return types;
+        }
         for (Row row : sheet) {
-            if (row.getRowNum() < rowNumber) {
+            if (row.getRowNum() + 1 < rowNumber) {
                 continue;
             }
-            String cellvalue = getCellValue(row.getCell(12));
-            if (cellvalue.contains("+")) {
+            String cellValue = getCellValue(row.getCell(KO_TREE_TYPE_COLUMN));
+            if (cellValue.contains("+")) {
                 types.add(TreeType.KO);
             }
-            cellvalue = getCellValue(row.getCell(13));
-            if (cellvalue.contains("+")) {
+            cellValue = getCellValue(row.getCell(GIBR_TREE_TYPE_COLUMN));
+            if (cellValue.contains("+")) {
                 types.add(TreeType.GIBR);
             }
             break;
         }
         return types;
     }
-
 
     private String getDescription(Row row) {
         String description = getCellValue(row.getCell(9));
@@ -152,15 +191,39 @@ public class FileReader {
         return description.replace("\n", " &#13;&#10;");
     }
 
+    private Integer getOrderNoInNode(Row row) {
+        String cellValue = getCellValue(row.getCell(ORDER_NO_COLUMN_NUMBER));
+        if (cellValue == null || cellValue.isBlank()) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(cellValue.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private String getPolitic(Workbook workbook, Pair<String, Integer> politicNumber) {
+        if (politicNumber.getFirst() == null) {
+            return "";
+        }
+
+        Double policyNumber = tryParseDouble(politicNumber.getFirst());
+        if (policyNumber == null) {
+            return "";
+        }
+
         Sheet sheet = workbook.getSheet("Политики");
+        if (sheet == null) {
+            return "";
+        }
         for (Row row : sheet) {
             if (row.getRowNum() < 3) {
                 continue;
             }
-            String cellvalue = getCellValue(row.getCell(0));
-            if (politicNumber.getFirst() != null && cellvalue != null && Double.compare(Double.parseDouble(cellvalue),
-                    (Double.parseDouble(politicNumber.getFirst()))) == 0) {
+            String cellValue = getCellValue(row.getCell(0));
+            Double currentPolicyNumber = tryParseDouble(cellValue);
+            if (currentPolicyNumber != null && Double.compare(currentPolicyNumber, policyNumber) == 0) {
                 return getCellValue(row.getCell(1));
             }
         }
@@ -171,23 +234,17 @@ public class FileReader {
         if (cell == null) {
             return "";
         }
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
-            default -> cell.getStringCellValue();
-        };
+        return dataFormatter.formatCellValue(cell).trim();
     }
 
     private Pair<String, Integer> getPoliticNumber(String value) {
         String regex = "\\b\\d+\\b";
-        // Найти все числа
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
         java.util.regex.Matcher matcher = pattern.matcher(value);
 
         String lastNumber = null;
         int lastIndex = -1;
 
-        // Итерация по всем найденным числам
         while (matcher.find()) {
             lastNumber = matcher.group();
             lastIndex = matcher.start();
@@ -199,11 +256,24 @@ public class FileReader {
         List<Profile> profiles = new ArrayList<>();
         for (int i = 0; i < Profile.values().length; i++) {
             String cell = getCellValue(row.getCell(profileStartColumn + i));
-            if (cell != null && cell.equals("+")) {
-                profiles.add(profileHeaderManager.getProfile(i));
+            if ("+".equals(cell)) {
+                Profile profile = profileHeaderManager.getProfile(i);
+                if (profile != null) {
+                    profiles.add(profile);
+                }
             }
         }
         return profiles;
     }
 
+    private Double tryParseDouble(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
 }

@@ -34,6 +34,17 @@ build/
 
 ### VS Code ###
 .vscode/
+*.swp
+*.swo
 
 ### Mac OS ###
 .DS_Store
+
+### Local app state / generated artifacts ###
+information.txt
+logger.txt
+selectedCheckboxes.txt
+AbacProfiles.txt
+attributeCodeFilePath.txt
+*_add_permissions_to_*.xml
+/koh-log-viewer-db/
