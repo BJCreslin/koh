@@ -1,5 +1,5 @@
 #KOH information state
-#Fri Aug 07 09:59:06 MSK 2026
+#Wed Aug 12 10:58:10 MSK 2026
 storyText=плашки во всех вкладках с выгрузкой в файл и гиперссылками в разделе карточки КО «Ценные бумаги»
 author=KreslinVYU
 shouldWriteAbacFile=true

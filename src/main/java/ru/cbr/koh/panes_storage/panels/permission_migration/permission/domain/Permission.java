@@ -22,8 +22,6 @@ public class Permission {
 
     private final String key;
 
-    private final String abacPermPresAttrCode;
-
     private final String abacPermPresGroupAction;
 
     private final String abacPermPresUserAction;
@@ -55,7 +53,6 @@ public class Permission {
         this.relKey = parts[parts.length - 1];
         this.key = key;
         this.parent = getParent(key);
-        this.abacPermPresAttrCode = PREFIX + key.replace("#", "_");
         this.type = type;
         this.abacPermPresGroupAction = abacPermPresGroupAction;
         this.name = name;
@@ -84,7 +81,6 @@ public class Permission {
         this.relKey = parts[parts.length - 1];
         this.key = key;
         this.parent = getParent(key);
-        this.abacPermPresAttrCode = PREFIX + key.replace("#", "_");
         this.type = type;
         this.abacPermPresGroupAction = abacPermPresGroupAction;
         this.name = name;
@@ -159,7 +155,7 @@ public class Permission {
     }
 
     public String getAbacPermPresAttrCode() {
-        return abacPermPresAttrCode;
+        return PREFIX + getKey().replace("#", "_");
     }
 
     public String getAbacPermPresGroupAction() {
@@ -222,7 +218,7 @@ public class Permission {
                         "name= " + name + "\n" +
                         "relKey= " + relKey + "\n" +
                         "key= " + key + "\n" +
-                        "abacPermPresAttrCode= " + abacPermPresAttrCode + "\n" +
+                        "abacPermPresAttrCode= " + getAbacPermPresAttrCode() + "\n" +
                         "abacPermPresGroupAction= " + abacPermPresGroupAction + "\n" +
                         "abacPermPresUserAction= " + abacPermPresUserAction + "\n" +
                         "koPermission= " + koPermission + "\n" +
